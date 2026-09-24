@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PromptOps AI — Pitch Deck</title>
+<meta name="description" content="Pitch deck: PromptOps AI — AI implementation & automation agency.">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%238b5cf6'/><text x='50' y='70' font-size='46' text-anchor='middle' fill='white' font-family='monospace'>&gt;_</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/pitch.css">
+</head>
+<body class="pitch-body">
+
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+<header class="deck-top">
+  <a class="brand" href="index.html" title="Back to website">
+    <span class="brand-mark" aria-hidden="true">&gt;_</span>
+    <span>PromptOps <span class="grad-text">AI</span></span>
+  </a>
+  <div class="deck-tools">
+    <span class="deck-counter"><b id="cur">1</b> / <span id="total">12</span></span>
+    <button class="tool-btn" id="notesBtn" type="button">Notes <span>(N)</span></button>
+    <button class="tool-btn" id="fsBtn" type="button">⛶ Present <span>(F)</span></button>
+    <button class="tool-btn" id="helpBtn" type="button">?</button>
+  </div>
+</header>
+
+<main class="deck" id="deck">
+
+  <!-- ================= SLIDE 1 — TITLE ================= -->
+  <section class="slide title-slide active" data-title="Title">
+    <div class="slide-bg" aria-hidden="true">
+      <span class="blob b1" style="top:-140px;left:-120px"></span>
+      <span class="blob b2" style="top:16%;right:-140px"></span>
+      <span class="blob b3" style="bottom:-180px;left:36%"></span>
+    </div>
+    <div class="slide-inner">
+      <span class="kicker anim">AI implementation &amp; automation agency · 2026</span>
+      <h1 class="anim" style="--d:80">PromptOps <span class="grad-text">AI</span></h1>
+      <p class="tagline anim" style="--d:160">We turn LLMs into reliable, revenue-driving business systems — prompt architectures, RAG chatbots and autonomous agents wired into your stack.</p>
+      <div class="title-chips anim" style="--d:240">
+        <span class="tag"><i></i>Prompt-as-a-Service</span>
+        <span class="tag"><i></i>RAG</span>
+        <span class="tag"><i></i>Agentic workflows</span>
+        <span class="tag"><i></i>70–80% margins</span>
+      </div>
+      <div class="title-meta anim" style="--d:320">
+        <span>Seed pitch</span>
+        <span>12 slides</span>
+        <span>hello@promptops.ai</span>
+      </div>
+      <div class="hint-next">Press <span class="kbd">→</span> or <span class="kbd">Space</span> to advance · <span class="kbd">?</span> for shortcuts</div>
+    </div>
+    <aside class="notes">
+      <p>Opening line: “Every company has AI ambition. Almost none have AI in production. We are the implementation partner that fixes that — starting with a free audit that finds three automatable tasks in 30 minutes.”</p>
+      <p>Keep it to 45 seconds, then move on. The audience for this deck: prospective clients, partners, and early hires.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 2 — PROBLEM ================= -->
+  <section class="slide" data-title="Problem">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b1" style="top:-160px;right:-120px"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">The problem</span>
+        <h2 class="s-title anim" style="--d:60">AI ambition is everywhere.<br><span class="grad-text">Implementation isn’t.</span></h2>
+        <p class="s-sub anim" style="--d:120">Businesses know AI can save them time and money — but four gaps stop pilots from becoming production systems.</p>
+      </div>
+      <div class="s-grid-4">
+        <article class="s-card anim" style="--d:180"><span class="big-ico">🧠</span><h4>No business context</h4><p>Generic chat interfaces know nothing about your SOPs, pricing or customers — so nobody trusts the output.</p></article>
+        <article class="s-card anim" style="--d:240"><span class="big-ico">🎯</span><h4>Hallucination &amp; context limits</h4><p>Long docs blow the window, and one confident wrong answer sets adoption back months.</p></article>
+        <article class="s-card anim" style="--d:300"><span class="big-ico">🔌</span><h4>An integration gap</h4><p>AI lives in a browser tab; the work lives in CRM, ERP, Slack and Drive. Unconnected, it is a toy.</p></article>
+        <article class="s-card anim" style="--d:360"><span class="big-ico">🔁</span><h4>Nobody owns model churn</h4><p>Models ship monthly. Prompts silently break, costs drift, and no one is accountable.</p></article>
+      </div>
+      <p class="quote anim" style="--d:440;margin-top:34px">Every stalled AI project is a $10k+ opportunity for whoever can make it production-grade.</p>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Problem</span></div>
+    <aside class="notes">
+      <p>Land the pain in one sentence: “The model was never the problem — architecture, integration and ownership are.” Ask the audience which of the four gaps they recognise most; it makes the solution slide feel tailored.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 3 — SOLUTION ================= -->
+  <section class="slide" data-title="Solution">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b2" style="bottom:-160px;left:-120px"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">The solution</span>
+        <h2 class="s-title anim" style="--d:60">Prompt-as-a-Service: from audit to <span class="grad-text">autonomous agents.</span></h2>
+      </div>
+      <div class="s-cols wide-left">
+        <ol class="s-list anim" style="--d:140">
+          <li><strong>Audit.</strong> A free 30-minute operational review that names at least three tasks an agent can absorb — with a cost estimate.</li>
+          <li><strong>Blueprint.</strong> Prompt architecture, retrieval plan, integration map and the evals that define success.</li>
+          <li><strong>Build.</strong> RAG indexes, prompt chains, agents and automations shipped in two-week increments against real data.</li>
+          <li><strong>Operate.</strong> Ongoing prompt optimization, A/B tests and model upgrades — the system gets better while you work.</li>
+        </ol>
+        <div class="s-stack">
+          <div class="stat-cards" style="grid-template-columns:1fr">
+            <div class="stat-card anim" style="--d:220"><b>14 days</b><span>idea → first production workflow</span></div>
+            <div class="stat-card anim" style="--d:280"><b>24/7</b><span>agents working while your team sleeps</span></div>
+            <div class="stat-card anim" style="--d:340"><b>70–80%</b><span>expected delivery margin on retainers</span></div>
+          </div>
+          <p class="quote anim" style="--d:400">We sell reliability, not prompts.</p>
+        </div>
+      </div>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Solution</span></div>
+    <aside class="notes">
+      <p>Emphasise the sequence: audit de-risks the buy-in, blueprint makes quality measurable, build is fast because scope is fixed, operate is where recurring revenue and compounding quality come from.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 4 — MARKET ================= -->
+  <section class="slide" data-title="Market">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b1" style="top:-150px;left:30%"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">Market &amp; trends</span>
+        <h2 class="s-title anim" style="--d:60">Three tailwinds. One open lane for an <span class="grad-text">implementation partner.</span></h2>
+      </div>
+      <div class="s-cols wide-left">
+        <div class="s-stack">
+          <article class="s-card anim" style="--d:140"><span class="card-num">TREND 01</span><h4>Agentic AI</h4><p>Buyers are moving beyond single prompts to chained prompts and agents that plan, reason and execute multi-step work autonomously.</p></article>
+          <article class="s-card anim" style="--d:200"><span class="card-num">TREND 02</span><h4>RAG goes mainstream</h4><p>Companies want LLMs connected to private data for accurate, company-specific answers — without retraining a model.</p></article>
+          <article class="s-card anim" style="--d:260"><span class="card-num">TREND 03</span><h4>No-code AI automation</h4><p>Make.com, Zapier and n8n put AI into back-office processes without heavy software engineering — if someone knows how to wire it.</p></article>
+        </div>
+        <div>
+          <article class="s-card anim" style="--d:320">
+            <span class="card-num">TARGET MARKET</span>
+            <ul class="s-list" style="margin-top:14px">
+              <li><strong>B2B service providers</strong> — agencies, law firms, brokerages drafting documents and synthesising data.</li>
+              <li><strong>E-commerce brands</strong> — support agents that resolve tickets, not just deflect them.</li>
+              <li><strong>SaaS companies</strong> — embedding AI features with expert prompt engineering.</li>
+            </ul>
+          </article>
+          <p class="s-footnote anim" style="--d:380"><span>Beachhead: marketing agencies &amp; B2B service firms</span><span>Entry offer: free AI audit</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Market</span></div>
+    <aside class="notes">
+      <p>Positioning tight: we are not competing with OpenAI or consultancies — we sit in the gap between “tool exists” and “workflow works”. The beachhead segment is chosen because those firms resell our work downstream.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 5 — SERVICES ================= -->
+  <section class="slide" data-title="Services">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b2" style="top:-140px;right:-140px"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">Products &amp; services</span>
+        <h2 class="s-title anim" style="--d:60">A hybrid model: <span class="grad-text">high-ticket builds</span> today, recurring revenue tomorrow.</h2>
+      </div>
+      <div class="s-cols">
+        <div>
+          <span class="card-num anim" style="--d:120">A · CONSULTING &amp; IMPLEMENTATION</span>
+          <article class="s-card anim" style="--d:160;margin-top:14px">
+            <h4>Custom AI workflow automation</h4>
+            <p>We audit operations and build prompt pipelines with real outcomes — e.g. client email intake, summarise and route straight into the CRM.</p>
+            <div class="svc-tags"><span class="tag"><i></i>Make / n8n</span><span class="tag"><i></i>Webhooks</span><span class="tag"><i></i>CRM sync</span></div>
+          </article>
+          <article class="s-card anim" style="--d:220;margin-top:16px">
+            <h4>Internal RAG chatbots</h4>
+            <p>Secure chat over private SOPs and HR documents — cited answers, permission-aware retrieval, nothing leaves your perimeter.</p>
+            <div class="svc-tags"><span class="tag"><i></i>Pinecone</span><span class="tag"><i></i>Supabase</span><span class="tag"><i></i>Citations</span></div>
+          </article>
+        </div>
+        <div>
+          <span class="card-num anim" style="--d:160">B · PRODUCTIZED RECURRING</span>
+          <article class="s-card anim" style="--d:200;margin-top:14px">
+            <h4>Prompt-as-a-Service retainer</h4>
+            <p>Ongoing prompt optimization, A/B testing of system prompts and seamless model upgrades — e.g. moving clients from GPT-4o to Claude 3.5 Sonnet when it wins on their evals.</p>
+            <div class="svc-tags"><span class="tag"><i></i>A/B testing</span><span class="tag"><i></i>Evals</span><span class="tag"><i></i>Model migration</span></div>
+          </article>
+          <article class="s-card anim" style="--d:260;margin-top:16px">
+            <h4>Pre-built agent packages</h4>
+            <p>Plug-and-play agents at fixed prices: the Automated Lead Qualifier, Invoice Extraction, Support Deflection and SOP Knowledge Bot.</p>
+            <div class="svc-tags"><span class="tag"><i></i>1-week deploy</span><span class="tag"><i></i>Fixed price</span></div>
+          </article>
+        </div>
+      </div>
+      <p class="s-footnote anim" style="--d:340"><span>Builds fund the roadmap</span><span>Retainers compound</span><span>Agent packs productise delivery</span></p>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Services</span></div>
+    <aside class="notes">
+      <p>Explain the flywheel: every build produces reusable components; components become agent packs; agent packs shorten delivery; retainers keep everything current. Margins hold because contractor bench scales with delivery.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 6 — ARCHITECTURE ================= -->
+  <section class="slide" data-title="Architecture">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b1" style="bottom:-170px;right:20%"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">Technology</span>
+        <h2 class="s-title anim" style="--d:60">The reference stack we deploy.</h2>
+        <p class="s-sub anim" style="--d:120">Model-agnostic, monitored at every layer, and swappable — a better model is an upgrade, not a rebuild.</p>
+      </div>
+
+      <div class="arch anim" style="--d:180;padding:26px">
+        <div class="layer">
+          <span class="layer-label"><b>01</b> Inputs</span>
+          <div class="chips"><span class="chip">HubSpot CRM</span><span class="chip">Gmail / Outlook</span><span class="chip">Drive &amp; SOPs</span><span class="chip">Slack</span><span class="chip">Postgres / ERP</span></div>
+        </div>
+        <div class="beam" aria-hidden="true"></div>
+        <div class="layer">
+          <span class="layer-label"><b>02</b> Retrieval &amp; RAG</span>
+          <div class="chips"><span class="chip v2">Chunk + embed</span><span class="chip v2">Pinecone / Weaviate</span><span class="chip v2">Supabase vectors</span><span class="chip v2">Hybrid search + rerank</span></div>
+        </div>
+        <div class="beam" aria-hidden="true"></div>
+        <div class="layer">
+          <span class="layer-label"><b>03</b> Orchestration</span>
+          <div class="chips"><span class="chip">LangChain</span><span class="chip">LlamaIndex</span><span class="chip">CrewAI</span><span class="chip">AutoGen</span></div>
+        </div>
+        <div class="beam" aria-hidden="true"></div>
+        <div class="layer">
+          <span class="layer-label"><b>04</b> Models</span>
+          <div class="chips"><span class="chip v3">GPT-4o</span><span class="chip v3">Claude 3.5 Sonnet</span><span class="chip v3">Gemini Pro</span><span class="chip v3">Cost-aware router</span></div>
+        </div>
+        <div class="beam" aria-hidden="true"></div>
+        <div class="layer">
+          <span class="layer-label"><b>05</b> Delivery</span>
+          <div class="chips"><span class="chip v2">n8n</span><span class="chip v2">Make.com</span><span class="chip v2">Zapier</span><span class="chip v2">Slack alerts</span><span class="chip v2">CRM updates</span></div>
+        </div>
+        <div class="ops-rail">
+          <span class="rail-title">Every layer</span>
+          <span class="rail-chip">Evals</span><span class="rail-chip">PII redaction</span><span class="rail-chip">Hallucination guardrails</span><span class="rail-chip">Cost caps</span><span class="rail-chip">Audit logs</span>
+        </div>
+      </div>
+      <p class="s-footnote anim" style="--d:280"><span>You own every prompt &amp; workflow</span><span>Runs in your cloud or ours</span><span>Quarterly model upgrade path</span></p>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Architecture</span></div>
+    <aside class="notes">
+      <p>Walk top to bottom in 60 seconds. The point is not the vendor names — it is that each layer is isolated, so swapping GPT-4o for Claude is a config change with regression tests, not a rewrite.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 7 — PRICING ================= -->
+  <section class="slide" data-title="Pricing">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b2" style="top:-150px;left:-140px"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">Pricing</span>
+        <h2 class="s-title anim" style="--d:60">Land with a sprint. Expand with a build. <span class="grad-text">Retain with ops.</span></h2>
+      </div>
+      <div class="price-grid">
+        <article class="price-card anim zoom" style="--d:140">
+          <div class="price-head"><h3>Automation Sprint</h3><p>First production workflow in 2 weeks.</p></div>
+          <div class="price-amount">$3,000<small> one-time</small></div>
+          <ul class="price-list">
+            <li>1 production workflow</li>
+            <li>Up to 2 integrations</li>
+            <li>Prompt architecture + starter evals</li>
+            <li>30 days support</li>
+          </ul>
+        </article>
+        <article class="price-card featured anim zoom" style="--d:200">
+          <span class="ribbon">Most popular</span>
+          <div class="price-head"><h3>AI Ops Build</h3><p>Operational backbone, automated.</p></div>
+          <div class="price-amount">$7,500<small> one-time</small></div>
+          <ul class="price-list">
+            <li>Up to 3 workflows + RAG chatbot</li>
+            <li>5 integrations</li>
+            <li>Guardrails, evals &amp; monitoring</li>
+            <li>90 days support + training</li>
+          </ul>
+        </article>
+        <article class="price-card anim zoom" style="--d:260">
+          <div class="price-head"><h3>Enterprise Platform</h3><p>Multi-agent systems + controls.</p></div>
+          <div class="price-amount">$10k+<small> custom</small></div>
+          <ul class="price-list">
+            <li>Multi-agent (CrewAI / AutoGen)</li>
+            <li>Private vectors, SSO, PII controls</li>
+            <li>Dedicated engineer + SLA</li>
+            <li>Quarterly upgrades</li>
+          </ul>
+        </article>
+      </div>
+      <div class="s-cols" style="margin-top:26px;gap:18px">
+        <article class="s-card anim" style="--d:340;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap">
+          <div><h4 style="margin:0">Prompt-as-a-Service retainer</h4><p style="margin-top:6px">Optimization · A/B tests · model upgrades · cost monitoring</p></div>
+          <span class="agent-price" style="font-size:1.5rem">$500<span class="muted" style="font-size:.8rem">/mo</span></span>
+        </article>
+        <article class="s-card anim" style="--d:380;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap">
+          <div><h4 style="margin:0">Agent packs</h4><p style="margin-top:6px">Lead Qualifier $1.9k · Invoice Extraction $2.4k · Support Deflection $2.9k</p></div>
+          <span class="agent-price" style="font-size:1.5rem">1 wk</span>
+        </article>
+      </div>
+      <p class="s-footnote anim" style="--d:440"><span>Free audit finds the first 3 automatable tasks</span><span>API usage at cost</span><span>No lock-in</span></p>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Pricing</span></div>
+    <aside class="notes">
+      <p>If asked “why not hourly?”: fixed scope protects the client and the margin. Retainer exists because models change quarterly and someone must own quality drift. Agent packs are the land-and-expand wedge for smaller buyers.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 8 — GO TO MARKET ================= -->
+  <section class="slide" data-title="Go-to-market">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b1" style="top:10%;left:-150px"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">Go-to-market</span>
+        <h2 class="s-title anim" style="--d:60">Show, don’t tell.</h2>
+        <p class="s-sub anim" style="--d:120">Three plays that turn demonstrations into pipeline.</p>
+      </div>
+      <div class="funnel anim" style="--d:160;margin-bottom:30px">
+        <div class="funnel-step"><b>Content</b><span>Live workflow demos on LinkedIn &amp; YouTube</span></div>
+        <div class="funnel-step"><b>Free audit</b><span>30 minutes → 3 automatable tasks</span></div>
+        <div class="funnel-step"><b>Pilot</b><span>Discounted first build for a case study</span></div>
+        <div class="funnel-step"><b>Retainer</b><span>$500/mo ops + expansion builds</span></div>
+      </div>
+      <div class="s-grid-3">
+        <article class="s-card anim" style="--d:240"><span class="big-ico">🎬</span><h4>Proof content</h4><p>“Watch this agent draft a 10-page legal brief in 30 seconds” — screen-recorded workflows, not opinions.</p></article>
+        <article class="s-card anim" style="--d:300"><span class="big-ico">🧭</span><h4>Free AI audits</h4><p>Every audit ends with at least three named tasks, a cost estimate and a recommended starting point.</p></article>
+        <article class="s-card anim" style="--d:360"><span class="big-ico">🧲</span><h4>Micro-SaaS lead magnets</h4><p>Free, specific tools on our site (e.g. AI Subject Line Generator) that capture B2B emails daily.</p></article>
+      </div>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Go-to-market</span></div>
+    <aside class="notes">
+      <p>Target titles for outreach: operations managers and agency owners. The audit is the sales call — it must be genuinely useful even when the prospect does not buy. Build-in-public content doubles as proof for inbound leads.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 9 — ROADMAP ================= -->
+  <section class="slide" data-title="Roadmap">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b2" style="bottom:-160px;left:40%"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">Roadmap</span>
+        <h2 class="s-title anim" style="--d:60">The first 30 days.</h2>
+      </div>
+      <div class="timeline">
+        <article class="tl anim" style="--d:140">
+          <span class="tl-badge">W1</span>
+          <span class="dl">Sharpen the offer</span>
+          <h4>Branding &amp; positioning</h4>
+          <p>Finalise agency name, identity and the core offer: “We build AI employees for marketing agencies.”</p>
+        </article>
+        <article class="tl anim" style="--d:200">
+          <span class="tl-badge">W2</span>
+          <span class="dl">Build the proof</span>
+          <h4>Three working demos</h4>
+          <p>Internal chatbot, content pipeline and automated customer service — each running end to end.</p>
+        </article>
+        <article class="tl anim" style="--d:260">
+          <span class="tl-badge">W3</span>
+          <span class="dl">Go public</span>
+          <h4>Website + outreach</h4>
+          <p>Portfolio site live; LinkedIn outreach begins to operations managers and agency owners.</p>
+        </article>
+        <article class="tl anim" style="--d:320">
+          <span class="tl-badge">W4</span>
+          <span class="dl">First revenue</span>
+          <h4>Beta client signed</h4>
+          <p>Discounted first project in exchange for a detailed case study and testimonial.</p>
+        </article>
+      </div>
+      <p class="s-footnote anim" style="--d:400"><span>Demos before decks</span><span>Case study before scale</span><span>Outreach daily, not weekly</span></p>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Roadmap</span></div>
+    <aside class="notes">
+      <p>Rule for the first month: nothing ships that cannot be demoed. The beta client is chosen for the strength of the testimonial they can give, not the size of the invoice.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 10 — FINANCIALS ================= -->
+  <section class="slide" data-title="Financials">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b1" style="top:-150px;left:20%"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">Financial projections</span>
+        <h2 class="s-title anim" style="--d:60">Lean cost base. <span class="grad-text">70–80% margins.</span></h2>
+        <p class="s-sub anim" style="--d:120">Service-heavy first, productised second — with software costs under $500/month.</p>
+      </div>
+
+      <div class="chart anim" style="--d:180">
+        <div class="bars">
+          <div class="bar muted" style="--h:9%;--d:0"><b class="bar-val">3k</b><span class="bar-fill"></span><span class="bar-lbl">M1</span></div>
+          <div class="bar muted" style="--h:17%;--d:60"><b class="bar-val">6k</b><span class="bar-fill"></span><span class="bar-lbl">M2</span></div>
+          <div class="bar muted" style="--h:26%;--d:120"><b class="bar-val">9k</b><span class="bar-fill"></span><span class="bar-lbl">M3</span></div>
+          <div class="bar muted" style="--h:34%;--d:180"><b class="bar-val">12k</b><span class="bar-fill"></span><span class="bar-lbl">M4</span></div>
+          <div class="bar muted" style="--h:43%;--d:240"><b class="bar-val">15k</b><span class="bar-fill"></span><span class="bar-lbl">M5</span></div>
+          <div class="bar muted" style="--h:51%;--d:300"><b class="bar-val">18k</b><span class="bar-fill"></span><span class="bar-lbl">M6</span></div>
+          <div class="bar" style="--h:63%;--d:360"><b class="bar-val">22k</b><span class="bar-fill"></span><span class="bar-lbl">M7</span></div>
+          <div class="bar" style="--h:74%;--d:420"><b class="bar-val">26k</b><span class="bar-fill"></span><span class="bar-lbl">M8</span></div>
+          <div class="bar" style="--h:83%;--d:480"><b class="bar-val">29k</b><span class="bar-fill"></span><span class="bar-lbl">M9</span></div>
+          <div class="bar" style="--h:89%;--d:540"><b class="bar-val">31k</b><span class="bar-fill"></span><span class="bar-lbl">M10</span></div>
+          <div class="bar" style="--h:94%;--d:600"><b class="bar-val">33k</b><span class="bar-fill"></span><span class="bar-lbl">M11</span></div>
+          <div class="bar" style="--h:100%;--d:660"><b class="bar-val">35k</b><span class="bar-fill"></span><span class="bar-lbl">M12</span></div>
+        </div>
+        <div class="chart-legend">
+          <span><i></i>MRR ($k) · Phase 2 productised</span>
+          <span class="alt"><i></i>Phase 1 service-heavy</span>
+        </div>
+      </div>
+
+      <div class="s-cols" style="margin-top:26px">
+        <div>
+          <article class="s-card anim" style="--d:300">
+            <span class="card-num">PHASE 1 · MONTHS 1–6</span>
+            <h4>Service-heavy</h4>
+            <p>3–5 high-ticket implementation clients at $3k–$10k per project. Build the case studies. <strong style="color:var(--text)">Target: $15k MRR by month 6.</strong></p>
+          </article>
+          <article class="s-card anim" style="--d:360;margin-top:16px">
+            <span class="card-num">PHASE 2 · MONTHS 6–12</span>
+            <h4>Productisation</h4>
+            <p>Launch $500/month retainers and pre-packaged agent templates. <strong style="color:var(--text)">Target: $35k MRR by month 12.</strong></p>
+          </article>
+        </div>
+        <div class="donut-row">
+          <div class="donut anim zoom" style="--d:340;--pv:75">
+            <div><b>75%</b><span>net margin</span></div>
+          </div>
+          <ul class="s-list anim" style="--d:400">
+            <li><strong>Software:</strong> $200–500/mo (APIs, Make.com, CRM)</li>
+            <li><strong>Main cost:</strong> human capital &amp; contractor margins</li>
+            <li><strong>No inventory, no offices</strong> — margins compound with templates</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Financials</span></div>
+    <aside class="notes">
+      <p>Be explicit that month 1–2 are founder-led delivery. The projection assumes 2 builds per month from month 3 and 10 retainer slots by month 12. Costs stay flat because delivery is productised, not headcount-driven.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 11 — TEAM ================= -->
+  <section class="slide" data-title="Team">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b2" style="top:-140px;right:-130px"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">Team</span>
+        <h2 class="s-title anim" style="--d:60">Small team. <span class="grad-text">Unfair leverage.</span></h2>
+        <p class="s-sub anim" style="--d:120">Three roles for launch — one full-time, one contract, one commission-led.</p>
+      </div>
+      <div class="team-grid">
+        <article class="team-card anim" style="--d:180">
+          <div class="avatar">FP</div>
+          <h4>Founder / Lead Prompt Engineer</h4>
+          <div class="role">Full-time</div>
+          <p>System architecture, prompt optimization, evals design and client acquisition. Owns delivery quality end to end.</p>
+        </article>
+        <article class="team-card anim" style="--d:240">
+          <div class="avatar">AS</div>
+          <h4>AI Automation Specialist</h4>
+          <div class="role">Contract · part-time</div>
+          <p>API integrations, webhooks and automation builds across Make.com, Zapier and n8n.</p>
+        </article>
+        <article class="team-card anim" style="--d:300">
+          <div class="avatar">SP</div>
+          <h4>Sales &amp; Partnerships Lead</h4>
+          <div class="role">Commission-led</div>
+          <p>B2B outreach, client onboarding and agency partnerships that feed recurring pipeline.</p>
+        </article>
+      </div>
+      <p class="quote anim" style="--d:380;margin-top:32px">Contractor bench scales with delivery — margins stay at 70–80% while revenue grows.</p>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>Team</span></div>
+    <aside class="notes">
+      <p>Highlight that all three roles are already scoped in the business plan. Hiring beyond this only happens when retainer revenue covers the salary — the model is deliberately capital-light.</p>
+    </aside>
+  </section>
+
+  <!-- ================= SLIDE 12 — ASK ================= -->
+  <section class="slide" data-title="The ask">
+    <div class="slide-bg" aria-hidden="true"><span class="blob b1" style="top:-140px;left:-130px"></span><span class="blob b2" style="bottom:-170px;right:-130px"></span></div>
+    <div class="slide-inner">
+      <div class="s-head">
+        <span class="kicker anim">The ask</span>
+        <h2 class="s-title anim" style="--d:60">The next 90 days.</h2>
+        <p class="s-sub anim" style="--d:120">We are selecting a small set of founding clients and partners.</p>
+      </div>
+      <div class="s-grid-3">
+        <article class="stat-card anim" style="--d:180"><b>3–5</b><span>flagship implementation clients at $3k–$10k per project</span></article>
+        <article class="stat-card anim" style="--d:240"><b>10</b><span>Prompt-as-a-Service retainer slots at $500/month</span></article>
+        <article class="stat-card anim" style="--d:300"><b>2</b><span>agency partnerships for co-selling and white-label delivery</span></article>
+      </div>
+      <div class="ask-band anim" style="--d:360">
+        <div>
+          <h3>Start with the free 30-minute AI audit.</h3>
+          <p>We map your operations and name at least three tasks an agent can absorb — with a cost estimate, whether or not you hire us.</p>
+          <div class="contact-line">
+            <span>hello@promptops.ai</span>
+            <span>promptops.ai</span>
+            <span>LinkedIn · YouTube</span>
+          </div>
+        </div>
+        <a class="btn btn-primary btn-lg" href="index.html#contact">Book the audit →</a>
+      </div>
+      <p class="s-footnote anim" style="--d:440"><span>Let’s ship something your team still uses in a year</span></p>
+    </div>
+    <div class="deck-footer"><span>PromptOps AI</span><span>The ask</span></div>
+    <aside class="notes">
+      <p>Close on the free audit — it is the lowest-friction next step and doubles as qualification. Have the calendar link ready in the chat. If the room is partner-heavy, emphasise the white-label angle instead.</p>
+    </aside>
+  </section>
+
+</main>
+
+<footer class="deck-bottom">
+  <button class="nav-btn" id="prevBtn" type="button" aria-label="Previous slide">←</button>
+  <div class="dots" id="dots" role="tablist" aria-label="Slides"></div>
+  <button class="nav-btn" id="nextBtn" type="button" aria-label="Next slide">→</button>
+</footer>
+
+<div class="notes-panel" id="notesPanel">
+  <div class="notes-inner">
+    <h4>Speaker notes — press N to hide</h4>
+    <div id="notesContent"></div>
+  </div>
+</div>
+
+<div class="help-overlay" id="helpOverlay" hidden>
+  <div class="help-card">
+    <h3>Presenter shortcuts</h3>
+    <p>Everything works with keyboard, mouse, touch — or a clicker.</p>
+    <div class="keys">
+      <div><span class="kbd">→</span><span class="kbd">Space</span></div><div>Next slide</div>
+      <div><span class="kbd">←</span></div><div>Previous slide</div>
+      <div><span class="kbd">Home</span><span class="kbd">End</span></div><div>First / last slide</div>
+      <div><span class="kbd">N</span></div><div>Toggle speaker notes</div>
+      <div><span class="kbd">F</span></div><div>Present mode (fullscreen)</div>
+      <div><span class="kbd">?</span></div><div>This help</div>
+      <div><span class="kbd">Esc</span></div><div>Close overlays</div>
+      <div><span class="kbd">⌘</span><span class="kbd">P</span></div><div>Export all slides to PDF</div>
+    </div>
+    <div class="help-close"><button class="btn btn-ghost" type="button">Close</button></div>
+  </div>
+</div>
+
+<script src="assets/js/pitch.js" defer></script>
+</body>
+</html>
