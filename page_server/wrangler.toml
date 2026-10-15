@@ -4,7 +4,7 @@
 #
 # The worker has no code of its own: it only hands the files to the visitor.
 
-name = "jfdiazbus-portfolio"
+name = "portfolio"
 compatibility_date = "2026-10-15"
 
 [assets]

@@ -24,14 +24,14 @@ that ships to Cloudflare or to a Docker container.
 
 | Path                              | What it does                                                            |
 | --------------------------------- | ----------------------------------------------------------------------- |
-| `page.html`                       | The deck itself — all the words live here                               |
+| `home.html`                       | The four slide deck, served at `/home` — the words live here            |
 | `style.css`                       | The look: paper, green bars, red accents, the slides                    |
 | `index.js`                        | The local server. No dependencies, only Node's own modules              |
 | `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                             |
 | `scripts/banner.mjs`              | Draws the banner with figlet                                            |
 | `scripts/deploy.mjs`              | Builds and uploads, reading credentials from `.secrets`                 |
 | `slides.js`                       | One keypress per slide, and marks the slide you are on                  |
-| `world.html`, `world.js`          | The scroll world page, and its config                                   |
+| `world.html`, `world.js`          | The front page: the scroll world, and its config                        |
 | `world/`                          | The film: scene sources, the render + motion steps, and `out/`          |
 | `test/`                           | Tests for the server, the page, the styles, the build and the pipelines |
 | `Dockerfile`, `docker/nginx.conf` | The container that serves `dist/`                                       |
@@ -41,7 +41,8 @@ that ships to Cloudflare or to a Docker container.
 
 ## Editing the text
 
-Everything you might want to change is in `page.html`:
+Everything you might want to change is in `home.html` (the deck) or `world.js`
+(the world's copy):
 
 - **Contact details** — search for `juan-felipe.diaz-bustamante` and replace
   the email, and update the GitHub link if you like.
@@ -61,7 +62,7 @@ editing it by hand, change the word and run:
 pnpm banner
 ```
 
-That rewrites the `<pre class="banner">` block in `page.html`. A test checks
+That rewrites the `<pre class="banner">` block in `home.html`. A test checks
 the banner still matches a real figlet rendering, so it can never drift.
 
 ## How it moves
@@ -95,9 +96,9 @@ appears complete. Printing gives one page per slide, with all of it visible.
 
 ## The scroll world
 
-`world.html` is a second page: a scroll driven flight through a paper print
-shop, five scenes long, with each scene's copy pinned over it. The deck offers
-it as "walk through the print shop".
+The front page (`/`) is a scroll driven flight through a paper print shop, five
+scenes long, with each scene's copy pinned over it. The four slide deck lives at
+`/home` (a rewrite to `home.html`), and the world links back to it.
 
 The film is **made by hand rather than by a video model**. The scenes are drawn
 as cardstock in `world/kit.mjs` and `world/scenes.mjs`, rendered to transparent
@@ -159,16 +160,16 @@ deploy twice.
 Connect the repository (Workers & Pages → **Create application** → GitHub →
 `jfdiazbus/Business`) with these values:
 
-| Field           | Value                                                                            |
-| --------------- | -------------------------------------------------------------------------------- |
-| Worker name     | `jfdiazbus-portfolio` — must match `name` in `wrangler.toml`, or the build fails |
-| Git branch      | `main`                                                                           |
-| Root directory  | `page_server`                                                                    |
-| Build command   | `pnpm build`                                                                     |
-| Deploy command  | `npx wrangler deploy`                                                            |
-| Preview command | leave the default                                                                |
-| API token       | leave empty — Cloudflare generates one and reuses it                             |
-| Build variables | none needed; `.node-version` pins Node 22 for the builder                        |
+| Field           | Value                                                                  |
+| --------------- | ---------------------------------------------------------------------- |
+| Worker name     | `portfolio` — must match `name` in `wrangler.toml`, or the build fails |
+| Git branch      | `main`                                                                 |
+| Root directory  | `page_server`                                                          |
+| Build command   | `pnpm build`                                                           |
+| Deploy command  | `npx wrangler deploy`                                                  |
+| Preview command | leave the default                                                      |
+| API token       | leave empty — Cloudflare generates one and reuses it                   |
+| Build variables | none needed; `.node-version` pins Node 22 for the builder              |
 
 The root directory is where the commands run. The whole repository is still
 checked out, which is what lets `scripts/build.mjs` copy the two client sites
@@ -231,7 +232,7 @@ pnpm exec wrangler whoami
 
 ### Keeping the token safe
 
-- Never paste it into `wrangler.toml`, `page.html`, an issue or a chat: it is
+- Never paste it into `wrangler.toml`, either page, an issue or a chat: it is
   the key to your account. `.secrets` is gitignored and excluded from the
   Docker image for that reason.
 - It is shown only once. If it leaks, delete it in **My Profile → API Tokens**

@@ -6,10 +6,10 @@ import { JSDOM } from "jsdom";
 import { renderBanner } from "../scripts/banner.mjs";
 
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const html = readFileSync(path.join(PROJECT_ROOT, "page.html"), "utf8");
+const html = readFileSync(path.join(PROJECT_ROOT, "home.html"), "utf8");
 const { document } = new JSDOM(html).window;
 
-describe("page.html", () => {
+describe("home.html (the deck)", () => {
   it("introduces the page with a title, a language and a description", () => {
     expect(document.documentElement.getAttribute("lang")).toBe("en");
     expect(document.title).toContain("Juan Felipe");
@@ -155,7 +155,7 @@ describe("page.html", () => {
   it("offers the scroll world from the title page", () => {
     const tour = document.querySelector(".tour a");
 
-    expect(tour?.getAttribute("href")).toBe("/world.html");
+    expect(tour?.getAttribute("href")).toBe("/");
     expect(tour.textContent).toContain("print shop");
   });
 });

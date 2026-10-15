@@ -28,19 +28,34 @@ afterAll(async () => {
 });
 
 describe("the build", () => {
-  it("writes the page as index.html, byte for byte", async () => {
-    const source = await readFile(path.join(PROJECT_ROOT, "page.html"), "utf8");
+  it("writes the world as the front page and the deck at /home, byte for byte", async () => {
+    const world = await readFile(path.join(PROJECT_ROOT, "world.html"), "utf8");
+    const deck = await readFile(path.join(PROJECT_ROOT, "home.html"), "utf8");
 
-    expect(await read("index.html")).toBe(source);
+    expect(await read("index.html")).toBe(world);
+    expect(await read("home.html")).toBe(deck);
   });
 
   it("writes the stylesheet", async () => {
     expect(await size("style.css")).toBeGreaterThan(500);
   });
 
+  it("puts the world on the front page and the deck at /home", async () => {
+    const index = await read("index.html");
+    const home = await read("home.html");
+
+    expect(index).toContain("The print shop");
+    expect(index).toContain('src="/world/engine.js"');
+    expect(home).toContain('class="banner"');
+    expect(home).toContain("A few things");
+
+    // /home is a rewrite, so the deck is addressable without the extension
+    expect(await read("_redirects")).toContain("/home /home.html 200");
+  });
+
   it("copies the script that makes the slides behave like a deck", async () => {
     expect(await size("slides.js")).toBeGreaterThan(500);
-    expect(await read("index.html")).toContain('src="slides.js"');
+    expect(await read("home.html")).toContain('src="slides.js"');
     expect(await read("_headers")).toContain("/slides.js");
   });
 
@@ -106,13 +121,14 @@ describe("the build", () => {
     expect(entries.sort()).toEqual([
       "404.html",
       "_headers",
+      "_redirects",
       "docs",
+      "home.html",
       "index.html",
       "projects",
       "slides.js",
       "style.css",
       "world",
-      "world.html",
       "world.js",
     ]);
   });

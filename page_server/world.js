@@ -8,7 +8,7 @@
 // plain language, benefit first, one action.
 
 export const world = {
-  brand: { name: "Juan Felipe", href: "/" },
+  brand: { name: "Juan Felipe", href: "/home" },
   hint: "scroll to walk through the print shop",
   diveScroll: 1.25,
   connScroll: 0.8,
@@ -75,7 +75,7 @@ export const world = {
       tags: [],
       cta: {
         primary: { label: "Email me", href: "mailto:juan-felipe.diaz-bustamante@epitech.eu" },
-        secondary: { label: "Read the four slide version", href: "/" },
+        secondary: { label: "Read the four slide version", href: "/home" },
       },
     },
   ],

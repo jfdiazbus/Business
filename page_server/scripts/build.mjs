@@ -17,10 +17,10 @@ export const PROJECT_ROOT = path.resolve(HERE, "..");
 export const DEFAULT_WORKSPACE = path.resolve(PROJECT_ROOT, "..");
 export const DEFAULT_OUT = path.join(PROJECT_ROOT, "dist");
 
-/** [source in page_server, path in dist] */
+/** [source in page_server, path in dist] — the world is the front page. */
 export const PAGE_FILES = [
-  ["page.html", "index.html"],
-  ["world.html", "world.html"],
+  ["world.html", "index.html"],
+  ["home.html", "home.html"],
   ["style.css", "style.css"],
   ["slides.js", "slides.js"],
   ["world.js", "world.js"],
@@ -60,6 +60,10 @@ export const HEADERS = `/projects/*/assets/*
 
 /projects/*
   Cache-Control: public, max-age=3600
+`;
+
+// The deck lives at /home; everything else in dist is already addressable.
+export const REDIRECTS = `/home /home.html 200
 `;
 
 const skipDotFiles = (src) => !src.split(path.sep).some((segment) => segment.startsWith("."));
@@ -108,12 +112,13 @@ export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPAC
     "utf8",
   );
   await writeFile(path.join(outDir, "_headers"), HEADERS, "utf8");
+  await writeFile(path.join(outDir, "_redirects"), REDIRECTS, "utf8");
   await copyWorld({ outDir });
 
   const brokenLinks = [
     ...new Set([
       ...(await checkLinks(outDir, "index.html")),
-      ...(await checkLinks(outDir, "world.html")),
+      ...(await checkLinks(outDir, "home.html")),
     ]),
   ];
 
@@ -147,7 +152,11 @@ export async function checkLinks(outDir, htmlFile = "index.html") {
 
   for (const href of collectInternalLinks(html)) {
     const candidate = resolveAsset(outDir, href);
-    const found = (await exists(candidate)) || (await exists(path.join(candidate, "index.html")));
+    // /home resolves to home.html, the way nginx and the Workers asset server do it
+    const found =
+      (await exists(candidate)) ||
+      (await exists(`${candidate}.html`)) ||
+      (await exists(path.join(candidate, "index.html")));
     if (!found) broken.push(href);
   }
 

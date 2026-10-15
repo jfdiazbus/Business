@@ -1,6 +1,6 @@
-// Draws the ASCII banner at the top of page.html.
+// Draws the ASCII banner at the top of home.html (the deck).
 //
-//   pnpm banner          rewrite page.html with a fresh banner
+//   pnpm banner          rewrite home.html with a fresh banner
 //
 // The same function is used by the tests, so the art on the page can never
 // drift away from a real figlet rendering of the title.
@@ -13,7 +13,7 @@ import figlet from "figlet";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
 export const PROJECT_ROOT = path.resolve(HERE, "..");
-export const PAGE_FILE = path.join(PROJECT_ROOT, "page.html");
+export const PAGE_FILE = path.join(PROJECT_ROOT, "home.html");
 export const BANNER_TEXT = "HELLO";
 export const BANNER_FONT = "Big";
 
@@ -37,7 +37,7 @@ export function bannerMarkup(lines = renderBanner()) {
 /** Replaces the banner block in a page, leaving the rest untouched. */
 export function replaceBanner(html, lines = renderBanner()) {
   const block = /(<pre class="banner"[^>]*>)[\s\S]*?(<\/pre>)/;
-  if (!block.test(html)) throw new Error('no <pre class="banner"> block found in page.html');
+  if (!block.test(html)) throw new Error('no <pre class="banner"> block found in home.html');
   return html.replace(block, (_match, open, close) => open + bannerMarkup(lines) + close);
 }
 

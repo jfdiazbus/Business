@@ -14,7 +14,11 @@ import { fileURLToPath } from "node:url";
 export const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const WORKSPACE = path.resolve(HERE, "..");
 export const DEFAULT_PORT = Number(process.env.PORT) || 3000;
-export const INDEX_FILES = ["index.html", "page.html"];
+export const INDEX_FILES = ["index.html", "home.html"];
+
+// The built site serves the scroll world at / and the deck at /home; in the
+// source they are world.html and home.html, so the dev server maps both.
+export const REWRITES = { "/": "world.html", "/home": "home.html" };
 
 export const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -179,7 +183,11 @@ async function firstExisting(candidates) {
   return null;
 }
 
-export function createAppServer({ mounts = buildMounts(), indexFiles = INDEX_FILES } = {}) {
+export function createAppServer({
+  mounts = buildMounts(),
+  indexFiles = INDEX_FILES,
+  rewrites = REWRITES,
+} = {}) {
   return createServer(async (req, res) => {
     const method = req.method ?? "GET";
 
@@ -192,7 +200,8 @@ export function createAppServer({ mounts = buildMounts(), indexFiles = INDEX_FIL
       return;
     }
 
-    const urlPath = new URL(req.url ?? "/", "http://localhost").pathname;
+    const requested = new URL(req.url ?? "/", "http://localhost").pathname;
+    const urlPath = rewrites[requested] ? `/${rewrites[requested]}` : requested;
 
     try {
       const found = locate(urlPath, { mounts });
@@ -247,7 +256,7 @@ export function createAppServer({ mounts = buildMounts(), indexFiles = INDEX_FIL
           res.end();
           return;
         }
-        // This project ships its page as page.html; the built site uses index.html.
+        // The built site serves the world as index.html and the deck as home.html;
         const index = await firstExisting(indexFiles.map((name) => path.join(target, name)));
         if (!index) {
           sendError(res, 404, {

@@ -37,16 +37,28 @@ function rawRequest(rawPath) {
 }
 
 describe("the development server", () => {
-  it("serves the portfolio at /", async () => {
+  it("serves the scroll world at /", async () => {
     const response = await fetch(`${base}/`);
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/html");
 
     const html = await response.text();
+    expect(html).toContain("The print shop");
+    expect(html).toContain('src="/world/engine.js"');
     expect(html).toContain("Juan Felipe");
+  });
+
+  it("serves the four slide deck at /home", async () => {
+    const response = await fetch(`${base}/home`);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("text/html");
+
+    const html = await response.text();
     expect(html).toContain('class="banner"');
     expect(html).toContain("A few things");
+    expect(html).toContain('src="slides.js"');
   });
 
   it("serves the stylesheet with the right content type", async () => {

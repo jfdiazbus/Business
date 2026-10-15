@@ -85,8 +85,11 @@ describe("the project", () => {
 
   it("writes down the settings Cloudflare builds with", async () => {
     const readme = await read("README.md");
+    // the name has to match what the dashboard Worker is called, so read it
+    // from the config rather than hard coding it twice
+    const name = /name = "([^"]+)"/.exec(await read("wrangler.toml"))[1];
 
-    expect(readme).toContain("jfdiazbus-portfolio"); // the Worker name
+    expect(readme).toContain(name); // the Worker name
     expect(readme).toContain("page_server"); // the root directory
     expect(readme).toContain("pnpm build"); // the build command
     expect(readme).toContain("npx wrangler deploy"); // the deploy command
@@ -102,7 +105,7 @@ describe("the project", () => {
   });
 
   it("still has the fonts and files the scripts need", async () => {
-    for (const file of ["page.html", "style.css", "index.js", "vitest.config.js"]) {
+    for (const file of ["home.html", "world.html", "style.css", "index.js", "vitest.config.js"]) {
       expect(await exists(file), file).toBe(true);
     }
     for (const file of ["scripts/build.mjs", "scripts/banner.mjs"]) {

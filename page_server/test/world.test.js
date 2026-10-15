@@ -14,7 +14,7 @@ const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 
 const OUT = path.join(PROJECT_ROOT, "world", "out");
 const read = (file) => readFile(path.join(PROJECT_ROOT, file), "utf8");
 
-const html = await read("world.html");
+const html = await read("world.html"); // built to index.html
 const { document } = new JSDOM(html).window;
 
 /** A config path like "/world/dive-1.mp4" is built from world/out/dive-1.mp4. */
@@ -103,7 +103,7 @@ describe("the copy, by the landing page rules", () => {
 
     expect(withCta).toHaveLength(1);
     expect(last.cta.primary.href).toMatch(/^mailto:/);
-    expect(last.cta.secondary.href).toBe("/");
+    expect(last.cta.secondary.href).toBe("/home"); // the deck lives at /home now
     for (const action of Object.values(last.cta)) {
       expect(action.label).not.toMatch(/learn more|submit|click here/i);
     }
@@ -145,12 +145,12 @@ describe("the world page", () => {
     const fallback = document.querySelector("noscript");
 
     expect(fallback.textContent).toContain("four slide version");
-    expect(fallback.querySelector('a[href="/"]')).toBeTruthy();
+    expect(fallback.querySelector('a[href="/home"]')).toBeTruthy();
     expect(fallback.querySelector('a[href^="mailto:"]')).toBeTruthy();
   });
 
   it("keeps the deck reachable from the world", () => {
-    expect(world.brand.href).toBe("/");
+    expect(world.brand.href).toBe("/home");
   });
 });
 
