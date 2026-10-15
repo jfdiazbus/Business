@@ -1,0 +1,6 @@
+# pnpm 12 refuses to run install scripts unless they are allowed here.
+# esbuild (used by vitest) and workerd (used by wrangler) need theirs to
+# fetch their platform binary.
+allowBuilds:
+  esbuild: true
+  workerd: true

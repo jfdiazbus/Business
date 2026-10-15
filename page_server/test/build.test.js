@@ -1,0 +1,140 @@
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  DOC_FILES,
+  PROJECT_DIRS,
+  PROJECT_ROOT,
+  build,
+  checkLinks,
+  collectInternalLinks,
+  resolveAsset,
+} from "../scripts/build.mjs";
+
+let outDir;
+
+const read = (rel) => readFile(path.join(outDir, rel), "utf8");
+const size = (rel) => stat(path.join(outDir, rel)).then((info) => info.size);
+
+beforeAll(async () => {
+  outDir = await mkdtemp(path.join(os.tmpdir(), "portfolio-build-"));
+  await build({ outDir });
+});
+
+afterAll(async () => {
+  await rm(outDir, { recursive: true, force: true });
+});
+
+describe("the build", () => {
+  it("writes the page as index.html, byte for byte", async () => {
+    const source = await readFile(path.join(PROJECT_ROOT, "page.html"), "utf8");
+
+    expect(await read("index.html")).toBe(source);
+  });
+
+  it("writes the stylesheet", async () => {
+    expect(await size("style.css")).toBeGreaterThan(500);
+  });
+
+  it("includes both client sites, website and presentation", async () => {
+    for (const project of PROJECT_DIRS) {
+      expect(await size(path.join("projects", project, "index.html")), project).toBeGreaterThan(
+        500,
+      );
+      expect(await size(path.join("projects", project, "pitch.html")), project).toBeGreaterThan(
+        500,
+      );
+      expect(
+        await size(path.join("projects", project, "assets", "css", "site.css")),
+        project,
+      ).toBeGreaterThan(100);
+    }
+  });
+
+  it("includes the business plans", async () => {
+    for (const doc of DOC_FILES) {
+      expect(await size(path.join("docs", doc)), doc).toBeGreaterThan(100);
+    }
+  });
+
+  it("leaves out tooling and hidden files", async () => {
+    const entries = await readdir(outDir);
+
+    expect(entries).not.toContain("node_modules");
+    expect(entries.filter((name) => name.startsWith("."))).toEqual([]);
+    expect(entries.sort()).toEqual([
+      "404.html",
+      "_headers",
+      "docs",
+      "index.html",
+      "projects",
+      "style.css",
+    ]);
+  });
+
+  it("ships a 404 page in the same style", async () => {
+    const page = await read("404.html");
+
+    expect(page).toContain("<!doctype html>");
+    expect(page).toContain("isn&#39;t here");
+    expect(page).toContain("[ back to the portfolio ]");
+  });
+
+  it("tells the host how to cache things", async () => {
+    const headers = await read("_headers");
+
+    expect(headers).toContain("/projects/*/assets/*");
+    expect(headers).toMatch(/immutable/);
+  });
+
+  it("has no links pointing at nothing", async () => {
+    expect(await checkLinks(outDir)).toEqual([]);
+  });
+
+  it("does not leak local file paths into the site", async () => {
+    for (const file of ["index.html", "404.html", "style.css"]) {
+      expect(await read(file)).not.toContain(PROJECT_ROOT);
+      expect(await read(file)).not.toContain("/home/");
+    }
+  });
+
+  it("is repeatable", async () => {
+    const first = await read("index.html");
+    await build({ outDir });
+
+    expect(await read("index.html")).toBe(first);
+    expect(await checkLinks(outDir)).toEqual([]);
+  });
+});
+
+describe("the link checker", () => {
+  it("reads the internal links out of a page", () => {
+    const html = `<a href="/a">a</a><a href="/b/">b</a><a href="#top">c</a><a href="mailto:x@y.z">d</a>`;
+
+    expect(collectInternalLinks(html)).toEqual(["/a", "/b/"]);
+  });
+
+  it("resolves folders to their index page", () => {
+    expect(resolveAsset("/site", "/")).toBe(path.join("/site", "index.html"));
+    expect(resolveAsset("/site", "/projects/x/")).toBe(path.join("/site", "projects/x/index.html"));
+    expect(resolveAsset("/site", "/style.css?v=2")).toBe(path.join("/site", "style.css"));
+  });
+
+  it("catches a link that goes nowhere", async () => {
+    const scratch = await mkdtemp(path.join(os.tmpdir(), "portfolio-broken-"));
+
+    try {
+      await writeFile(
+        path.join(scratch, "index.html"),
+        `<a href="/missing.html">missing</a><a href="/">home</a>`,
+        "utf8",
+      );
+
+      expect(await checkLinks(scratch)).toEqual(["/missing.html"]);
+    } finally {
+      await rm(scratch, { recursive: true, force: true });
+    }
+  });
+});
