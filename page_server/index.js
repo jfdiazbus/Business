@@ -104,6 +104,11 @@ export function buildMounts({ root = HERE, workspace = WORKSPACE } = {}) {
       prefix: "/docs/ai_marketing_automation_business_plan.md",
       file: path.join(workspace, "ai_marketing_automation_business_plan.md"),
     },
+    // The scroll world: the built site keeps the film and the engine in one
+    // folder (dist/world), but in the source they live apart — so the engine
+    // gets its own exact mount and the prefix below serves the generated film.
+    { prefix: "/world/engine.js", file: path.join(root, "world", "engine.js") },
+    { prefix: "/world/", root: path.join(root, "world", "out") },
     { prefix: "/", root },
   ].sort((a, b) => b.prefix.length - a.prefix.length);
 }

@@ -306,6 +306,21 @@ body {
   color: var(--ink-soft);
 }
 
+/* a link to the scroll world, offered under the title page */
+.tour {
+  margin: 20px 0 0;
+}
+
+.tour a {
+  color: var(--ribbon);
+  text-decoration: none;
+}
+
+.tour a:hover,
+.tour a:focus-visible {
+  text-decoration: underline;
+}
+
 /* -- project cards ------------------------------------------------------ */
 
 .project {

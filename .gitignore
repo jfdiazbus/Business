@@ -7,6 +7,9 @@ dist/
 page_server/dist/
 .wrangler/
 
+# scroll world intermediates (the shipped film lives in page_server/world/out)
+page_server/world/build/
+
 # credentials — never commit these
 .env
 .env.*

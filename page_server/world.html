@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>The print shop — Juan Felipe Diaz Bustamante</title>
+    <meta
+      name="description"
+      content="Scroll through the print shop: a paper world of websites, presentations and small tools, built by Juan Felipe Diaz Bustamante."
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#f0eee6" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="The print shop — Juan Felipe Diaz Bustamante" />
+    <meta
+      property="og:description"
+      content="A paper world of websites, presentations and small tools."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f0eee6'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='14' font-weight='bold' text-anchor='middle' fill='%23b03024'%3E:-)%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f0eee6;
+        --ink: #1b1b18;
+        --ink-soft: #5f5c52;
+        --ribbon: #b03024;
+        --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+      }
+
+      /* the engine draws the stage; these keep it on the deck's paper */
+      :root,
+      .sw-root {
+        --sw-bg: var(--paper);
+        --sw-ink: var(--ink);
+        --sw-ink-soft: var(--ink-soft);
+        --sw-accent: var(--ribbon);
+        --sw-font-display: var(--mono);
+        --sw-font-body: var(--mono);
+      }
+
+      html,
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--mono);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .no-js {
+        max-width: 62ch;
+        margin: 14vh auto;
+        padding: 0 24px;
+        line-height: 1.65;
+      }
+
+      .no-js h1 {
+        font-size: 20px;
+      }
+
+      .no-js a {
+        color: var(--ribbon);
+      }
+
+      /* The engine's copy block is centred on the left of the stage. Kept on the
+         deck's scale and line lengths, and short enough not to run past the fold.
+         These win over the engine's defaults, which live in @layer sw. */
+      @media (min-width: 861px) {
+        .sw-copy {
+          width: min(38vw, 420px);
+        }
+      }
+
+      .sw-copy__title {
+        font-size: clamp(1.5rem, 2.9vw, 2.5rem);
+        line-height: 1.12;
+        max-width: 20ch;
+        text-wrap: balance;
+      }
+
+      .sw-copy__body {
+        font-size: clamp(0.95rem, 1.05vw, 1.06rem);
+        max-width: 36ch;
+        text-wrap: pretty;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="top"></div>
+    <h1 class="sr-only">The print shop — Juan Felipe Diaz Bustamante</h1>
+    <div id="world"></div>
+
+    <noscript>
+      <div class="no-js">
+        <h1>Juan Felipe Diaz Bustamante — web developer</h1>
+        <p>
+          The tour needs JavaScript to play. The four slide version has everything in it:
+          <a href="/">read the portfolio</a>.
+        </p>
+        <p>
+          Or email me at
+          <a href="mailto:juan-felipe.diaz-bustamante@epitech.eu"
+            >juan-felipe.diaz-bustamante@epitech.eu</a
+          >.
+        </p>
+      </div>
+    </noscript>
+
+    <script src="/world/engine.js"></script>
+    <script type="module" src="/world.js"></script>
+  </body>
+</html>

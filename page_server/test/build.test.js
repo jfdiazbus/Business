@@ -44,6 +44,39 @@ describe("the build", () => {
     expect(await read("_headers")).toContain("/slides.js");
   });
 
+  it("ships the scroll world, its film and its engine", async () => {
+    const files = await readdir(path.join(outDir, "world"));
+
+    expect(files).toContain("engine.js");
+    expect(files.filter((name) => name.startsWith("dive-"))).toHaveLength(5);
+    expect(files.filter((name) => name.startsWith("wipe-"))).toHaveLength(4);
+    expect(files.filter((name) => name.startsWith("still-")).length).toBeGreaterThanOrEqual(5);
+    // the paper edge is a build intermediate, not a shipped asset
+    expect(files).not.toContain("paper-edge.png");
+
+    const headers = await read("_headers");
+    expect(headers).toContain("/world/*.mp4");
+    expect(headers).toContain("/world/engine.js");
+  });
+
+  it("keeps every shipped file inside Cloudflare's per asset limit", async () => {
+    const limit = 25 * 1024 * 1024;
+    const walk = async (dir) => {
+      const entries = await readdir(dir, { withFileTypes: true });
+      const files = await Promise.all(
+        entries.map((entry) =>
+          entry.isDirectory() ? walk(path.join(dir, entry.name)) : [path.join(dir, entry.name)],
+        ),
+      );
+      return files.flat();
+    };
+
+    for (const file of await walk(outDir)) {
+      const { size } = await stat(file);
+      expect(size, path.relative(outDir, file)).toBeLessThan(limit);
+    }
+  });
+
   it("includes both client sites, website and presentation", async () => {
     for (const project of PROJECT_DIRS) {
       expect(await size(path.join("projects", project, "index.html")), project).toBeGreaterThan(
@@ -78,6 +111,9 @@ describe("the build", () => {
       "projects",
       "slides.js",
       "style.css",
+      "world",
+      "world.html",
+      "world.js",
     ]);
   });
 

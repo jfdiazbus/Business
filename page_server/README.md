@@ -31,6 +31,8 @@ that ships to Cloudflare or to a Docker container.
 | `scripts/banner.mjs`              | Draws the banner with figlet                                            |
 | `scripts/deploy.mjs`              | Builds and uploads, reading credentials from `.secrets`                 |
 | `slides.js`                       | One keypress per slide, and marks the slide you are on                  |
+| `world.html`, `world.js`          | The scroll world page, and its config                                   |
+| `world/`                          | The film: scene sources, the render + motion steps, and `out/`          |
 | `test/`                           | Tests for the server, the page, the styles, the build and the pipelines |
 | `Dockerfile`, `docker/nginx.conf` | The container that serves `dist/`                                       |
 | `.secrets`                        | Your Cloudflare credentials. Gitignored — never committed               |
@@ -91,9 +93,40 @@ page. Where scroll timelines or snapping are not supported, or for anyone who
 asked their system for reduced motion, the slides stop snapping and everything
 appears complete. Printing gives one page per slide, with all of it visible.
 
+## The scroll world
+
+`world.html` is a second page: a scroll driven flight through a paper print
+shop, five scenes long, with each scene's copy pinned over it. The deck offers
+it as "walk through the print shop".
+
+The film is **made by hand rather than by a video model**. The scenes are drawn
+as cardstock in `world/kit.mjs` and `world/scenes.mjs`, rendered to transparent
+PNGs with headless Chrome, and animated with ffmpeg — so it costs nothing to
+regenerate, and every seam is exact because both sides of it are mine.
+
+| Command                            | What it does                                            |
+| ---------------------------------- | ------------------------------------------------------- |
+| `node world/render.mjs`            | redraw all layers to `world/build/{svg,png}`            |
+| `node world/render.mjs print-room` | just one scene, while tuning the art                    |
+| `node world/motion.mjs`            | dives, wipes and posters into `world/out`               |
+| `node world/motion.mjs preview`    | write frames from every clip into `world/build/preview` |
+
+**How the camera works.** It is locked isometric, so nothing rotates or tilts:
+each layer simply slides at its own speed — 0.45 for the wall, 1 for the hero,
+1.25 for the paper sweeping past the lens — and the depth comes from the
+difference. Because the camera only ever travels one way, the velocity matches
+at every seam, and each wipe begins and ends on the _actual_ frames of the
+dives beside it (the `world.test.js` film checks and the preview frames keep
+that honest; measured seam difference is 1.4/255, which is encode noise).
+
+`world/engine.js` is the scrub engine from the scroll-world skill, copied
+unchanged so it can be pulled from upstream later; `world.js` holds only the
+config (sections, copy, accents) and the deck's paper tokens. `world/build` is
+scratch and is not committed; `world/out` is the film the site ships.
+
 ## Tests
 
-`pnpm test` runs seven suites:
+`pnpm test` runs eight suites:
 
 - **server** — routing, content types, redirects, the friendly 404, request
   methods, and that a URL can never climb out of the folders it serves.
@@ -107,8 +140,10 @@ appears complete. Printing gives one page per slide, with all of it visible.
   paths, is repeatable, and has no broken links.
 - **deploy** — credentials stay out of git and out of the image, and an
   unfilled `.secrets` template can never look like a real token.
-- **slides** — what each keypress does, including the case of a slide taller
-  than the screen, and which slide the nav should mark.
+- **slides** — what each keypress does, including the case of a slide taller than the screen, and which slide the nav should mark.
+- **world** — the scroll world's config points at assets that exist, the film
+  fits Cloudflare's per file limit, the copy keeps to the house rules (no
+  hyphens, no cliches, one action), and the vendored engine is intact.
 - **project** — the promises this project makes about itself: no runtime
   dependencies, the pipeline files exist, git stays clean.
 

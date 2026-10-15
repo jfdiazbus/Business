@@ -151,4 +151,11 @@ describe("page.html", () => {
     expect(scripts.map((script) => script.getAttribute("src"))).toEqual(["slides.js"]);
     expect(scripts[0].getAttribute("type")).toBe("module");
   });
+
+  it("offers the scroll world from the title page", () => {
+    const tour = document.querySelector(".tour a");
+
+    expect(tour?.getAttribute("href")).toBe("/world.html");
+    expect(tour.textContent).toContain("print shop");
+  });
 });
