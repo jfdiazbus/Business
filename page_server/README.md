@@ -6,32 +6,32 @@ Cloudflare or to a Docker container.
 
 ## Everyday commands
 
-| Command | What it does |
-| --- | --- |
+| Command        | What it does                                                      |
+| -------------- | ----------------------------------------------------------------- |
 | `pnpm install` | Install the dev tools (only needed once, and after a fresh clone) |
-| `pnpm start` | Open it at <http://localhost:3000> |
-| `pnpm dev` | The same, but reloads when you edit a file |
-| `pnpm test` | Run the tests |
-| `pnpm build` | Write the deployable site to `dist/` |
-| `pnpm banner` | Redraw the HELLO banner |
-| `pnpm format` | Tidy the code with Prettier |
-| `pnpm deploy` | Ship `dist/` to Cloudflare |
+| `pnpm start`   | Open it at <http://localhost:3000>                                |
+| `pnpm dev`     | The same, but reloads when you edit a file                        |
+| `pnpm test`    | Run the tests                                                     |
+| `pnpm build`   | Write the deployable site to `dist/`                              |
+| `pnpm banner`  | Redraw the HELLO banner                                           |
+| `pnpm format`  | Tidy the code with Prettier                                       |
+| `pnpm deploy`  | Ship `dist/` to Cloudflare                                        |
 
 `node_modules/` and `dist/` are not committed — they are built from
 `package.json` and the source files.
 
 ## What's in here
 
-| Path | What it does |
-| --- | --- |
-| `page.html` | The portfolio itself — all the words live here |
-| `style.css` | The look: paper, green bars, red accents |
-| `index.js` | The local server. No dependencies, only Node's own modules |
-| `scripts/build.mjs` | Assembles `dist/` for Docker and Cloudflare |
-| `scripts/banner.mjs` | Draws the banner with figlet |
-| `test/` | Tests for the server, the page, the build and the pipelines |
-| `Dockerfile`, `docker/nginx.conf` | The container that serves `dist/` |
-| `wrangler.toml` | Cloudflare configuration |
+| Path                              | What it does                                                |
+| --------------------------------- | ----------------------------------------------------------- |
+| `page.html`                       | The portfolio itself — all the words live here              |
+| `style.css`                       | The look: paper, green bars, red accents                    |
+| `index.js`                        | The local server. No dependencies, only Node's own modules  |
+| `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                 |
+| `scripts/banner.mjs`              | Draws the banner with figlet                                |
+| `test/`                           | Tests for the server, the page, the build and the pipelines |
+| `Dockerfile`, `docker/nginx.conf` | The container that serves `dist/`                           |
+| `wrangler.toml`                   | Cloudflare configuration                                    |
 
 ## Editing the text
 
@@ -56,14 +56,33 @@ pnpm banner
 That rewrites the `<pre class="banner">` block in `page.html`. A test checks
 the banner still matches a real figlet rendering, so it can never drift.
 
+## How it moves
+
+The whole page is one sheet of paper, and it behaves like paper going through
+a printer:
+
+- The tractor-feed holes on both edges advance as you scroll, and a small red
+  print head rides down the strip so you can see how far you are.
+- Rules, headings, project cards and dot leaders print in as they come into
+  view — the green bar sweeps across, then the words settle.
+- The "keep scrolling" cue in the hero leaves as soon as you start.
+
+It is all CSS (`animation-timeline`), so the page still ships no JavaScript.
+Where scroll timelines are not supported — or for anyone who asked their
+system for reduced motion — the page simply appears complete, and printing it
+to PDF always shows everything.
+
 ## Tests
 
-`pnpm test` runs four suites:
+`pnpm test` runs five suites:
 
 - **server** — routing, content types, redirects, the friendly 404, request
   methods, and that a URL can never climb out of the folders it serves.
 - **page** — the words on the page stay human: no terminal jargon, headings in
   order, every link readable, the banner still genuine ASCII art.
+- **style** — the paper really does span the page, the hero owns the first
+  screen, and no animation can run without either scroll-timeline support or a
+  visitor who is happy with motion.
 - **build** — `dist/` contains both client sites and the plans, leaks no local
   paths, is repeatable, and has no broken links.
 - **project** — the promises this project makes about itself: no runtime
@@ -85,10 +104,10 @@ name.
 Every push to `main` also deploys, through `.github/workflows/deploy.yml`.
 That workflow needs two repository secrets:
 
-| Secret | Where to get it |
-| --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → *Edit Cloudflare Workers* template |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → right-hand sidebar |
+| Secret                  | Where to get it                                                                     |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | Cloudflare dashboard → My Profile → API Tokens → _Edit Cloudflare Workers_ template |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → right-hand sidebar                         |
 
 `.github/workflows/ci.yml` runs the tests, the formatting check and the build
 on every push and pull request.

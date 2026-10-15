@@ -114,4 +114,12 @@ describe("page.html", () => {
       expect(row.querySelector(".v")?.textContent.trim().length).toBeGreaterThan(0);
     }
   });
+
+  it("tells the visitor there is more to scroll to, without nagging a screen reader", () => {
+    const hint = document.querySelector(".scroll-hint");
+
+    expect(hint?.getAttribute("aria-hidden")).toBe("true");
+    expect(hint.textContent).toContain("scrolling");
+    expect(hint.closest(".hero")).toBeTruthy();
+  });
 });

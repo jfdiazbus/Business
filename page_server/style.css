@@ -3,12 +3,14 @@
 :root {
   --paper: #f0eee6;
   --paper-edge: #e5e1d4;
-  --desk: #cdc9ba;
+  --desk: #cdc9ba; /* the dark showing through the punched holes */
   --bar: #dde7d4;
   --ink: #1b1b18;
   --ink-soft: #5f5c52;
   --ribbon: #b03024;
   --measure: 74ch;
+  --page-max: 1120px;
+  --hole-pitch: 34px; /* one sprocket hole per repeat */
   --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
 }
 
@@ -20,7 +22,7 @@
 
 body {
   margin: 0;
-  background: var(--desk);
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--mono);
   font-size: 15px;
@@ -66,35 +68,53 @@ body {
   text-decoration: none;
 }
 
-/* -- the sheet ---------------------------------------------------------- */
+/* -- the sheet: paper fills the whole page ------------------------------ */
 
 .sheet {
-  max-width: 960px;
-  min-height: 100dvh;
-  margin: 0 auto;
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
   background: var(--paper);
-  display: flex;
 }
 
+/* the tractor-feed edges stay put while the paper feeds past them */
 .sprocket {
-  flex: 0 0 34px;
-  background:
-    radial-gradient(circle at 17px 17px, var(--desk) 0 5.5px, transparent 6px) 0 0 / 34px 34px
-      repeat-y,
-    var(--paper-edge);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: var(--hole-pitch);
+  overflow: hidden;
+  background: var(--paper-edge);
   border-right: 1px dashed rgba(27, 27, 24, 0.22);
+  pointer-events: none;
 }
 
 .sprocket--r {
+  left: auto;
+  right: 0;
   border-right: 0;
   border-left: 1px dashed rgba(27, 27, 24, 0.22);
 }
 
+/* the holes, on a strip long enough that the feed never shows a gap */
+.sprocket::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--hole-pitch) * -5) 0 0;
+  background: radial-gradient(
+      circle at calc(var(--hole-pitch) / 2) calc(var(--hole-pitch) / 2),
+      var(--desk) 0 5.5px,
+      transparent 6px
+    )
+    0 0 / var(--hole-pitch) var(--hole-pitch) repeat-y;
+}
+
 .page {
-  flex: 1 1 auto;
-  min-width: 0;
-  padding: 26px clamp(16px, 4vw, 46px) 64px;
-  container-type: inline-size;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 26px clamp(20px, 5vw, 72px) 80px;
 }
 
 /* -- header ------------------------------------------------------------- */
@@ -160,7 +180,7 @@ body {
   font-size: 14px;
   color: var(--ink-soft);
   opacity: 0.5;
-  margin: clamp(28px, 5vh, 46px) 0 20px;
+  margin: clamp(40px, 9vh, 96px) 0 28px;
   user-select: none;
 }
 
@@ -172,19 +192,26 @@ body {
   content: "------------------------------------------------------------------------------------------------------------------------------------";
 }
 
-/* -- hero --------------------------------------------------------------- */
+/* -- hero: the first screen belongs to the banner ----------------------- */
 
 .hero {
-  padding-top: clamp(22px, 6vh, 46px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* the header sits above: leave just enough room for it to land a screen tall */
+  min-height: calc(100vh - 52px);
+  min-height: calc(100svh - 52px);
+  padding-top: clamp(20px, 5vh, 44px);
 }
 
 .banner {
-  margin: 4px 0 22px;
+  /* the auto top margin balances the block against the scroll cue below */
+  margin: auto 0 22px;
   padding: 0;
   font-family: var(--mono);
-  /* the banner is 36 characters wide: 1cqi ≈ a fifth of the column, with margin for fallback fonts */
-  font-size: clamp(12px, 3vw, 30px);
-  font-size: clamp(12px, 4.4cqi, 36px);
+  /* 36 characters wide: ~3.45vw keeps the art inside the column at every width,
+     44px is as large as the 1120px page allows */
+  font-size: clamp(11px, 3.45vw, 44px);
   line-height: 1.1;
   overflow-x: auto;
 }
@@ -201,6 +228,14 @@ body {
 
 .page p {
   max-width: var(--measure);
+}
+
+/* a small, quiet cue that there is more below — it leaves once you scroll */
+.scroll-hint {
+  margin: auto 0 0;
+  padding-top: 40px;
+  font-size: 14px;
+  color: var(--ink-soft);
 }
 
 /* -- project cards ------------------------------------------------------ */
@@ -310,7 +345,7 @@ body {
   color: var(--ink-soft);
 }
 
-/* -- motion: the banner prints, then rests ------------------------------ */
+/* -- motion: the banner prints on arrival ------------------------------- */
 
 @media (prefers-reduced-motion: no-preference) {
   .banner .line {
@@ -328,27 +363,144 @@ body {
   }
 }
 
+/* the print head sweeping across a line of type */
+@keyframes wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* the paper advancing through the tractor feed */
+@keyframes feed {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 calc(var(--hole-pitch) * 5);
+  }
+}
+
+/* the print head travelling down the page as you read */
+@keyframes head {
+  from {
+    translate: 0 12px;
+  }
+  to {
+    translate: 0 calc(100svh - 26px);
+  }
+}
+
+/* -- scroll: the page prints itself as you go down ---------------------- */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* the holes advance with the scroll, as if the paper were feeding */
+    .sprocket::before {
+      animation: feed linear both;
+      animation-timeline: scroll(root block);
+    }
+
+    /* the print head rides down the sprocket strip, marking a hole as it goes */
+    .sprocket::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: calc(50% - 5.5px);
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--ribbon);
+      animation: head linear both;
+      animation-timeline: scroll(root block);
+    }
+
+    /* the scroll cue leaves as soon as you start */
+    .scroll-hint {
+      animation: print 0.2s linear both;
+      animation-direction: reverse;
+      animation-timeline: scroll(root block);
+      animation-range: 0% 10%;
+    }
+
+    /* rules print across the sheet */
+    .rule {
+      animation: wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 26%;
+    }
+
+    /* headings and their red marker arrive first, words settle after */
+    .heading {
+      animation: print 0.12s steps(2, end) both;
+      animation-timeline: view();
+      animation-range: entry 6% cover 22%;
+    }
+
+    /* a card prints: the green bar sweeps across, then the words */
+    .project h3 {
+      animation: wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 20%;
+    }
+
+    .project p,
+    .project .links {
+      animation: print 0.12s steps(2, end) both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 34%;
+    }
+
+    /* dot leaders draw across the row, the value settles after */
+    .leader .fill {
+      animation: wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 30%;
+    }
+
+    .leader .v {
+      animation: print 0.1s steps(2, end) both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 36%;
+    }
+  }
+}
+
 /* -- small screens ------------------------------------------------------ */
 
 @media (max-width: 639px) {
   .sprocket {
     display: none;
   }
+
+  .hero {
+    /* the header wraps to two lines on a phone */
+    min-height: calc(100svh - 107px);
+  }
 }
 
 /* -- print: it is a printout, after all --------------------------------- */
 
 @media print {
+  /* a paper printout shows everything, so no scroll-driven states may hide it */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+  }
+
   body {
     background: #fff;
   }
 
   .sheet {
-    max-width: none;
     min-height: 0;
   }
 
   .sprocket,
+  .scroll-hint,
   .topbar nav,
   .skip {
     display: none;
