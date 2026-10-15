@@ -18,7 +18,7 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "deploy": "wrangler deploy"
+    "deploy": "node scripts/deploy.mjs"
   },
   "devDependencies": {
     "figlet": "^1.12.0",

@@ -7,9 +7,11 @@ dist/
 page_server/dist/
 .wrangler/
 
-# environment
+# credentials — never commit these
 .env
 .env.*
+.secrets
+.dev.vars
 
 # logs
 *.log

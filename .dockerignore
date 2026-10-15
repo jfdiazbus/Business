@@ -4,4 +4,7 @@
 **/dist
 **/.wrangler
 **/.agents
+**/.secrets
+.env
+.env.*
 *.log

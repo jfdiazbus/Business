@@ -6,16 +6,16 @@ Cloudflare or to a Docker container.
 
 ## Everyday commands
 
-| Command        | What it does                                                      |
-| -------------- | ----------------------------------------------------------------- |
-| `pnpm install` | Install the dev tools (only needed once, and after a fresh clone) |
-| `pnpm start`   | Open it at <http://localhost:3000>                                |
-| `pnpm dev`     | The same, but reloads when you edit a file                        |
-| `pnpm test`    | Run the tests                                                     |
-| `pnpm build`   | Write the deployable site to `dist/`                              |
-| `pnpm banner`  | Redraw the HELLO banner                                           |
-| `pnpm format`  | Tidy the code with Prettier                                       |
-| `pnpm deploy`  | Ship `dist/` to Cloudflare                                        |
+| Command           | What it does                                                      |
+| ----------------- | ----------------------------------------------------------------- |
+| `pnpm install`    | Install the dev tools (only needed once, and after a fresh clone) |
+| `pnpm start`      | Open it at <http://localhost:3000>                                |
+| `pnpm dev`        | The same, but reloads when you edit a file                        |
+| `pnpm test`       | Run the tests                                                     |
+| `pnpm build`      | Write the deployable site to `dist/`                              |
+| `pnpm banner`     | Redraw the HELLO banner                                           |
+| `pnpm format`     | Tidy the code with Prettier                                       |
+| `pnpm run deploy` | Build and ship `dist/` to Cloudflare                              |
 
 `node_modules/` and `dist/` are not committed — they are built from
 `package.json` and the source files.
@@ -31,6 +31,7 @@ Cloudflare or to a Docker container.
 | `scripts/banner.mjs`              | Draws the banner with figlet                                |
 | `test/`                           | Tests for the server, the page, the build and the pipelines |
 | `Dockerfile`, `docker/nginx.conf` | The container that serves `dist/`                           |
+| `.secrets`                        | Your Cloudflare credentials. Gitignored — never committed   |
 | `wrangler.toml`                   | Cloudflare configuration                                    |
 
 ## Editing the text
@@ -93,24 +94,88 @@ to PDF always shows everything.
 The worker has no code of its own — it only serves `dist/`.
 
 ```bash
-pnpm build
-pnpm deploy          # runs: wrangler deploy
+cd page_server
+pnpm run deploy              # builds dist/, then uploads it
+pnpm run deploy -- --dry-run # builds and reports, without uploading
 ```
 
-The first time, run `npx wrangler login`, or set `CLOUDFLARE_API_TOKEN` in the
-environment. Change `name` in `wrangler.toml` if you want a different worker
-name.
+> `pnpm run deploy`, not `pnpm deploy`: pnpm has its own `deploy` command for
+> workspaces, so the short form silently runs the wrong thing.
 
-Every push to `main` also deploys, through `.github/workflows/deploy.yml`.
-That workflow needs two repository secrets:
+### Signing in
 
-| Secret                  | Where to get it                                                                     |
-| ----------------------- | ----------------------------------------------------------------------------------- |
-| `CLOUDFLARE_API_TOKEN`  | Cloudflare dashboard → My Profile → API Tokens → _Edit Cloudflare Workers_ template |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → right-hand sidebar                         |
+Pick whichever suits you:
+
+**On your own machine — log in once.** No keys to handle:
+
+```bash
+pnpm exec wrangler login
+pnpm run deploy
+```
+
+**With an API token — for scripts, containers, CI.** Put the two values in
+`page_server/.secrets` (it is gitignored, and `pnpm run deploy` reads it for
+you):
+
+```
+CLOUDFLARE_API_TOKEN=your-token-here
+CLOUDFLARE_ACCOUNT_ID=your-account-id-here
+```
+
+### Getting the API token
+
+1. Sign in to the [Cloudflare dashboard](https://dash.cloudflare.com) and open
+   **My Profile → API Tokens**.
+2. Select **Create Token**.
+3. Under templates, choose **Edit Cloudflare Workers**. (It grants the token
+   permission to publish workers, and nothing else.)
+4. Leave the token name as the template filled it in — something like
+   _Edit Cloudflare Workers_ — and set **Account Resources** to your own
+   account. Add a **Zone** resource too if the site will live on a domain you
+   already have in Cloudflare.
+5. Select **Continue to summary**, check it reads _Workers Scripts: Edit_, then
+   select **Create Token**.
+6. Copy the token now: Cloudflare shows it **once**. It looks like
+   `cfut_...`. Paste it into the `CLOUDFLARE_API_TOKEN=` line of `.secrets`.
+
+### Getting the account ID
+
+In the same dashboard, go to **Workers & Pages**: the **Account ID** is listed
+in the right-hand column (it is also the long hash in the dashboard URL). Paste
+it into the `CLOUDFLARE_ACCOUNT_ID=` line of `.secrets`.
+
+Or, after logging in, ask wrangler:
+
+```bash
+pnpm exec wrangler whoami      # prints the account ID and the token's status
+```
+
+### Every push to `main`
+
+`.github/workflows/deploy.yml` runs the tests, builds the site and deploys it.
+It needs the same two values as repository secrets — **Settings → Secrets and
+variables → Actions → New repository secret**:
+
+| Secret                  | Value                     |
+| ----------------------- | ------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | the token from above      |
+| `CLOUDFLARE_ACCOUNT_ID` | the account ID from above |
 
 `.github/workflows/ci.yml` runs the tests, the formatting check and the build
-on every push and pull request.
+on every push and pull request, so nothing reaches Cloudflare untested.
+
+### Keeping the token safe
+
+- Never paste it into `wrangler.toml`, `page.html`, an issue or a chat: it is
+  the key to your account. `.secrets` is gitignored and excluded from the
+  Docker image for that reason.
+- It is shown only once. If it leaks, delete it in **My Profile → API Tokens**
+  and create a new one — a token can be revoked at any moment.
+- Tokens start with `cfut_`, which lets secret scanners spot them in a
+  repository.
+- Set an expiry date on the token if you would rather rotate it yearly.
+
+Change `name` in `wrangler.toml` if you want a different worker name.
 
 ## Running it in Docker
 

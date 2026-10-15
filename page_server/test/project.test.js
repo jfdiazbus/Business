@@ -43,7 +43,7 @@ describe("the project", () => {
     for (const script of ["start", "dev", "build", "test", "deploy", "banner"]) {
       expect(pkg.scripts[script], script).toBeTruthy();
     }
-    expect(pkg.scripts.deploy).toContain("wrangler deploy");
+    expect(pkg.scripts.deploy).toContain("scripts/deploy.mjs");
     expect(pkg.type).toBe("module");
     expect(pkg.private).toBe(true);
   });
