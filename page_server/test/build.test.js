@@ -38,6 +38,12 @@ describe("the build", () => {
     expect(await size("style.css")).toBeGreaterThan(500);
   });
 
+  it("copies the script that makes the slides behave like a deck", async () => {
+    expect(await size("slides.js")).toBeGreaterThan(500);
+    expect(await read("index.html")).toContain('src="slides.js"');
+    expect(await read("_headers")).toContain("/slides.js");
+  });
+
   it("includes both client sites, website and presentation", async () => {
     for (const project of PROJECT_DIRS) {
       expect(await size(path.join("projects", project, "index.html")), project).toBeGreaterThan(
@@ -70,6 +76,7 @@ describe("the build", () => {
       "docs",
       "index.html",
       "projects",
+      "slides.js",
       "style.css",
     ]);
   });

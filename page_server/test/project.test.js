@@ -37,6 +37,13 @@ describe("the project", () => {
     }
   });
 
+  it("keeps the deck's script free of imports, too", async () => {
+    const script = await read("slides.js");
+
+    expect(script).not.toMatch(/^\s*import\s/m);
+    expect(script).not.toContain("require(");
+  });
+
   it("exposes the commands the pipelines call", async () => {
     const pkg = JSON.parse(await read("package.json"));
 
@@ -63,15 +70,26 @@ describe("the project", () => {
     expect(ignore).toContain("dist");
   });
 
-  it("has a CI workflow that tests, and a deploy workflow that ships", async () => {
+  it("lets Cloudflare build the site, keeping CI to tests", async () => {
     const ci = await read(".github/workflows/ci.yml", REPO_ROOT);
-    const deploy = await read(".github/workflows/deploy.yml", REPO_ROOT);
 
     expect(ci).toContain("pnpm test");
     expect(ci).toContain("pnpm build");
-    expect(deploy).toContain("pnpm test");
-    expect(deploy).toContain("npx wrangler deploy");
-    expect(deploy).toContain("secrets.CLOUDFLARE_API_TOKEN");
+
+    // Cloudflare's Git integration publishes the site, so a second, GitHub-side
+    // deploy must not be racing it.
+    expect(await exists(".github/workflows/deploy.yml", REPO_ROOT)).toBe(false);
+    expect(await exists("wrangler.toml")).toBe(true);
+    expect(await read(".node-version")).toMatch(/^\d+\s*$/);
+  });
+
+  it("writes down the settings Cloudflare builds with", async () => {
+    const readme = await read("README.md");
+
+    expect(readme).toContain("jfdiazbus-portfolio"); // the Worker name
+    expect(readme).toContain("page_server"); // the root directory
+    expect(readme).toContain("pnpm build"); // the build command
+    expect(readme).toContain("npx wrangler deploy"); // the deploy command
   });
 
   it("has a Dockerfile that serves the built site", async () => {

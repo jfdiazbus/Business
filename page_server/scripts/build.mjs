@@ -21,6 +21,7 @@ export const DEFAULT_OUT = path.join(PROJECT_ROOT, "dist");
 export const PAGE_FILES = [
   ["page.html", "index.html"],
   ["style.css", "style.css"],
+  ["slides.js", "slides.js"],
 ];
 
 /** folders copied from the workspace into dist/projects/ */
@@ -35,6 +36,9 @@ export const HEADERS = `/projects/*/assets/*
   Cache-Control: public, max-age=31536000, immutable
 
 /style.css
+  Cache-Control: public, max-age=3600
+
+/slides.js
   Cache-Control: public, max-age=3600
 
 /projects/*

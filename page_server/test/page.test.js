@@ -122,4 +122,33 @@ describe("page.html", () => {
     expect(hint.textContent).toContain("scrolling");
     expect(hint.closest(".hero")).toBeTruthy();
   });
+
+  it("is a deck: four slides, each numbered after the title page", () => {
+    const slides = [...document.querySelectorAll("main > .slide")];
+
+    expect(slides).toHaveLength(4);
+    expect(slides[0].classList.contains("hero")).toBe(true);
+
+    slides.slice(1).forEach((slide, index) => {
+      const count = slide.querySelector(":scope > .slide-top .count");
+
+      expect(slide.querySelector(":scope > .rule"), slide.id).toBeTruthy();
+      expect(count.textContent.replace(/\s+/g, " ").trim()).toBe(`${index + 2} / 4`);
+    });
+  });
+
+  it("ends the deck on the contact slide", () => {
+    const last = document.querySelector("main > .slide:last-of-type");
+
+    expect(last.id).toBe("contact");
+    expect(last.querySelector("footer .eof").textContent).toContain("Thanks for reading");
+    expect(last.querySelector("footer .colophon")).toBeTruthy();
+  });
+
+  it("loads one small module, and no frameworks", () => {
+    const scripts = [...document.querySelectorAll("script[src]")];
+
+    expect(scripts.map((script) => script.getAttribute("src"))).toEqual(["slides.js"]);
+    expect(scripts[0].getAttribute("type")).toBe("module");
+  });
 });

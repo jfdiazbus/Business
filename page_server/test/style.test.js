@@ -91,11 +91,26 @@ describe("the page fills the screen", () => {
     expect(page).toContain("max-width: var(--page-max)");
   });
 
-  it("gives the hero the first screen", () => {
-    const hero = ruleBody(css, ".hero");
+  it("gives every slide a screen of its own", () => {
+    const slide = ruleBody(css, ".slide");
 
-    expect(hero).toMatch(/min-height: calc\(100(s?v)h - /);
-    expect(hero).toContain("justify-content: center");
+    expect(slide).toMatch(/min-block-size: 100(s?v)h/);
+    expect(slide).toContain("scroll-snap-align: start");
+    expect(slide).toContain("padding-block");
+  });
+
+  it("keeps the name and nav reachable from every slide", () => {
+    const topbar = ruleBody(css, ".topbar");
+
+    expect(topbar).toContain("position: sticky");
+    expect(topbar).toMatch(/z-index: \d/);
+    expect(topbar).toContain("background");
+  });
+
+  it("centres a slide without cropping one that is taller than the screen", () => {
+    // auto margins, not justify-content: center, which clips the overflow
+    expect(css).toMatch(/\.slide > \.rule:first-child\s*\{[^}]*margin-block: auto/);
+    expect(css).not.toMatch(/\.slide\s*\{[^}]*justify-content: center/);
   });
 
   it("hides the decorative strips on small screens", () => {
@@ -120,6 +135,21 @@ describe("the scroll animations", () => {
 
     expect(print).toMatch(/animation:\s*none\s*!important/);
     expect(print).toContain(".scroll-hint");
+  });
+
+  it("prints a stack of pages, not a stack of screens", () => {
+    const print = blocks(css, /@media\s*print\s*\{/)[0].body;
+
+    expect(print).toMatch(/\.slide\s*\{[^}]*min-block-size: 0/);
+    expect(print).toMatch(/\.topbar\s*\{[^}]*position: static/);
+  });
+
+  it("snaps between slides, and not at all for someone who would rather scroll freely", () => {
+    const snapping = blocks(css, MOTION)[0].body;
+    const calm = blocks(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{/)[0].body;
+
+    expect(snapping).toContain("scroll-snap-type: y proximity");
+    expect(calm).toContain("scroll-snap-type: none");
   });
 
   it("never uses a scroll timeline where it is not supported", () => {

@@ -11,6 +11,8 @@
   --measure: 74ch;
   --page-max: 1120px;
   --hole-pitch: 34px; /* one sprocket hole per repeat */
+  /* the dot leaders, shared by skill rows and slide headings */
+  --dots: "................................................................................................................................................................................................";
   --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
 }
 
@@ -29,9 +31,18 @@ body {
   line-height: 1.65;
 }
 
+/* the deck scrolls one slide at a time, when the browser can snap */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
+  }
+}
+
+/* no snapping for anyone who would rather scroll freely */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-snap-type: none;
   }
 }
 
@@ -114,17 +125,25 @@ body {
 .page {
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: 26px clamp(20px, 5vw, 72px) 80px;
+  /* the slides bring their own vertical space */
+  padding: 0 clamp(20px, 5vw, 72px);
 }
 
 /* -- header ------------------------------------------------------------- */
 
+/* the name and nav ride along, so the deck is reachable from any slide */
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 10px 24px;
+  gap: 8px 24px;
+  padding-block: 10px;
+  background: var(--paper);
+  border-bottom: 1px dashed rgba(27, 27, 24, 0.18);
   font-size: 14px;
 }
 
@@ -149,8 +168,14 @@ body {
 }
 
 .topbar nav a:hover,
-.topbar nav a:focus-visible {
+.topbar nav a:focus-visible,
+.topbar nav a[aria-current="true"] {
   color: var(--ribbon);
+}
+
+/* the slide you are looking at gets noticed */
+.topbar nav a[aria-current="true"] {
+  font-weight: 600;
 }
 
 /* -- section headings --------------------------------------------------- */
@@ -169,6 +194,33 @@ body {
 .sigil {
   color: var(--ribbon);
   font-weight: 700;
+}
+
+/* the heading row of a slide: name ......... 2 / 4 */
+.slide-top {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2ch;
+  margin: 0 0 16px;
+}
+
+.slide-top .heading {
+  margin: 0;
+}
+
+.slide-top .fill {
+  flex: 1 1 8ch;
+  min-width: 8ch;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+
+.slide-top .count {
+  flex: 0 0 auto;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
 }
 
 /* -- ascii rules -------------------------------------------------------- */
@@ -192,16 +244,32 @@ body {
   content: "------------------------------------------------------------------------------------------------------------------------------------";
 }
 
-/* -- hero: the first screen belongs to the banner ----------------------- */
+/* -- slides: one screen each, snapping like a deck ---------------------- */
 
-.hero {
+.slide {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  /* the header sits above: leave just enough room for it to land a screen tall */
-  min-height: calc(100vh - 52px);
-  min-height: calc(100svh - 52px);
-  padding-top: clamp(20px, 5vh, 44px);
+  min-block-size: 100vh;
+  min-block-size: 100svh;
+  /* the top padding is room for the sticky header above it */
+  padding-block: clamp(72px, 9vh, 96px) clamp(32px, 6vh, 64px);
+  scroll-snap-align: start;
+}
+
+/* centring with auto margins, so a slide taller than the screen
+   (a narrow phone, say) still starts at its first line instead of being
+   cropped at the top the way `justify-content: center` would crop it */
+.slide > .rule:first-child {
+  margin-block: auto 28px;
+}
+
+.slide:not(.hero) > :last-child {
+  margin-block-end: auto;
+}
+
+/* slide 1: the title page */
+.hero {
+  padding-block-start: clamp(20px, 5vh, 44px);
 }
 
 .banner {
@@ -312,8 +380,9 @@ body {
   color: var(--ink-soft);
 }
 
-.leader .fill::after {
-  content: "................................................................................................................................................................................................";
+.leader .fill::after,
+.slide-top .fill::after {
+  content: var(--dots);
 }
 
 .leader .v {
@@ -331,7 +400,11 @@ body {
   text-decoration: underline;
 }
 
-/* -- footer ------------------------------------------------------------- */
+/* -- footer: the last lines of the deck --------------------------------- */
+
+.slide-foot {
+  margin-block-start: clamp(28px, 5vh, 48px);
+}
 
 .eof {
   margin: 0 0 6px;
@@ -443,27 +516,31 @@ body {
     .project h3 {
       animation: wipe linear both;
       animation-timeline: view();
-      animation-range: entry 0% cover 20%;
+      animation-range: entry 0% cover 14%;
     }
 
     .project p,
-    .project .links {
+    .project .links,
+    .count,
+    .eof,
+    .colophon {
       animation: print 0.12s steps(2, end) both;
       animation-timeline: view();
-      animation-range: entry 8% cover 34%;
+      animation-range: entry 4% cover 18%;
     }
 
     /* dot leaders draw across the row, the value settles after */
-    .leader .fill {
+    .leader .fill,
+    .slide-top .fill {
       animation: wipe linear both;
       animation-timeline: view();
-      animation-range: entry 5% cover 30%;
+      animation-range: entry 0% cover 14%;
     }
 
     .leader .v {
       animation: print 0.1s steps(2, end) both;
       animation-timeline: view();
-      animation-range: entry 10% cover 36%;
+      animation-range: entry 4% cover 18%;
     }
   }
 }
@@ -473,11 +550,6 @@ body {
 @media (max-width: 639px) {
   .sprocket {
     display: none;
-  }
-
-  .hero {
-    /* the header wraps to two lines on a phone */
-    min-height: calc(100svh - 107px);
   }
 }
 
@@ -497,6 +569,16 @@ body {
 
   .sheet {
     min-height: 0;
+  }
+
+  /* a printed deck is a stack of pages, not a stack of screens */
+  .topbar {
+    position: static;
+  }
+
+  .slide {
+    min-block-size: 0;
+    padding-block: 0 clamp(20px, 4vh, 40px);
   }
 
   .sprocket,
