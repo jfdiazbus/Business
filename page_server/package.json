@@ -1,23 +1,30 @@
 {
   "name": "page_server",
   "version": "1.0.0",
-  "description": "ASCII portfolio printed on green-bar paper, served by a zero-dependency Node server.",
-  "main": "index.js",
+  "description": "ASCII portfolio printed on green-bar paper — built to static files, served by a zero-dependency Node server, deployed to Cloudflare.",
   "type": "module",
   "private": true,
+  "license": "ISC",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@12.8.1",
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "banner": "node scripts/banner.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "deploy": "wrangler deploy"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "figlet": "^1.12.0",
     "jsdom": "^30.1.2",
-    "next": "^16.4.0",
     "prettier": "^3.9.10",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.4",
+    "wrangler": "^4.151.0"
   }
 }

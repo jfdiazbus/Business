@@ -79,7 +79,8 @@ body {
 .sprocket {
   flex: 0 0 34px;
   background:
-    radial-gradient(circle at 17px 17px, var(--desk) 0 5.5px, transparent 6px) 0 0 / 34px 34px repeat-y,
+    radial-gradient(circle at 17px 17px, var(--desk) 0 5.5px, transparent 6px) 0 0 / 34px 34px
+      repeat-y,
     var(--paper-edge);
   border-right: 1px dashed rgba(27, 27, 24, 0.22);
 }
@@ -181,7 +182,7 @@ body {
   margin: 4px 0 22px;
   padding: 0;
   font-family: var(--mono);
-  /* 35 characters wide: 1cqi ≈ a fifth of the column, with margin for fallback fonts */
+  /* the banner is 36 characters wide: 1cqi ≈ a fifth of the column, with margin for fallback fonts */
   font-size: clamp(12px, 3vw, 30px);
   font-size: clamp(12px, 4.4cqi, 36px);
   line-height: 1.1;
