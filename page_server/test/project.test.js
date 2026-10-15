@@ -55,6 +55,16 @@ describe("the project", () => {
     expect(pkg.private).toBe(true);
   });
 
+  it("can run the commands Cloudflare's builder uses", async () => {
+    const config = await read("wrangler.toml");
+
+    // branch builds run `wrangler preview`, and it refuses to run at all
+    // without a previews block; that failure only shows up in CI, so pin it
+    expect(config).toMatch(/^\[previews\]$/m);
+    expect(config).toContain("[assets]");
+    expect(config).toContain('directory = "./dist"');
+  });
+
   it("deploys the folder the build produces", async () => {
     const config = await read("wrangler.toml");
 

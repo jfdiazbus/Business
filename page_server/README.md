@@ -175,6 +175,16 @@ The root directory is where the commands run. The whole repository is still
 checked out, which is what lets `scripts/build.mjs` copy the two client sites
 and the business plans into `dist/`.
 
+Two things in `wrangler.toml` are load bearing for the builder:
+
+- **`name`** has to be the Worker the repository is connected to (`portfolio`).
+  If it differs, Cloudflare builds a _different_ Worker and fails the check —
+  that is where the stray `jfdiazbus-portfolio` Worker came from.
+- **`[previews]`** has to be present, even empty. Branch builds run
+  `wrangler preview`, and without that block it refuses to run, so every pull
+  request check fails with "missing a `previews` block". Branch builds land on
+  `<branch>-portfolio.<your-subdomain>.workers.dev`.
+
 ### Deploying by hand
 
 `pnpm run deploy` builds `dist/` and uploads it from your machine — handy to
