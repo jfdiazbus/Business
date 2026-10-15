@@ -1,0 +1,20 @@
+# Fallback for Cloudflare's builder.
+#
+# If the build's root directory is set to `page_server`, this file is ignored
+# and page_server/wrangler.toml is used. If it is left unset — so the builder
+# runs from the repository root — this file and the package.json beside it let
+# the same Worker build and deploy from here.
+#
+# Keep `name` and `compatibility_date` in step with page_server/wrangler.toml:
+# the test suite compares them.
+
+name = "portfolio"
+compatibility_date = "2026-10-15"
+
+# Branch (pull request) builds run `wrangler preview`, which refuses to run
+# without this block. It can be empty: assets and compatibility stay above.
+[previews]
+
+[assets]
+directory = "./page_server/dist"
+not_found_handling = "404-page"

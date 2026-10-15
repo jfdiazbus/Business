@@ -8,7 +8,7 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
-import { world } from "../world.js";
+import { sceneStep, world } from "../world.js";
 
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(PROJECT_ROOT, "world", "out");
@@ -112,6 +112,40 @@ describe("the copy, by the landing page rules", () => {
   it("paces the first and last scenes slower than the transit", () => {
     expect(sections[0].scroll).toBeGreaterThan(1);
     expect(sections[sections.length - 1].scroll).toBeGreaterThan(1);
+  });
+});
+
+describe("one gesture, one scene", () => {
+  it("turns a wheel notch into the next or previous scene", () => {
+    expect(sceneStep({ delta: 120, index: 0, count: 5 })).toBe(1);
+    expect(sceneStep({ delta: -120, index: 3, count: 5 })).toBe(2);
+  });
+
+  it("answers the arrow and page keys, and the ends", () => {
+    for (const key of ["ArrowDown", "PageDown", " "]) {
+      expect(sceneStep({ key, index: 1, count: 5 }), key).toBe(2);
+    }
+    expect(sceneStep({ key: "ArrowUp", index: 2, count: 5 })).toBe(1);
+    expect(sceneStep({ key: "Home", index: 4, count: 5 })).toBe(0);
+    expect(sceneStep({ key: "End", index: 0, count: 5 })).toBe(4);
+  });
+
+  it("stays put at the ends, and leaves other keys alone", () => {
+    expect(sceneStep({ delta: 120, index: 4, count: 5 })).toBeNull();
+    expect(sceneStep({ delta: -120, index: 0, count: 5 })).toBeNull();
+    expect(sceneStep({ delta: 0, index: 2, count: 5 })).toBeNull();
+    expect(sceneStep({ key: "Tab", index: 2, count: 5 })).toBeNull();
+  });
+
+  it("keeps the whole film short enough that a gesture is a scene", () => {
+    // count the real per-section dwell, not just the defaults
+    const screens =
+      world.sections.reduce((total, section) => total + (section.scroll ?? world.diveScroll), 0) +
+      world.connectors.length * world.connScroll;
+
+    expect(world.diveScroll).toBeLessThanOrEqual(0.8);
+    expect(world.connScroll).toBeLessThanOrEqual(0.5);
+    expect(screens).toBeLessThan(6);
   });
 });
 

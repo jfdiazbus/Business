@@ -112,6 +112,11 @@ regenerate, and every seam is exact because both sides of it are mine.
 | `node world/motion.mjs`            | dives, wipes and posters into `world/out`               |
 | `node world/motion.mjs preview`    | write frames from every clip into `world/build/preview` |
 
+**One gesture, one scene.** A wheel notch, an arrow key, PageUp/PageDown, space,
+Home or End moves the film a whole scene at a time (the route dots on the right
+do the same), and the whole film is about six screens of scroll, so a scene never
+takes a long scroll to reach. Touch devices keep their native scrolling.
+
 **How the camera works.** It is locked isometric, so nothing rotates or tilts:
 each layer simply slides at its own speed — 0.45 for the wall, 1 for the hero,
 1.25 for the paper sweeping past the lens — and the depth comes from the
@@ -160,16 +165,16 @@ deploy twice.
 Connect the repository (Workers & Pages → **Create application** → GitHub →
 `jfdiazbus/Business`) with these values:
 
-| Field           | Value                                                                  |
-| --------------- | ---------------------------------------------------------------------- |
-| Worker name     | `portfolio` — must match `name` in `wrangler.toml`, or the build fails |
-| Git branch      | `main`                                                                 |
-| Root directory  | `page_server`                                                          |
-| Build command   | `pnpm build`                                                           |
-| Deploy command  | `npx wrangler deploy`                                                  |
-| Preview command | leave the default                                                      |
-| API token       | leave empty — Cloudflare generates one and reuses it                   |
-| Build variables | none needed; `.node-version` pins Node 22 for the builder              |
+| Field           | Value                                                                                                                             |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Worker name     | `portfolio` — must match `name` in `wrangler.toml`, or the build fails                                                            |
+| Git branch      | `main`                                                                                                                            |
+| Root directory  | `page_server` — if you leave it unset, the repository root has its own `package.json` and `wrangler.toml` that run the same build |
+| Build command   | `pnpm build`                                                                                                                      |
+| Deploy command  | `npx wrangler deploy`                                                                                                             |
+| Preview command | leave the default                                                                                                                 |
+| API token       | leave empty — Cloudflare generates one and reuses it                                                                              |
+| Build variables | none needed; `.node-version` pins Node 22 for the builder                                                                         |
 
 The root directory is where the commands run. The whole repository is still
 checked out, which is what lets `scripts/build.mjs` copy the two client sites

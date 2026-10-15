@@ -65,6 +65,23 @@ describe("the project", () => {
     expect(config).toContain('directory = "./dist"');
   });
 
+  it("can also build from the repository root, where Cloudflare may run it", async () => {
+    const rootPkg = JSON.parse(await read("package.json", REPO_ROOT));
+    const rootConfig = await read("wrangler.toml", REPO_ROOT);
+    const projectConfig = await read("wrangler.toml");
+    const value = (text, key) => new RegExp(`${key} = "([^"]+)"`).exec(text)[1];
+
+    expect(rootPkg.scripts.build).toContain("page_server/scripts/build.mjs");
+    expect(rootConfig).toContain('directory = "./page_server/dist"');
+    expect(rootConfig).toMatch(/^\[previews\]$/m);
+
+    // a build that ran from the repository root must deploy the same Worker
+    expect(value(rootConfig, "name")).toBe(value(projectConfig, "name"));
+    expect(value(rootConfig, "compatibility_date")).toBe(
+      value(projectConfig, "compatibility_date"),
+    );
+  });
+
   it("deploys the folder the build produces", async () => {
     const config = await read("wrangler.toml");
 
