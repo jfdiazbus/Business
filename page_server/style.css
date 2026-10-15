@@ -1,0 +1,359 @@
+/* page_server — a portfolio printed on tractor-feed green-bar paper */
+
+:root {
+  --paper: #f0eee6;
+  --paper-edge: #e5e1d4;
+  --desk: #cdc9ba;
+  --bar: #dde7d4;
+  --ink: #1b1b18;
+  --ink-soft: #5f5c52;
+  --ribbon: #b03024;
+  --measure: 74ch;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--ribbon);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+}
+
+.skip:focus {
+  left: 10px;
+  top: 10px;
+  z-index: 20;
+  background: var(--paper);
+  color: var(--ribbon);
+  padding: 8px 12px;
+  border: 1px solid var(--ribbon);
+  text-decoration: none;
+}
+
+/* -- the sheet ---------------------------------------------------------- */
+
+.sheet {
+  max-width: 960px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--paper);
+  display: flex;
+}
+
+.sprocket {
+  flex: 0 0 34px;
+  background:
+    radial-gradient(circle at 17px 17px, var(--desk) 0 5.5px, transparent 6px) 0 0 / 34px 34px repeat-y,
+    var(--paper-edge);
+  border-right: 1px dashed rgba(27, 27, 24, 0.22);
+}
+
+.sprocket--r {
+  border-right: 0;
+  border-left: 1px dashed rgba(27, 27, 24, 0.22);
+}
+
+.page {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 26px clamp(16px, 4vw, 46px) 64px;
+  container-type: inline-size;
+}
+
+/* -- header ------------------------------------------------------------- */
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  font-size: 14px;
+}
+
+.who {
+  margin: 0;
+  font-weight: 600;
+}
+
+.role {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.topbar nav {
+  display: flex;
+  gap: 16px;
+}
+
+.topbar nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.topbar nav a:hover,
+.topbar nav a:focus-visible {
+  color: var(--ribbon);
+}
+
+/* -- section headings --------------------------------------------------- */
+
+.heading {
+  margin: 0 0 16px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.heading--sub {
+  font-size: 15px;
+  margin-top: 36px;
+}
+
+.sigil {
+  color: var(--ribbon);
+  font-weight: 700;
+}
+
+/* -- ascii rules -------------------------------------------------------- */
+
+.rule {
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 1;
+  font-size: 14px;
+  color: var(--ink-soft);
+  opacity: 0.5;
+  margin: clamp(28px, 5vh, 46px) 0 20px;
+  user-select: none;
+}
+
+.rule::after {
+  content: "====================================================================================================================================";
+}
+
+.rule--thin::after {
+  content: "------------------------------------------------------------------------------------------------------------------------------------";
+}
+
+/* -- hero --------------------------------------------------------------- */
+
+.hero {
+  padding-top: clamp(22px, 6vh, 46px);
+}
+
+.banner {
+  margin: 4px 0 22px;
+  padding: 0;
+  font-family: var(--mono);
+  /* 35 characters wide: 1cqi ≈ a fifth of the column, with margin for fallback fonts */
+  font-size: clamp(12px, 3vw, 30px);
+  font-size: clamp(12px, 4.4cqi, 36px);
+  line-height: 1.1;
+  overflow-x: auto;
+}
+
+.banner .line {
+  display: block;
+}
+
+.lede {
+  margin: 0;
+  max-width: 66ch;
+  font-size: 16px;
+}
+
+.page p {
+  max-width: var(--measure);
+}
+
+/* -- project cards ------------------------------------------------------ */
+
+.project {
+  border: 1px solid rgba(27, 27, 24, 0.3);
+  margin: 0 0 20px;
+  max-width: 78ch;
+}
+
+.project h3 {
+  margin: 0;
+  padding: 7px 14px;
+  background: var(--bar);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.project p {
+  margin: 0;
+  padding: 10px 14px 0;
+}
+
+.project p.detail {
+  color: var(--ink-soft);
+}
+
+.project .links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  padding: 10px 14px 12px;
+}
+
+.project .links a {
+  color: var(--ribbon);
+  text-decoration: none;
+}
+
+.project .links a:hover,
+.project .links a:focus-visible {
+  text-decoration: underline;
+}
+
+/* -- dot-leader rows ---------------------------------------------------- */
+
+.leaders {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: var(--measure);
+}
+
+.leader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 1.2ch;
+  font-size: 14.5px;
+  padding: 6px 0;
+}
+
+.leader .k {
+  flex: 0 0 auto;
+  min-width: 13ch;
+  font-weight: 600;
+}
+
+.leader .fill {
+  flex: 1 1 8ch;
+  min-width: 8ch;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+
+.leader .fill::after {
+  content: "................................................................................................................................................................................................";
+}
+
+.leader .v {
+  flex: 0 1 auto;
+  overflow-wrap: anywhere;
+}
+
+.leader .v a {
+  color: var(--ribbon);
+  text-decoration: none;
+}
+
+.leader .v a:hover,
+.leader .v a:focus-visible {
+  text-decoration: underline;
+}
+
+/* -- footer ------------------------------------------------------------- */
+
+.eof {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.colophon {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+
+/* -- motion: the banner prints, then rests ------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .banner .line {
+    animation: print 0.1s steps(2, end) both;
+    animation-delay: calc(var(--i, 0) * 65ms);
+  }
+}
+
+@keyframes print {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* -- small screens ------------------------------------------------------ */
+
+@media (max-width: 639px) {
+  .sprocket {
+    display: none;
+  }
+}
+
+/* -- print: it is a printout, after all --------------------------------- */
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .sheet {
+    max-width: none;
+    min-height: 0;
+  }
+
+  .sprocket,
+  .topbar nav,
+  .skip {
+    display: none;
+  }
+
+  .project {
+    break-inside: avoid;
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "page_server",
+  "version": "1.0.0",
+  "description": "ASCII portfolio printed on green-bar paper, served by a zero-dependency Node server.",
+  "main": "index.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "figlet": "^1.12.0",
+    "jsdom": "^30.1.2",
+    "next": "^16.4.0",
+    "prettier": "^3.9.10",
+    "vitest": "^5.0.4"
+  }
+}
