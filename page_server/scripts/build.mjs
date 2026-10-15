@@ -6,7 +6,7 @@
 // is copied in, so the result is a self-contained folder with no server code
 // and no dependencies.
 
-import { access, cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { errorPageHtml } from "../index.js";
@@ -17,11 +17,17 @@ export const PROJECT_ROOT = path.resolve(HERE, "..");
 export const DEFAULT_WORKSPACE = path.resolve(PROJECT_ROOT, "..");
 export const DEFAULT_OUT = path.join(PROJECT_ROOT, "dist");
 
-/** [source in page_server, path in dist] */
+/** [source in page_server, path in dist] — the world is the front page. */
 export const PAGE_FILES = [
-  ["page.html", "index.html"],
+  ["world.html", "index.html"],
+  ["home.html", "home.html"],
   ["style.css", "style.css"],
+  ["slides.js", "slides.js"],
+  ["world.js", "world.js"],
 ];
+
+/** Files built by world/motion.mjs that are not shipped (intermediates). */
+export const WORLD_SKIP = ["paper-edge.png"];
 
 /** folders copied from the workspace into dist/projects/ */
 export const PROJECT_DIRS = ["promptops-ai", "omniprompt-marketing"];
@@ -34,14 +40,49 @@ export const DOC_FILES = ["ai_business_plan.md", "ai_marketing_automation_busine
 export const HEADERS = `/projects/*/assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+/world/*.mp4
+  Cache-Control: public, max-age=3600
+
+/world/*.webp
+  Cache-Control: public, max-age=3600
+
+/world/engine.js
+  Cache-Control: public, max-age=3600
+
 /style.css
+  Cache-Control: public, max-age=3600
+
+/slides.js
+  Cache-Control: public, max-age=3600
+
+/world.js
   Cache-Control: public, max-age=3600
 
 /projects/*
   Cache-Control: public, max-age=3600
 `;
 
+// The deck lives at /home; everything else in dist is already addressable.
+export const REDIRECTS = `/home /home.html 200
+`;
+
 const skipDotFiles = (src) => !src.split(path.sep).some((segment) => segment.startsWith("."));
+
+/** The scroll world's film, posters and the engine that plays them. */
+export async function copyWorld({ outDir, source = path.join(PROJECT_ROOT, "world") } = {}) {
+  const target = path.join(outDir, "world");
+  await mkdir(target, { recursive: true });
+
+  const built = await readdir(path.join(source, "out"));
+  const shipped = built.filter((name) => !WORLD_SKIP.includes(name));
+
+  for (const name of shipped) {
+    await cp(path.join(source, "out", name), path.join(target, name));
+  }
+
+  await cp(path.join(source, "engine.js"), path.join(target, "engine.js"));
+  return shipped.sort();
+}
 
 export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPACE } = {}) {
   await rm(outDir, { recursive: true, force: true });
@@ -71,8 +112,17 @@ export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPAC
     "utf8",
   );
   await writeFile(path.join(outDir, "_headers"), HEADERS, "utf8");
+  await writeFile(path.join(outDir, "_redirects"), REDIRECTS, "utf8");
+  await copyWorld({ outDir });
 
-  return { outDir, brokenLinks: await checkLinks(outDir) };
+  const brokenLinks = [
+    ...new Set([
+      ...(await checkLinks(outDir, "index.html")),
+      ...(await checkLinks(outDir, "home.html")),
+    ]),
+  ];
+
+  return { outDir, brokenLinks };
 }
 
 /** Every link on the page that points inside the site. */
@@ -102,7 +152,11 @@ export async function checkLinks(outDir, htmlFile = "index.html") {
 
   for (const href of collectInternalLinks(html)) {
     const candidate = resolveAsset(outDir, href);
-    const found = (await exists(candidate)) || (await exists(path.join(candidate, "index.html")));
+    // /home resolves to home.html, the way nginx and the Workers asset server do it
+    const found =
+      (await exists(candidate)) ||
+      (await exists(`${candidate}.html`)) ||
+      (await exists(path.join(candidate, "index.html")));
     if (!found) broken.push(href);
   }
 

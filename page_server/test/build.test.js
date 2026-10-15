@@ -28,14 +28,68 @@ afterAll(async () => {
 });
 
 describe("the build", () => {
-  it("writes the page as index.html, byte for byte", async () => {
-    const source = await readFile(path.join(PROJECT_ROOT, "page.html"), "utf8");
+  it("writes the world as the front page and the deck at /home, byte for byte", async () => {
+    const world = await readFile(path.join(PROJECT_ROOT, "world.html"), "utf8");
+    const deck = await readFile(path.join(PROJECT_ROOT, "home.html"), "utf8");
 
-    expect(await read("index.html")).toBe(source);
+    expect(await read("index.html")).toBe(world);
+    expect(await read("home.html")).toBe(deck);
   });
 
   it("writes the stylesheet", async () => {
     expect(await size("style.css")).toBeGreaterThan(500);
+  });
+
+  it("puts the world on the front page and the deck at /home", async () => {
+    const index = await read("index.html");
+    const home = await read("home.html");
+
+    expect(index).toContain("The print shop");
+    expect(index).toContain('src="/world/engine.js"');
+    expect(home).toContain('class="banner"');
+    expect(home).toContain("A few things");
+
+    // /home is a rewrite, so the deck is addressable without the extension
+    expect(await read("_redirects")).toContain("/home /home.html 200");
+  });
+
+  it("copies the script that makes the slides behave like a deck", async () => {
+    expect(await size("slides.js")).toBeGreaterThan(500);
+    expect(await read("home.html")).toContain('src="slides.js"');
+    expect(await read("_headers")).toContain("/slides.js");
+  });
+
+  it("ships the scroll world, its film and its engine", async () => {
+    const files = await readdir(path.join(outDir, "world"));
+
+    expect(files).toContain("engine.js");
+    expect(files.filter((name) => name.startsWith("dive-"))).toHaveLength(5);
+    expect(files.filter((name) => name.startsWith("wipe-"))).toHaveLength(4);
+    expect(files.filter((name) => name.startsWith("still-")).length).toBeGreaterThanOrEqual(5);
+    // the paper edge is a build intermediate, not a shipped asset
+    expect(files).not.toContain("paper-edge.png");
+
+    const headers = await read("_headers");
+    expect(headers).toContain("/world/*.mp4");
+    expect(headers).toContain("/world/engine.js");
+  });
+
+  it("keeps every shipped file inside Cloudflare's per asset limit", async () => {
+    const limit = 25 * 1024 * 1024;
+    const walk = async (dir) => {
+      const entries = await readdir(dir, { withFileTypes: true });
+      const files = await Promise.all(
+        entries.map((entry) =>
+          entry.isDirectory() ? walk(path.join(dir, entry.name)) : [path.join(dir, entry.name)],
+        ),
+      );
+      return files.flat();
+    };
+
+    for (const file of await walk(outDir)) {
+      const { size } = await stat(file);
+      expect(size, path.relative(outDir, file)).toBeLessThan(limit);
+    }
   });
 
   it("includes both client sites, website and presentation", async () => {
@@ -67,10 +121,15 @@ describe("the build", () => {
     expect(entries.sort()).toEqual([
       "404.html",
       "_headers",
+      "_redirects",
       "docs",
+      "home.html",
       "index.html",
       "projects",
+      "slides.js",
       "style.css",
+      "world",
+      "world.js",
     ]);
   });
 

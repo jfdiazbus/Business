@@ -37,6 +37,13 @@ describe("the project", () => {
     }
   });
 
+  it("keeps the deck's script free of imports, too", async () => {
+    const script = await read("slides.js");
+
+    expect(script).not.toMatch(/^\s*import\s/m);
+    expect(script).not.toContain("require(");
+  });
+
   it("exposes the commands the pipelines call", async () => {
     const pkg = JSON.parse(await read("package.json"));
 
@@ -46,6 +53,33 @@ describe("the project", () => {
     expect(pkg.scripts.deploy).toContain("scripts/deploy.mjs");
     expect(pkg.type).toBe("module");
     expect(pkg.private).toBe(true);
+  });
+
+  it("can run the commands Cloudflare's builder uses", async () => {
+    const config = await read("wrangler.toml");
+
+    // branch builds run `wrangler preview`, and it refuses to run at all
+    // without a previews block; that failure only shows up in CI, so pin it
+    expect(config).toMatch(/^\[previews\]$/m);
+    expect(config).toContain("[assets]");
+    expect(config).toContain('directory = "./dist"');
+  });
+
+  it("can also build from the repository root, where Cloudflare may run it", async () => {
+    const rootPkg = JSON.parse(await read("package.json", REPO_ROOT));
+    const rootConfig = await read("wrangler.toml", REPO_ROOT);
+    const projectConfig = await read("wrangler.toml");
+    const value = (text, key) => new RegExp(`${key} = "([^"]+)"`).exec(text)[1];
+
+    expect(rootPkg.scripts.build).toContain("page_server/scripts/build.mjs");
+    expect(rootConfig).toContain('directory = "./page_server/dist"');
+    expect(rootConfig).toMatch(/^\[previews\]$/m);
+
+    // a build that ran from the repository root must deploy the same Worker
+    expect(value(rootConfig, "name")).toBe(value(projectConfig, "name"));
+    expect(value(rootConfig, "compatibility_date")).toBe(
+      value(projectConfig, "compatibility_date"),
+    );
   });
 
   it("deploys the folder the build produces", async () => {
@@ -63,15 +97,29 @@ describe("the project", () => {
     expect(ignore).toContain("dist");
   });
 
-  it("has a CI workflow that tests, and a deploy workflow that ships", async () => {
+  it("lets Cloudflare build the site, keeping CI to tests", async () => {
     const ci = await read(".github/workflows/ci.yml", REPO_ROOT);
-    const deploy = await read(".github/workflows/deploy.yml", REPO_ROOT);
 
     expect(ci).toContain("pnpm test");
     expect(ci).toContain("pnpm build");
-    expect(deploy).toContain("pnpm test");
-    expect(deploy).toContain("npx wrangler deploy");
-    expect(deploy).toContain("secrets.CLOUDFLARE_API_TOKEN");
+
+    // Cloudflare's Git integration publishes the site, so a second, GitHub-side
+    // deploy must not be racing it.
+    expect(await exists(".github/workflows/deploy.yml", REPO_ROOT)).toBe(false);
+    expect(await exists("wrangler.toml")).toBe(true);
+    expect(await read(".node-version")).toMatch(/^\d+\s*$/);
+  });
+
+  it("writes down the settings Cloudflare builds with", async () => {
+    const readme = await read("README.md");
+    // the name has to match what the dashboard Worker is called, so read it
+    // from the config rather than hard coding it twice
+    const name = /name = "([^"]+)"/.exec(await read("wrangler.toml"))[1];
+
+    expect(readme).toContain(name); // the Worker name
+    expect(readme).toContain("page_server"); // the root directory
+    expect(readme).toContain("pnpm build"); // the build command
+    expect(readme).toContain("npx wrangler deploy"); // the deploy command
   });
 
   it("has a Dockerfile that serves the built site", async () => {
@@ -84,7 +132,7 @@ describe("the project", () => {
   });
 
   it("still has the fonts and files the scripts need", async () => {
-    for (const file of ["page.html", "style.css", "index.js", "vitest.config.js"]) {
+    for (const file of ["home.html", "world.html", "style.css", "index.js", "vitest.config.js"]) {
       expect(await exists(file), file).toBe(true);
     }
     for (const file of ["scripts/build.mjs", "scripts/banner.mjs"]) {

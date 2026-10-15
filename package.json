@@ -1,0 +1,8 @@
+{
+  "name": "business",
+  "private": true,
+  "description": "Fallback entry point for Cloudflare's builder. It runs the same build as page_server, so a build whose root directory is left unset still works.",
+  "scripts": {
+    "build": "node page_server/scripts/build.mjs"
+  }
+}

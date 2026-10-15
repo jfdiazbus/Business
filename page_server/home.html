@@ -45,7 +45,8 @@
         </header>
 
         <main>
-          <section class="hero" aria-labelledby="title">
+          <!-- slide 1: the title page -->
+          <section class="slide hero" aria-labelledby="title">
             <h1 id="title" class="sr-only">Juan Felipe Diaz Bustamante — web developer</h1>
             <pre
               class="banner"
@@ -56,13 +57,20 @@
               Hi! I&rsquo;m Juan Felipe. I build websites, online presentations and small tools
               &mdash; mostly for companies that work with AI.
             </p>
+            <p class="tour"><a href="/">[ walk through the print shop ]</a></p>
             <p class="scroll-hint" aria-hidden="true">v&nbsp;&nbsp;keep scrolling</p>
           </section>
 
-          <div class="rule" aria-hidden="true"></div>
-
-          <section id="work" aria-label="my projects">
-            <h2 class="heading"><span class="sigil">&gt;</span> A few things I&rsquo;ve built</h2>
+          <!-- slide 2: the work -->
+          <section class="slide" id="work" aria-labelledby="work-title">
+            <div class="rule" aria-hidden="true"></div>
+            <div class="slide-top">
+              <h2 class="heading" id="work-title">
+                <span class="sigil">&gt;</span> A few things I&rsquo;ve built
+              </h2>
+              <span class="fill" aria-hidden="true"></span>
+              <span class="count" aria-hidden="true">2 / 4</span>
+            </div>
 
             <article class="project">
               <h3>OmniPrompt Marketing</h3>
@@ -104,10 +112,17 @@
             </article>
           </section>
 
-          <div class="rule" aria-hidden="true"></div>
+          <!-- slide 3: about -->
+          <section class="slide" id="about" aria-labelledby="about-title">
+            <div class="rule" aria-hidden="true"></div>
+            <div class="slide-top">
+              <h2 class="heading" id="about-title">
+                <span class="sigil">&gt;</span> A bit about me
+              </h2>
+              <span class="fill" aria-hidden="true"></span>
+              <span class="count" aria-hidden="true">3 / 4</span>
+            </div>
 
-          <section id="about" aria-label="about me">
-            <h2 class="heading"><span class="sigil">&gt;</span> A bit about me</h2>
             <p>
               I&rsquo;m a web developer who likes to keep things simple: pages that load fast, work
               on any device, and don&rsquo;t need heavy tools to run. Both client websites above are
@@ -141,10 +156,17 @@
             </ul>
           </section>
 
-          <div class="rule" aria-hidden="true"></div>
+          <!-- slide 4: contact, and the end of the deck -->
+          <section class="slide" id="contact" aria-labelledby="contact-title">
+            <div class="rule" aria-hidden="true"></div>
+            <div class="slide-top">
+              <h2 class="heading" id="contact-title">
+                <span class="sigil">&gt;</span> Want to work together?
+              </h2>
+              <span class="fill" aria-hidden="true"></span>
+              <span class="count" aria-hidden="true">4 / 4</span>
+            </div>
 
-          <section id="contact" aria-label="how to reach me">
-            <h2 class="heading"><span class="sigil">&gt;</span> Want to work together?</h2>
             <p>The fastest way to reach me is email. I usually reply within a day.</p>
             <ul class="leaders">
               <li class="leader">
@@ -162,17 +184,19 @@
                 >
               </li>
             </ul>
+
+            <footer class="slide-foot">
+              <div class="rule rule--thin" aria-hidden="true"></div>
+              <p class="eof">Thanks for reading! :-)</p>
+              <p class="colophon">Hand-coded by Juan Felipe with HTML and CSS, 2026.</p>
+            </footer>
           </section>
         </main>
-
-        <footer>
-          <div class="rule rule--thin" aria-hidden="true"></div>
-          <p class="eof">Thanks for reading! :-)</p>
-          <p class="colophon">Hand-coded by Juan Felipe with HTML and CSS, 2026.</p>
-        </footer>
       </div>
 
       <div class="sprocket sprocket--r" aria-hidden="true"></div>
     </div>
+
+    <script type="module" src="slides.js"></script>
   </body>
 </html>
