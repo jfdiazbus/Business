@@ -47,15 +47,37 @@ describe("home.html (the deck)", () => {
     }
   });
 
-  it("shows three projects, each with a title and a description", () => {
+  it("shows four projects, each with a title and a description", () => {
     const projects = [...document.querySelectorAll(".project")];
 
-    expect(projects).toHaveLength(3);
+    expect(projects).toHaveLength(4);
 
     for (const project of projects) {
       expect(project.querySelector("h3")?.textContent.trim().length).toBeGreaterThan(0);
       expect(project.querySelector("p")?.textContent.trim().length).toBeGreaterThan(20);
     }
+
+    // the lab's code is private, so the live site is the proof
+    expect(document.querySelector('a[href="https://migalabs.io/"]')).toBeTruthy();
+  });
+
+  it("lists where I have worked, years first", () => {
+    const rows = [...document.querySelectorAll(".werk-row")];
+
+    expect(rows).toHaveLength(3);
+    expect(document.querySelector("#experience")).toBeTruthy();
+
+    for (const row of rows) {
+      expect(row.querySelector(".werk-when").textContent.trim()).toMatch(/^\d{4} – /);
+      expect(row.querySelector(".werk-what").textContent.trim().length).toBeGreaterThan(40);
+    }
+  });
+
+  it("points at the school work, and at LinkedIn", () => {
+    expect(document.querySelector('.more a[href="/school"]')).toBeTruthy();
+    expect(
+      document.querySelector('a[href^="https://www.linkedin.com/in/"]')?.getAttribute("href"),
+    ).toContain("juan-felipe-diaz-bustamante");
   });
 
   it("links the two client sites from the right place", () => {
@@ -123,17 +145,17 @@ describe("home.html (the deck)", () => {
     expect(hint.closest(".hero")).toBeTruthy();
   });
 
-  it("is a deck: four slides, each numbered after the title page", () => {
+  it("is a deck: five slides, each numbered after the title page", () => {
     const slides = [...document.querySelectorAll("main > .slide")];
 
-    expect(slides).toHaveLength(4);
+    expect(slides).toHaveLength(5);
     expect(slides[0].classList.contains("hero")).toBe(true);
 
     slides.slice(1).forEach((slide, index) => {
       const count = slide.querySelector(":scope > .slide-top .count");
 
       expect(slide.querySelector(":scope > .rule"), slide.id).toBeTruthy();
-      expect(count.textContent.replace(/\s+/g, " ").trim()).toBe(`${index + 2} / 4`);
+      expect(count.textContent.replace(/\s+/g, " ").trim()).toBe(`${index + 2} / 5`);
     });
   });
 

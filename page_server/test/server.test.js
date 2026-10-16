@@ -61,6 +61,17 @@ describe("the development server", () => {
     expect(html).toContain('src="slides.js"');
   });
 
+  it("serves the school work at /school", async () => {
+    const response = await fetch(`${base}/school`);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("text/html");
+
+    const html = await response.text();
+    expect(html).toContain("EpyTodo");
+    expect(html).toContain("Tardis");
+  });
+
   it("serves the stylesheet with the right content type", async () => {
     const response = await fetch(`${base}/style.css`);
 

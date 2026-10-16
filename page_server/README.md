@@ -1,6 +1,6 @@
 # page_server — my portfolio
 
-A four-slide portfolio deck printed on tractor-feed green-bar paper: plain HTML
+A five-slide portfolio deck printed on tractor-feed green-bar paper: plain HTML
 and CSS, a tiny zero-dependency Node server for local work, and a static build
 that ships to Cloudflare or to a Docker container.
 
@@ -24,7 +24,8 @@ that ships to Cloudflare or to a Docker container.
 
 | Path                              | What it does                                                            |
 | --------------------------------- | ----------------------------------------------------------------------- |
-| `home.html`                       | The four slide deck, served at `/home` — the words live here            |
+| `home.html`                       | The five slide deck, served at `/home` — the words live here            |
+| `school.html`                     | The Epitech coursework, served at `/school`                             |
 | `style.css`                       | The look: paper, green bars, red accents, the slides                    |
 | `index.js`                        | The local server. No dependencies, only Node's own modules              |
 | `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                             |
@@ -50,8 +51,10 @@ Everything you might want to change is in `home.html` (the deck) or `world.js`
   block. Change the text; the links point at the two client sites that live
   next to this folder.
 - **Slides** — each slide is a `<section class="slide">`; the number in its
-  heading row (`2 / 4`) is plain text, so update it if you add or remove a
-  slide.
+  heading row (`3 / 5`) is plain text, so update it if you add or remove a slide.
+- **Where I have worked** — the rows live under `<ul class="werk">`, one
+  `.werk-row` each, with the years in the left column.
+- **School work** — the coursework is in `school.html`, served at `/school`.
 
 ## The banner
 
@@ -67,7 +70,7 @@ the banner still matches a real figlet rendering, so it can never drift.
 
 ## How it moves
 
-The page is a four-slide deck printed on one continuous sheet of paper: the
+The page is a five-slide deck printed on one continuous sheet of paper: the
 title page, the work, about, and contact. Every slide fills the screen and
 snaps into place as you scroll.
 
@@ -97,8 +100,9 @@ appears complete. Printing gives one page per slide, with all of it visible.
 ## The scroll world
 
 The front page (`/`) is a scroll driven flight through a paper print shop, five
-scenes long, with each scene's copy pinned over it. The four slide deck lives at
-`/home` (a rewrite to `home.html`), and the world links back to it.
+scenes long, with each scene's copy pinned over it. The five slide deck lives at
+`/home` (a rewrite to `home.html`), the coursework at `/school`, and the world
+links back to both.
 
 The film is **made by hand rather than by a video model**. The scenes are drawn
 as cardstock in `world/kit.mjs` and `world/scenes.mjs`, rendered to transparent

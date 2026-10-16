@@ -31,9 +31,11 @@ describe("the build", () => {
   it("writes the world as the front page and the deck at /home, byte for byte", async () => {
     const world = await readFile(path.join(PROJECT_ROOT, "world.html"), "utf8");
     const deck = await readFile(path.join(PROJECT_ROOT, "home.html"), "utf8");
+    const school = await readFile(path.join(PROJECT_ROOT, "school.html"), "utf8");
 
     expect(await read("index.html")).toBe(world);
     expect(await read("home.html")).toBe(deck);
+    expect(await read("school.html")).toBe(school);
   });
 
   it("writes the stylesheet", async () => {
@@ -51,6 +53,7 @@ describe("the build", () => {
 
     // /home is a rewrite, so the deck is addressable without the extension
     expect(await read("_redirects")).toContain("/home /home.html 200");
+    expect(await read("_redirects")).toContain("/school /school.html 200");
   });
 
   it("copies the script that makes the slides behave like a deck", async () => {
@@ -126,6 +129,7 @@ describe("the build", () => {
       "home.html",
       "index.html",
       "projects",
+      "school.html",
       "slides.js",
       "style.css",
       "world",
