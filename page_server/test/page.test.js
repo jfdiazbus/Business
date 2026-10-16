@@ -1,38 +1,148 @@
+// The portfolio page: what it says, how it is marked up, and what it must not
+// grow back into. It used to be a five slide deck; it is a document page now,
+// and a few checks here exist purely to keep the deck from creeping back.
+
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
 
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const html = readFileSync(path.join(PROJECT_ROOT, "home.html"), "utf8");
-const { document } = new JSDOM(html).window;
+const read = (file) => readFileSync(path.join(PROJECT_ROOT, file), "utf8");
+const html = read("home.html");
+const document = new JSDOM(html).window.document;
 
-describe("home.html (the deck)", () => {
-  it("introduces the page with a title, a language and a description", () => {
+/** Every page this site serves, so a link can be checked without a server. */
+const ROUTES = {
+  "/": "world.html",
+  "/home": "home.html",
+  "/school": "school.html",
+  "/services": "services.html",
+  "/thanks": "thanks.html",
+  "/terms": "terms.html",
+};
+
+const text = (node) => node.textContent.replace(/\s+/g, " ").trim();
+const section = (id) => document.getElementById(id);
+
+describe("the portfolio page", () => {
+  it("introduces itself for a reader and for a link preview", () => {
+    const meta = (name) => document.querySelector(`meta[name="${name}"]`)?.content;
+
     expect(document.documentElement.getAttribute("lang")).toBe("en");
-    expect(document.title).toContain("Juan Felipe");
-    expect(document.querySelector('meta[name="description"]')?.content.length).toBeGreaterThan(40);
-    expect(document.querySelector('meta[name="viewport"]')).toBeTruthy();
+    expect(document.title).toContain("Juan Felipe Diaz Bustamante");
+    expect(meta("description").length).toBeGreaterThan(40);
+    expect(meta("color-scheme")).toBe("dark");
+    expect(document.querySelector('meta[property="og:title"]')).toBeTruthy();
+    expect(document.querySelector('link[rel="icon"]')).toBeTruthy();
   });
 
   it("has exactly one h1, and it says what the page is", () => {
     const headings = document.querySelectorAll("h1");
 
     expect(headings).toHaveLength(1);
-    expect(headings[0].textContent.trim()).toBe("Websites, presentations and small tools");
+    expect(text(headings[0])).toBe("Websites, presentations and small tools");
     // the name lives in the bar, which is on every page
     expect(document.querySelector(".brand").textContent).toContain("Juan Felipe Diaz Bustamante");
   });
 
-  it("keeps ascii art out of the page", () => {
-    expect(document.querySelector(".banner")).toBeNull();
-    expect(document.querySelector("pre")).toBeNull();
+  it("keeps its landmarks and heading levels in order", () => {
+    const landmarks = [...document.querySelectorAll("header, main, footer")].map((el) =>
+      el.tagName.toLowerCase(),
+    );
+
+    expect(landmarks).toEqual(["header", "main", "footer"]);
+
+    const levels = [...document.querySelectorAll("h1, h2, h3")].map((h) => Number(h.tagName[1]));
+    expect(levels.filter((level) => level === 1)).toHaveLength(1);
+
+    for (let i = 1; i < levels.length; i += 1) {
+      expect(levels[i] - levels[i - 1], `heading ${i}`).toBeLessThanOrEqual(1);
+    }
   });
 
-  it("lets a keyboard visitor skip the bar", () => {
-    expect(document.querySelector('.skip[href="#work"]')).toBeTruthy();
-    expect(document.getElementById("work")).toBeTruthy();
+  it("lets a keyboard visitor skip to the content", () => {
+    const skip = document.querySelector("a.skip");
+
+    expect(skip).toBeTruthy();
+    expect(document.getElementById(skip.getAttribute("href").slice(1))).toBeTruthy();
+  });
+
+  it("has the four sections the site is organised by", () => {
+    const sections = [...document.querySelectorAll("main > section.block")];
+
+    expect(sections.map((s) => s.id)).toEqual(["experience", "education", "projects", "contact"]);
+
+    for (const id of ["experience", "education", "projects", "contact"]) {
+      const heading = document.querySelector(`#${id} > .heading`);
+      expect(heading, id).toBeTruthy();
+      expect(text(heading).toLowerCase(), id).toContain(id);
+    }
+  });
+
+  it("says where I have worked, and what I am good at", () => {
+    const rows = [...section("experience").querySelectorAll(".werk-row")];
+
+    expect(rows.length).toBeGreaterThanOrEqual(2);
+    expect(text(section("experience"))).toContain("MigaLabs");
+    expect(text(section("experience"))).toMatch(/Alvatroz/);
+    expect(section("experience").querySelectorAll(".leader").length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("says where I studied, and points at the long version", () => {
+    const education = text(section("education"));
+
+    expect(education).toContain("Epitech");
+    expect(education).toMatch(/2025/);
+    expect(section("education").querySelector('a[href="/school"]')).toBeTruthy();
+  });
+
+  it("shows four things I built, each with a title and a description", () => {
+    const projects = [...section("projects").querySelectorAll(".project")];
+
+    expect(projects).toHaveLength(4);
+
+    for (const project of projects) {
+      expect(text(project.querySelector("h3")).length).toBeGreaterThan(2);
+      expect(text(project.querySelector("p")).length).toBeGreaterThan(20);
+    }
+  });
+
+  it("sells nothing and links no client site from the work", () => {
+    // the projects are mine; the client sites are not advertised here
+    const links = [...section("projects").querySelectorAll("a[href^='http']")];
+
+    expect(links).toEqual([]);
+    expect(text(section("projects")).toLowerCase()).not.toContain("omniprompt");
+  });
+
+  it("leaves one way to get in touch, and one way to the prices", () => {
+    const contact = section("contact");
+
+    expect(contact.querySelector('a[href^="mailto:"]')).toBeTruthy();
+    expect(contact.querySelector('a[href="/services"]')).toBeTruthy();
+    expect(contact.querySelectorAll(".leader").length).toBeGreaterThanOrEqual(4);
+    expect(text(contact)).toContain("linkedin");
+  });
+
+  it("sends every internal link somewhere this site serves", () => {
+    for (const link of document.querySelectorAll("a[href]")) {
+      const href = link.getAttribute("href");
+
+      expect(text(link).length, "a link with no words cannot be read out").toBeGreaterThan(0);
+      expect(href, text(link)).not.toBe("#");
+
+      if (href.startsWith("#")) {
+        expect(document.getElementById(href.slice(1)), href).toBeTruthy();
+        continue;
+      }
+      if (!href.startsWith("/")) continue;
+
+      const route = href.split("#")[0].split("?")[0];
+      expect(ROUTES[route], `${href} is not a route this site serves`).toBeTruthy();
+      expect(existsSync(path.join(PROJECT_ROOT, ROUTES[route])), href).toBe(true);
+    }
   });
 
   it("does not talk like a terminal", () => {
@@ -41,147 +151,38 @@ describe("home.html (the deck)", () => {
     }
   });
 
-  it("shows four projects, each with a title and a description", () => {
-    const projects = [...document.querySelectorAll(".project")];
+  it("keeps ascii art out of the page", () => {
+    expect(document.querySelector(".banner")).toBeNull();
+    expect(document.querySelector("pre")).toBeNull();
+  });
 
-    expect(projects).toHaveLength(4);
-
-    for (const project of projects) {
-      expect(project.querySelector("h3")?.textContent.trim().length).toBeGreaterThan(0);
-      expect(project.querySelector("p")?.textContent.trim().length).toBeGreaterThan(20);
+  it("stays a page, and does not grow back into a deck", () => {
+    for (const leftover of [".slide", ".slide-top", ".count", ".scroll-hint", ".hero"]) {
+      expect(document.querySelector(leftover), leftover).toBeNull();
     }
 
-    // the school work leads the slide, and no card sells a client site
-    expect(projects[0].querySelector("h3").textContent.trim()).toBe("EpyTodo");
-    expect(projects[1].querySelector("h3").textContent.trim()).toBe("Tardis");
+    expect(html).not.toContain("scroll-snap");
+    expect(read("style.css")).not.toContain("scroll-snap-type");
   });
 
-  it("lists where I have worked, years first", () => {
-    const rows = [...document.querySelectorAll(".werk-row")];
+  it("keeps the copy on the house rules", () => {
+    const copy = [...document.querySelectorAll("h1, h2, h3, p, li")]
+      .filter((node) => !node.closest("footer") && !node.classList.contains("leader"))
+      .map(text)
+      .join(" ")
+      .replace(/[\w.-]+@[\w.-]+/g, "")
+      .toLowerCase();
 
-    expect(rows).toHaveLength(2);
-    expect(document.querySelector("#experience")).toBeTruthy();
-
-    for (const row of rows) {
-      expect(row.querySelector(".werk-when").textContent.trim()).toMatch(/^\d{4} – /);
-      expect(row.querySelector(".werk-what").textContent.trim().length).toBeGreaterThan(40);
-    }
-  });
-
-  it("points at the school work, the prices, and LinkedIn", () => {
-    expect(document.querySelector('.more a[href="/school"]')).toBeTruthy();
-    expect(document.querySelector('.leader a[href="/services"]')).toBeTruthy();
-    expect(
-      document.querySelector('a[href^="https://www.linkedin.com/in/"]')?.getAttribute("href"),
-    ).toContain("juan-felipe-diaz-bustamante");
-  });
-
-  it("sends the work slide to the school page instead of client sites", () => {
-    const hrefs = [...document.querySelectorAll(".project a")].map((link) =>
-      link.getAttribute("href"),
-    );
-
-    // the cards describe school work, so they carry no links of their own
-    expect(hrefs).toEqual([]);
-    expect(document.querySelector(".project:last-of-type h3").textContent.trim()).toBe(
-      "This portfolio",
-    );
-  });
-
-  it("points every nav link at a section that exists", () => {
-    const navLinks = [...document.querySelectorAll(".topbar nav a")];
-
-    expect(navLinks.map((link) => link.getAttribute("href"))).toEqual([
-      "/home",
-      "/services",
-      "/school",
-    ]);
-
-    // exactly one of them is the page you are on
-    expect(document.querySelectorAll('.topbar nav a[aria-current="page"]')).toHaveLength(1);
-
-    // the bar is a site nav now: routes, not in-page anchors
-    for (const link of navLinks) {
-      expect(link.getAttribute("href"), link.textContent).toMatch(/^\/[a-z]*$/);
-      expect(link.textContent.trim().length).toBeGreaterThan(0);
+    expect(copy).not.toMatch(/\w-\w/); // no hyphens inside sentences
+    for (const cliche of ["elevate", "seamless", "unleash", "next gen", "game changer", "delve"]) {
+      expect(copy, cliche).not.toContain(cliche);
     }
   });
 
-  it("keeps heading levels in order", () => {
-    const levels = [...document.querySelectorAll("h1, h2, h3")].map((heading) =>
-      Number(heading.tagName.slice(1)),
-    );
-
-    for (let i = 1; i < levels.length; i += 1) {
-      expect(levels[i] - levels[i - 1], `after ${levels[i - 1]}`).toBeLessThanOrEqual(1);
-    }
-  });
-
-  it("gives every link words a person can read", () => {
-    for (const link of document.querySelectorAll("a")) {
-      expect(link.textContent.trim().length, link.outerHTML.slice(0, 60)).toBeGreaterThan(0);
-    }
-  });
-
-  it("offers a way to get in touch", () => {
-    const mailto = document.querySelector('a[href^="mailto:"]');
-
-    expect(mailto?.getAttribute("href")).toContain("@");
-    expect(document.querySelector('a[href^="https://github.com/"]')).toBeTruthy();
-  });
-
-  it("describes its skills and contact details in plain rows", () => {
-    const leaders = [...document.querySelectorAll(".leader")];
-
-    expect(leaders.length).toBeGreaterThanOrEqual(6);
-
-    for (const row of leaders) {
-      expect(row.querySelector(".k")?.textContent.trim().length).toBeGreaterThan(0);
-      expect(row.querySelector(".v")?.textContent.trim().length).toBeGreaterThan(0);
-    }
-  });
-
-  it("tells the visitor there is more to scroll to, without nagging a screen reader", () => {
-    const hint = document.querySelector(".scroll-hint");
-
-    expect(hint?.getAttribute("aria-hidden")).toBe("true");
-    expect(hint.textContent).toContain("scrolling");
-    expect(hint.closest(".hero")).toBeTruthy();
-  });
-
-  it("is a deck: five slides, each numbered after the title page", () => {
-    const slides = [...document.querySelectorAll("main > .slide")];
-
-    expect(slides).toHaveLength(5);
-    expect(slides[0].classList.contains("hero")).toBe(true);
-
-    slides.slice(1).forEach((slide, index) => {
-      const count = slide.querySelector(":scope > .slide-top .count");
-
-      expect(slide.querySelector(":scope > .rule"), slide.id).toBeTruthy();
-      expect(count.textContent.replace(/\s+/g, " ").trim()).toBe(`${index + 2} / 5`);
-    });
-  });
-
-  it("ends the deck on the contact slide", () => {
-    const last = document.querySelector("main > .slide:last-of-type");
-
-    expect(last.id).toBe("contact");
-    expect(last.querySelector("footer .eof").textContent).toContain("Thanks for reading");
-    expect(last.querySelector("footer .colophon")).toBeTruthy();
-  });
-
-  it("loads two small modules, and no frameworks", () => {
+  it("loads one small script, and no frameworks", () => {
     const scripts = [...document.querySelectorAll("script[src]")];
 
-    expect(scripts.map((script) => script.getAttribute("src"))).toEqual(["slides.js", "/bar.js"]);
-    for (const script of scripts) expect(script.getAttribute("type")).toBe("module");
-  });
-
-  it("offers the scroll world from the title page", () => {
-    const tour = document.querySelector(".tour a");
-
-    expect(tour?.getAttribute("href")).toBe("/");
-    expect(tour.textContent).toContain("print shop");
+    expect(scripts.map((script) => script.getAttribute("src"))).toEqual(["/bar.js"]);
+    expect(scripts[0].getAttribute("type")).toBe("module");
   });
 });

@@ -51,25 +51,26 @@ describe("the build", () => {
     expect(await size("style.css")).toBeGreaterThan(500);
   });
 
-  it("puts the world on the front page and the deck at /home", async () => {
+  it("puts the world on the front page and the portfolio at /home", async () => {
     const index = await read("index.html");
     const home = await read("home.html");
 
     expect(index).toContain("The print shop");
     expect(index).toContain('src="/world/engine.js"');
     expect(home).toContain("Websites, presentations and small tools");
-    expect(home).toContain("A few things");
+    expect(home).toContain('id="experience"');
 
-    // /home is a rewrite, so the deck is addressable without the extension
+    // /home is a rewrite, so the page is addressable without the extension
     // pretty URLs are the host's job (Cloudflare html_handling, nginx try_files),
     // so the build ships no _redirects for them
     expect(await exists("_redirects")).toBe(false);
   });
 
-  it("copies the script that makes the slides behave like a deck", async () => {
-    expect(await size("slides.js")).toBeGreaterThan(500);
-    expect(await read("home.html")).toContain('src="slides.js"');
-    expect(await read("_headers")).toContain("/slides.js");
+  it("ships the bar script, and no deck", async () => {
+    expect(await size("bar.js")).toBeGreaterThan(500);
+    expect(await read("home.html")).toContain('src="/bar.js"');
+    expect(await read("_headers")).toContain("/bar.js");
+    expect(await exists("slides.js")).toBe(false);
   });
 
   it("ships the scroll world, its film and its engine", async () => {
@@ -141,7 +142,6 @@ describe("the build", () => {
       "projects",
       "school.html",
       "services.html",
-      "slides.js",
       "style.css",
       "terms.html",
       "thanks.html",

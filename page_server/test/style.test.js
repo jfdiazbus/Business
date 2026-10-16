@@ -84,14 +84,6 @@ describe("the page fills the screen", () => {
     expect(page).toContain("max-width: var(--page-max)");
   });
 
-  it("gives every slide a screen of its own", () => {
-    const slide = ruleBody(css, ".slide");
-
-    expect(slide).toMatch(/min-block-size: 100(s?v)h/);
-    expect(slide).toContain("scroll-snap-align: start");
-    expect(slide).toContain("padding-block");
-  });
-
   it("keeps the name and nav reachable from every slide", () => {
     const topbar = ruleBody(css, ".topbar");
 
@@ -99,12 +91,6 @@ describe("the page fills the screen", () => {
     expect(topbar).toMatch(/z-index: \d/);
     // the background arrives with the scrolled state, so the bar can start clear
     expect(ruleBody(css, ".topbar--solid")).toContain("background");
-  });
-
-  it("centres a slide without cropping one that is taller than the screen", () => {
-    // auto margins, not justify-content: center, which clips the overflow
-    expect(css).toMatch(/\.slide > \.rule:first-child\s*\{[^}]*margin-block: auto/);
-    expect(css).not.toMatch(/\.slide\s*\{[^}]*justify-content: center/);
   });
 
   it("shortens the bar on small screens", () => {
@@ -131,22 +117,13 @@ describe("the scroll animations", () => {
     const print = blocks(css, /@media\s*print\s*\{/)[0].body;
 
     expect(print).toMatch(/animation:\s*none\s*!important/);
-    expect(print).toContain(".scroll-hint");
+    expect(print).toContain(".topbar nav");
   });
 
-  it("prints a stack of pages, not a stack of screens", () => {
+  it("prints the bar at the top of the sheet rather than over it", () => {
     const print = blocks(css, /@media\s*print\s*\{/)[0].body;
 
-    expect(print).toMatch(/\.slide\s*\{[^}]*min-block-size: 0/);
     expect(print).toMatch(/\.topbar\s*\{[^}]*position: static/);
-  });
-
-  it("snaps between slides, and not at all for someone who would rather scroll freely", () => {
-    const snapping = blocks(css, MOTION)[0].body;
-    const calm = blocks(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{/)[0].body;
-
-    expect(snapping).toContain("scroll-snap-type: y mandatory");
-    expect(calm).toContain("scroll-snap-type: none");
   });
 
   it("never uses a scroll timeline where it is not supported", () => {
@@ -164,8 +141,8 @@ describe("the scroll animations", () => {
     expect(motion).toContain("animation-timeline: view()");
   });
 
-  it("has no tractor feed, print head or ascii ruler left over", () => {
-    for (const gone of [".sprocket", "--dots", "print head", "===="]) {
+  it("has no tractor feed, deck or ascii ruler left over", () => {
+    for (const gone of [".sprocket", "--dots", "====", "scroll-snap", ".slide", ".count"]) {
       expect(css, gone).not.toContain(gone);
     }
   });
@@ -200,18 +177,6 @@ describe("the scroll animations", () => {
     for (const selector of [".rule", ".heading", ".project", ".leader", ".werk-row"]) {
       expect(motion, selector).toContain(selector);
     }
-  });
-
-  it("moves exactly one slide per gesture", () => {
-    expect(ruleBody(css, ".slide")).toContain("scroll-snap-stop: always");
-  });
-
-  it("fades the scroll cue as the first slide leaves, not on a document percentage", () => {
-    const [scroll] = blocks(css, SUPPORTS);
-    const motion = blocks(scroll.body, MOTION)[0].body;
-
-    expect(motion).toContain(".scroll-hint");
-    expect(motion).toMatch(/animation-range:\s*exit 0% exit 90%/);
   });
 });
 

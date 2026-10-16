@@ -26,7 +26,6 @@ export const PAGE_FILES = [
   ["thanks.html", "thanks.html"],
   ["terms.html", "terms.html"],
   ["style.css", "style.css"],
-  ["slides.js", "slides.js"],
   ["world.js", "world.js"],
   ["bar.js", "bar.js"],
 ];
@@ -55,9 +54,6 @@ export const HEADERS = `/projects/*/assets/*
   Cache-Control: public, max-age=3600
 
 /style.css
-  Cache-Control: public, max-age=3600
-
-/slides.js
   Cache-Control: public, max-age=3600
 
 /world.js

@@ -37,8 +37,8 @@ describe("the project", () => {
     }
   });
 
-  it("keeps the deck's script free of imports, too", async () => {
-    const script = await read("slides.js");
+  it("keeps the bar script free of imports, too", async () => {
+    const script = await read("bar.js");
 
     expect(script).not.toMatch(/^\s*import\s/m);
     expect(script).not.toContain("require(");

@@ -83,20 +83,10 @@ html {
   scroll-padding-top: var(--bar-h);
 }
 
-/* the deck scrolls one slide at a time, when the browser can snap */
+/* anchors glide rather than jump */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
-    /* mandatory, so one gesture is one slide: proximity leaves the visitor
-       nudging at the next slide before anything moves */
-    scroll-snap-type: y mandatory;
-  }
-}
-
-/* no snapping for anyone who would rather scroll freely */
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-snap-type: none;
   }
 }
 
@@ -447,75 +437,10 @@ a:focus-visible {
   background: color-mix(in srgb, var(--line) 60%, transparent);
   margin-block: var(--sp-500);
 }
-
-/* the heading row of a slide: the name, then where you are */
-.slide-top {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-200);
-  margin: 0 0 var(--sp-300);
-}
-
-.slide-top .heading {
-  margin: 0;
-}
-
-.slide-top .fill {
-  flex: 1 1 auto;
-  height: 1px;
-  min-width: var(--sp-300);
-  background: var(--line);
-}
-
-.slide-top .count {
-  flex: 0 0 auto;
-  color: var(--ink-soft);
-  font-family: var(--mono);
-  font-size: var(--fs-xs);
-  font-weight: 500;
-}
-
 /* -- slides: one screen each, snapping like a deck ----------------------- */
-
-.slide {
-  display: flex;
-  flex-direction: column;
-  min-block-size: 100vh;
-  min-block-size: 100svh;
-  /* the top padding is room for the fixed bar above it */
-  padding-block: calc(var(--bar-h) + var(--sp-500)) var(--sp-600);
-  scroll-snap-align: start;
-  /* never let one flick skip past a slide */
-  scroll-snap-stop: always;
-}
-
 /* centring with auto margins, so a slide taller than the screen
    (a narrow phone, say) still starts at its first line instead of being
    cropped at the top the way `justify-content: center` would crop it */
-.slide > .rule:first-child {
-  margin-block: auto var(--sp-300);
-}
-
-.slide:not(.hero) > :last-child {
-  margin-block-end: auto;
-}
-
-/* slide 1: the title page */
-.hero {
-  padding-block-start: calc(var(--bar-h) + var(--sp-400));
-}
-
-.hero h1 {
-  /* the headline sits in the optical middle of the screen, balanced against the
-     scroll cue below it */
-  margin: auto 0 var(--sp-300);
-  max-width: 24ch;
-  font-size: clamp(var(--fs-4xl), 7vw, var(--fs-6xl));
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
 .lede {
   margin: 0;
   max-width: 60ch;
@@ -526,15 +451,6 @@ a:focus-visible {
 .page p {
   max-width: var(--measure);
 }
-
-/* a small, quiet cue that there is more below — it leaves once you scroll */
-.scroll-hint {
-  margin: auto 0 0;
-  padding-top: var(--sp-500);
-  color: var(--ink-soft);
-  font-size: var(--fs-sm);
-}
-
 /* aside links: the tour from the title page, the school work from the listing */
 .tour,
 .more {
@@ -780,11 +696,6 @@ a:focus-visible {
 }
 
 /* -- footer -------------------------------------------------------------- */
-
-.slide-foot {
-  margin-block-start: var(--sp-600);
-}
-
 .eof {
   margin: 0 0 var(--sp-50);
   font-size: var(--fs-base);
@@ -846,7 +757,6 @@ footer .links a:focus-visible {
 
 @media (prefers-reduced-motion: no-preference) {
   .page-title,
-  .hero h1,
   .lede {
     animation: reveal var(--slow) var(--ease) both;
   }
@@ -876,21 +786,11 @@ footer .links a:focus-visible {
     .faq dt,
     .faq dd,
     .included li,
-    .count,
     .eof,
     .colophon {
       animation: reveal linear both;
       animation-timeline: view();
       animation-range: entry 0% cover 18%;
-    }
-
-    /* the scroll cue leaves exactly as the first slide does, so the advice and
-       the movement line up instead of drifting apart */
-    .scroll-hint {
-      animation: reveal 0.3s linear both;
-      animation-direction: reverse;
-      animation-timeline: view();
-      animation-range: exit 0% exit 90%;
     }
   }
 }
@@ -998,21 +898,15 @@ footer .links a:focus-visible {
     background: #fff;
   }
 
-  /* a printed deck is a stack of pages, not a stack of screens */
+  /* a printed page carries the bar at the top of the sheet, not floating over it */
   .topbar {
     position: static;
     height: auto;
     border: 0;
   }
 
-  .slide {
-    min-block-size: 0;
-    padding-block: 0 var(--sp-600);
-  }
-
   .topbar nav,
   .topbar .btn,
-  .scroll-hint,
   .skip {
     display: none;
   }
