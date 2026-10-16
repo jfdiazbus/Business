@@ -23,15 +23,15 @@ because something looks wrong, the section you want is probably
 
 `page_server/style.css` opens with the tokens, in four groups:
 
-| Group          | Tokens                                                                             |
-| -------------- | ---------------------------------------------------------------------------------- |
-| Surfaces       | `--bg`, `--surface`, `--surface-2`, `--line`, `--line-strong`                        |
-| Text           | `--ink`, `--ink-soft`, `--ink-faint`                                                 |
-| Accent         | `--accent`, `--accent-deep`                                                          |
-| Type scale     | `--fs-xs` … `--fs-6xl` — 12, 14, 16, 18, 20, 24, 30, 36, 48, 60px                    |
-| Space scale    | `--sp-25` … `--sp-900` — 2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96px               |
-| Radii, motion  | `--r-sm`, `--r-md`, `--r-lg`, `--r-full`, `--ease`, `--slow`                         |
-| Layout         | `--measure`, `--page-max`, `--page-pad`, `--bar-h`                                   |
+| Group         | Tokens                                                                 |
+| ------------- | ---------------------------------------------------------------------- |
+| Surfaces      | `--bg`, `--surface`, `--surface-2`, `--line`, `--line-strong`          |
+| Text          | `--ink`, `--ink-soft`, `--ink-faint`                                   |
+| Accent        | `--accent`, `--accent-deep`                                            |
+| Type scale    | `--fs-xs` … `--fs-6xl` — 12, 14, 16, 18, 20, 24, 30, 36, 48, 60px      |
+| Space scale   | `--sp-25` … `--sp-900` — 2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96px |
+| Radii, motion | `--r-sm`, `--r-md`, `--r-lg`, `--r-full`, `--ease`, `--slow`           |
+| Layout        | `--measure`, `--page-max`, `--page-pad`, `--bar-h`                     |
 
 `page_server/world/kit.mjs` holds the matching palette for the film, in `P`. The
 two are deliberately separate files, because the film is drawn offline and
@@ -45,12 +45,12 @@ clear the contrast floor below.
 
 Against `--bg` (`#0a0a0a`):
 
-| Token         | Value                  | Ratio  | Used for                                  |
-| ------------- | ---------------------- | ------ | ----------------------------------------- |
-| `--ink`       | `#ffffff`              | 19.7:1 | body text, headings, the primary button   |
-| `--ink-soft`  | `#a3a3a3`              | 7.8:1  | secondary text, labels, the colophon      |
-| `--accent`    | `#ff6b5a`              | 7.0:1  | links, the current page mark, focus       |
-| `--ink-faint` | `#737373`              | 4.1:1  | marks only: the list dots, never sentences |
+| Token         | Value     | Ratio  | Used for                                   |
+| ------------- | --------- | ------ | ------------------------------------------ |
+| `--ink`       | `#ffffff` | 19.7:1 | body text, headings, the primary button    |
+| `--ink-soft`  | `#a3a3a3` | 7.8:1  | secondary text, labels, the colophon       |
+| `--accent`    | `#ff6b5a` | 7.0:1  | links, the current page mark, focus        |
+| `--ink-faint` | `#737373` | 4.1:1  | marks only: the list dots, never sentences |
 
 Two rules follow from this, and both were learned the hard way:
 
@@ -82,11 +82,11 @@ Copy rules, enforced on the pages by tests:
 `header.topbar`, one per page, `position: fixed`, `--bar-h` tall (72px, 60px on a
 phone). It has three states:
 
-| State                     | What it looks like                                     |
-| ------------------------- | ------------------------------------------------------ |
-| clear (top of the page)   | transparent, no border                                 |
+| State                      | What it looks like                                     |
+| -------------------------- | ------------------------------------------------------ |
+| clear (top of the page)    | transparent, no border                                 |
 | `topbar--solid` (scrolled) | `color-mix` of the background, blurred, hairline below |
-| `topbar--open` (phone)    | the nav becomes a full panel under the bar             |
+| `topbar--open` (phone)     | the nav becomes a full panel under the bar             |
 
 `bar.js` sets those classes. It is the only script the document pages load, and
 it does two things:
@@ -111,7 +111,7 @@ at routes the site serves.
   500ms. Nothing animates on a default ease.
 - **Every animation sits inside the `prefers-reduced-motion: no-preference`
   guard, and every scroll timeline inside an `@supports (animation-timeline:
-  view())` guard.** Two tests fail the build otherwise.
+view())` guard.** Two tests fail the build otherwise.
 - Scroll reveals use CSS scroll timelines (`animation-timeline: view()`), so
   there is no JavaScript involved and no `window.addEventListener("scroll")`
   anywhere.
@@ -162,16 +162,16 @@ tractor feed strips down the edges, an ASCII ruler between sections, dot leaders
 on the rows, and a figlet banner on the title page. It read as a template of that
 idea rather than as a site, so it was replaced:
 
-| Removed                        | Replaced by                                            |
-| ------------------------------ | ------------------------------------------------------ |
-| Sprocket strips, paper feed     | a flat background and a fixed bar                      |
-| `====` ASCII ruler              | a one pixel hairline                                   |
-| Dot leaders                     | a hairline that fills the row                          |
-| `>` sigils before headings      | sentence case headings                                 |
-| Figlet banner, `pnpm banner`    | a real `h1`, which is also what a search engine reads  |
-| Bracketed link labels `[ ]`     | plain labels; the shape of the button carries the meaning |
-| Monospace for everything        | Geist for prose, Geist Mono for data                   |
-| Green bar cards                 | flat cards with a hairline border and a large price    |
+| Removed                      | Replaced by                                               |
+| ---------------------------- | --------------------------------------------------------- |
+| Sprocket strips, paper feed  | a flat background and a fixed bar                         |
+| `====` ASCII ruler           | a one pixel hairline                                      |
+| Dot leaders                  | a hairline that fills the row                             |
+| `>` sigils before headings   | sentence case headings                                    |
+| Figlet banner, `pnpm banner` | a real `h1`, which is also what a search engine reads     |
+| Bracketed link labels `[ ]`  | plain labels; the shape of the button carries the meaning |
+| Monospace for everything     | Geist for prose, Geist Mono for data                      |
+| Green bar cards              | flat cards with a hairline border and a large price       |
 
 Two things were kept on purpose: the `:-)` in the favicon and the footer, which
 is a signature rather than decoration, and the film's print shop, which is the
@@ -214,19 +214,19 @@ pnpm format:check  # prettier
 pnpm build         # dist/, and it fails on a broken link
 ```
 
-| Suite      | What it protects                                                          |
-| ---------- | ------------------------------------------------------------------------- |
-| `style`    | tokens, contrast, flat backgrounds, upright type, the motion guards        |
-| `bar`      | the solid state, the menu, and that nothing listens to scroll              |
-| `slides`   | what a keypress does, and how long a page turn takes                       |
-| `page`     | the deck's words, headings, links and shell                                |
-| `services` | prices, one action per offer, heading order, routes, the copy rules         |
-| `terms`    | the seller, the buyer's questions, the cancellation right, the data note    |
-| `stripe`   | the payment links against the live Stripe account, and price drift          |
-| `world`    | the world's config, its copy, and the film's sizes                         |
-| `build`    | what ships, that nothing leaks a local path, and that no link is broken     |
-| `deploy`   | credentials stay out of git and out of the image                           |
-| `school`, `project`, `server` | the coursework page, the project's own promises, the local server |
+| Suite                         | What it protects                                                         |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| `style`                       | tokens, contrast, flat backgrounds, upright type, the motion guards      |
+| `bar`                         | the solid state, the menu, and that nothing listens to scroll            |
+| `slides`                      | what a keypress does, and how long a page turn takes                     |
+| `page`                        | the deck's words, headings, links and shell                              |
+| `services`                    | prices, one action per offer, heading order, routes, the copy rules      |
+| `terms`                       | the seller, the buyer's questions, the cancellation right, the data note |
+| `stripe`                      | the payment links against the live Stripe account, and price drift       |
+| `world`                       | the world's config, its copy, and the film's sizes                       |
+| `build`                       | what ships, that nothing leaks a local path, and that no link is broken  |
+| `deploy`                      | credentials stay out of git and out of the image                         |
+| `school`, `project`, `server` | the coursework page, the project's own promises, the local server        |
 
 Accessibility is checked by hand with Lighthouse, at 390px wide. The expectation
 is **100 for accessibility on every page**, and the only audit allowed to fail is
