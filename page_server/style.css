@@ -65,7 +65,7 @@
 
   /* motion: mass and spring, never a default ease */
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --slow: 700ms;
+  --slow: 500ms;
 
   --sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Geist Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
@@ -87,7 +87,9 @@ html {
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
-    scroll-snap-type: y proximity;
+    /* mandatory, so one gesture is one slide: proximity leaves the visitor
+       nudging at the next slide before anything moves */
+    scroll-snap-type: y mandatory;
   }
 }
 
@@ -156,6 +158,21 @@ p {
   border-radius: var(--r-full);
   text-decoration: none;
   font-size: var(--fs-sm);
+}
+
+/* Any link that is not part of a styled row still has to be readable: without
+   this, an anchor inside a paragraph falls back to the browser's own link
+   colour, which is unreadable on a near black background. */
+a {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  text-underline-offset: 3px;
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--ink);
+  text-decoration-color: currentColor;
 }
 
 /* -- the sheet: one flat background behind everything -------------------- */
@@ -253,6 +270,80 @@ p {
   margin-top: var(--sp-50);
   background: var(--accent);
   border-radius: var(--r-full);
+}
+
+/* -- the phone menu ------------------------------------------------------ */
+
+/* Hidden until the script says it can drive it. Without bar.js the nav stays a
+   plain scrollable row, so the links are never behind a button that cannot
+   open. */
+.topbar__menu {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  cursor: pointer;
+}
+
+.topbar__bars,
+.topbar__bars::before,
+.topbar__bars::after {
+  display: block;
+  width: 16px;
+  height: 2px;
+  border-radius: var(--r-full);
+  background: var(--ink);
+}
+
+.topbar__bars {
+  position: relative;
+}
+
+.topbar__bars::before,
+.topbar__bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+
+.topbar__bars::before {
+  top: -5px;
+}
+
+.topbar__bars::after {
+  top: 5px;
+}
+
+/* the lines rotate into an X rather than disappearing */
+.topbar--open .topbar__bars {
+  background: transparent;
+}
+
+.topbar--open .topbar__bars::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.topbar--open .topbar__bars::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .topbar__bars,
+  .topbar__bars::before,
+  .topbar__bars::after {
+    transition:
+      transform var(--slow) var(--ease),
+      top var(--slow) var(--ease),
+      background-color var(--slow) var(--ease);
+  }
 }
 
 /* -- buttons ------------------------------------------------------------- */
@@ -394,6 +485,8 @@ p {
   /* the top padding is room for the fixed bar above it */
   padding-block: calc(var(--bar-h) + var(--sp-500)) var(--sp-600);
   scroll-snap-align: start;
+  /* never let one flick skip past a slide */
+  scroll-snap-stop: always;
 }
 
 /* centring with auto margins, so a slide taller than the screen
@@ -728,13 +821,15 @@ footer .links a:focus-visible {
 
 /* -- motion: content arrives, it does not appear ------------------------- */
 
+/* A reveal settles into place; it does not fade in. Anything dimmer than the
+   tokens themselves is not legible on a near black background, so fading text
+   means text that cannot be read while it arrives: an audit cannot tell that
+   apart from text that is simply too dim. The movement carries the reveal. */
 @keyframes reveal {
   from {
-    opacity: 0;
-    translate: 0 var(--sp-200);
+    translate: 0 var(--sp-100);
   }
   to {
-    opacity: 1;
     translate: 0 0;
   }
 }
@@ -789,12 +884,13 @@ footer .links a:focus-visible {
       animation-range: entry 0% cover 18%;
     }
 
-    /* the scroll cue leaves as soon as you start */
+    /* the scroll cue leaves exactly as the first slide does, so the advice and
+       the movement line up instead of drifting apart */
     .scroll-hint {
-      animation: reveal 0.2s linear both;
+      animation: reveal 0.3s linear both;
       animation-direction: reverse;
-      animation-timeline: scroll(root block);
-      animation-range: 0% 10%;
+      animation-timeline: view();
+      animation-range: exit 0% exit 90%;
     }
   }
 }
@@ -820,8 +916,63 @@ footer .links a:focus-visible {
   }
 }
 
+@media (max-width: 767px) {
+  .topbar--enhanced .topbar__menu {
+    display: inline-flex;
+  }
+
+  /* the row would collide with the button, so the panel carries the links */
+  .topbar--enhanced nav {
+    position: fixed;
+    inset: var(--bar-h) 0 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--sp-200) var(--page-pad) var(--sp-600);
+    background: color-mix(in srgb, var(--bg) 96%, transparent);
+    backdrop-filter: blur(16px);
+    overflow-y: auto;
+  }
+
+  .topbar--enhanced.topbar--open nav {
+    display: flex;
+  }
+
+  .topbar--enhanced nav a {
+    padding: var(--sp-200) 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-2xl);
+    color: var(--ink);
+  }
+
+  /* a full width row does not need the current page underline */
+  .topbar--enhanced nav a[aria-current]::after {
+    display: none;
+  }
+
+  /* the panel already links the prices */
+  .topbar--enhanced > .btn {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .topbar--open nav a {
+      animation: reveal 350ms var(--ease) both;
+    }
+
+    .topbar--open nav a:nth-child(2) {
+      animation-delay: 50ms;
+    }
+
+    .topbar--open nav a:nth-child(3) {
+      animation-delay: 100ms;
+    }
+  }
+}
+
 @media (max-width: 479px) {
-  .topbar .btn {
+  .topbar:not(.topbar--enhanced) .btn {
     display: none;
   }
 }

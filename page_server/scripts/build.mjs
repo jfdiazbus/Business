@@ -24,6 +24,7 @@ export const PAGE_FILES = [
   ["school.html", "school.html"],
   ["services.html", "services.html"],
   ["thanks.html", "thanks.html"],
+  ["terms.html", "terms.html"],
   ["style.css", "style.css"],
   ["slides.js", "slides.js"],
   ["world.js", "world.js"],
@@ -125,6 +126,7 @@ export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPAC
       ...(await checkLinks(outDir, "school.html")),
       ...(await checkLinks(outDir, "services.html")),
       ...(await checkLinks(outDir, "thanks.html")),
+      ...(await checkLinks(outDir, "terms.html")),
     ]),
   ];
 

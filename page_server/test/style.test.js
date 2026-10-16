@@ -145,7 +145,7 @@ describe("the scroll animations", () => {
     const snapping = blocks(css, MOTION)[0].body;
     const calm = blocks(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{/)[0].body;
 
-    expect(snapping).toContain("scroll-snap-type: y proximity");
+    expect(snapping).toContain("scroll-snap-type: y mandatory");
     expect(calm).toContain("scroll-snap-type: none");
   });
 
@@ -202,12 +202,16 @@ describe("the scroll animations", () => {
     }
   });
 
-  it("lets the scroll cue leave once the page moves", () => {
+  it("moves exactly one slide per gesture", () => {
+    expect(ruleBody(css, ".slide")).toContain("scroll-snap-stop: always");
+  });
+
+  it("fades the scroll cue as the first slide leaves, not on a document percentage", () => {
     const [scroll] = blocks(css, SUPPORTS);
     const motion = blocks(scroll.body, MOTION)[0].body;
 
     expect(motion).toContain(".scroll-hint");
-    expect(motion).toMatch(/animation-range:\s*0%\s*10%/);
+    expect(motion).toMatch(/animation-range:\s*exit 0% exit 90%/);
   });
 });
 
@@ -250,6 +254,12 @@ describe("the design tokens", () => {
 
     // the faint tone is for marks like the little list dots, never for sentences
     expect(contrast(tokens["ink-faint"], tokens.bg)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("never fades text on its way in", () => {
+    // anything below full opacity is dimmer than the tokens, and the tokens are
+    // already set to the contrast floor
+    expect(ruleBody(css, "@keyframes reveal")).not.toContain("opacity");
   });
 
   it("keeps backgrounds flat and type upright", () => {

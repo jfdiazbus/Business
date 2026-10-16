@@ -24,6 +24,7 @@ export const REWRITES = {
   "/school": "school.html",
   "/services": "services.html",
   "/thanks": "thanks.html",
+  "/terms": "terms.html",
 };
 
 export const MIME = {

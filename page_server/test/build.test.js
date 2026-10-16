@@ -143,6 +143,7 @@ describe("the build", () => {
       "services.html",
       "slides.js",
       "style.css",
+      "terms.html",
       "thanks.html",
       "world",
       "world.js",

@@ -24,6 +24,7 @@ const ROUTES = {
   "/school": "school.html",
   "/services": "services.html",
   "/thanks": "thanks.html",
+  "/terms": "terms.html",
 };
 
 const text = (node) => node.textContent.replace(/\s+/g, " ").trim();
