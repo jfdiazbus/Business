@@ -18,13 +18,13 @@ export const world = {
   sections: [
     {
       id: "print-room",
-      label: "The print room",
+      label: "Presentation",
       still: "/world/still-1.webp",
       clip: "/world/dive-1.mp4",
       accent: "#ff6b5a",
       scroll: 1.1,
       linger: 0.35,
-      eyebrow: "Hello",
+      eyebrow: "Presentation",
       title: "Websites, presentations and small tools.",
       body: "Mostly for companies that work with AI. Plain HTML and CSS, so pages load fast on any phone and stay easy to edit.",
       tags: ["Websites", "Presentations", "Small tools"],

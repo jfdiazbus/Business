@@ -56,6 +56,33 @@ describe("the film the config points at", () => {
       expect(section.label.length).toBeGreaterThan(0);
     }
   });
+
+  it("names its scene after each part of the site, in order", () => {
+    // one scene per part: the pages, the bar's nav and the film all say the same
+    // five words
+    expect(world.sections.map((section) => section.label)).toEqual([
+      "Presentation",
+      "Experience",
+      "Education",
+      "Projects",
+      "Contact",
+    ]);
+  });
+
+  it("writes those names into the film itself, not only into the copy beside it", () => {
+    return read("world/scenes.mjs").then((scenes) => {
+      for (const name of [
+        "PRESENTATION",
+        "EXPERIENCE",
+        "EDUCATION",
+        "EPITECH",
+        "PROJECTS",
+        "CONTACT",
+      ]) {
+        expect(scenes, name).toContain(`"${name}"`);
+      }
+    });
+  });
 });
 
 describe("the copy, by the landing page rules", () => {

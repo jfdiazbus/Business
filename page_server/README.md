@@ -121,9 +121,9 @@ load. Printing gives white pages, with the bar at the top of the sheet.
 ## The scroll world
 
 The front page (`/`) is a scroll driven flight through a print shop, five
-scenes long, with each scene's copy pinned over it. The scenes are named after
-the parts of the site: the print room for the introduction, then Experience,
-Education, Projects and Contact. The portfolio lives at `/home` (a rewrite to
+scenes long, with each scene's copy pinned over it. One scene per part of the
+site, and the film says so on the scene itself: **Presentation, Experience,
+Education, Projects, Contact**. The portfolio lives at `/home` (a rewrite to
 `home.html`), the coursework at `/school`, and the world links back to both.
 
 The film is **made by hand rather than by a video model**. The scenes are drawn
