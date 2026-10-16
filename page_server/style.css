@@ -306,26 +306,76 @@ body {
   color: var(--ink-soft);
 }
 
-/* a link to the scroll world, offered under the title page */
-.tour {
+/* aside links: the tour from the title page, the school work from the listing */
+.tour,
+.more {
   margin: 20px 0 0;
 }
 
-.tour a {
+.tour a,
+.more a {
   color: var(--ribbon);
   text-decoration: none;
 }
 
 .tour a:hover,
-.tour a:focus-visible {
+.tour a:focus-visible,
+.more a:hover,
+.more a:focus-visible {
   text-decoration: underline;
+}
+
+/* -- where I have worked: the years in the left column, like a printed CV -- */
+
+.werk {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 78ch;
+}
+
+.werk-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2ch;
+  padding: 9px 0;
+}
+
+.werk-row + .werk-row {
+  border-top: 1px dashed rgba(27, 27, 24, 0.16);
+}
+
+.werk-when {
+  flex: 0 0 12ch;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.werk-what {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* -- plain sections, for pages that are not a deck ----------------------- */
+
+.block {
+  padding-block: clamp(40px, 8vh, 92px);
+}
+
+.block .heading--sub {
+  margin-top: 44px;
+}
+
+/* the school list carries longer lines than the deck's skill rows */
+.block .leaders {
+  max-width: 92ch;
 }
 
 /* -- project cards ------------------------------------------------------ */
 
 .project {
   border: 1px solid rgba(27, 27, 24, 0.3);
-  margin: 0 0 20px;
+  margin: 0 0 14px;
   max-width: 78ch;
 }
 
@@ -339,7 +389,7 @@ body {
 
 .project p {
   margin: 0;
-  padding: 10px 14px 0;
+  padding: 8px 14px 0;
 }
 
 .project p.detail {
@@ -350,7 +400,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 20px;
-  padding: 10px 14px 12px;
+  padding: 8px 14px 10px;
 }
 
 .project .links a {

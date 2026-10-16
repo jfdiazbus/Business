@@ -178,7 +178,7 @@ describe("the world page", () => {
   it("still offers a way in without JavaScript", () => {
     const fallback = document.querySelector("noscript");
 
-    expect(fallback.textContent).toContain("four slide version");
+    expect(fallback.textContent).toContain("five slide version");
     expect(fallback.querySelector('a[href="/home"]')).toBeTruthy();
     expect(fallback.querySelector('a[href^="mailto:"]')).toBeTruthy();
   });

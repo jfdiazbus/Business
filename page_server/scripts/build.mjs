@@ -21,6 +21,7 @@ export const DEFAULT_OUT = path.join(PROJECT_ROOT, "dist");
 export const PAGE_FILES = [
   ["world.html", "index.html"],
   ["home.html", "home.html"],
+  ["school.html", "school.html"],
   ["style.css", "style.css"],
   ["slides.js", "slides.js"],
   ["world.js", "world.js"],
@@ -64,6 +65,7 @@ export const HEADERS = `/projects/*/assets/*
 
 // The deck lives at /home; everything else in dist is already addressable.
 export const REDIRECTS = `/home /home.html 200
+/school /school.html 200
 `;
 
 const skipDotFiles = (src) => !src.split(path.sep).some((segment) => segment.startsWith("."));
@@ -119,6 +121,7 @@ export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPAC
     ...new Set([
       ...(await checkLinks(outDir, "index.html")),
       ...(await checkLinks(outDir, "home.html")),
+      ...(await checkLinks(outDir, "school.html")),
     ]),
   ];
 
