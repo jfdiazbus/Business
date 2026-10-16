@@ -182,13 +182,18 @@ dashboard can drift apart — check both when a price changes. And selling to
 consumers inside the EU means VAT in the buyer's country (the OSS scheme):
 Stripe Tax calculates it, but you have to be enrolled.
 
-Nothing here needs a Stripe API key: Payment Links are public URLs. Do not put
-one in `.secrets` either, because the deploy script exports every value in that
-file to wrangler.
+Nothing on the site needs a Stripe API key: Payment Links are public URLs and the
+page loads no Stripe JavaScript. The one thing that wants a key is the `stripe`
+suite, which reads it from `STRIPE_SECRET_KEY` in the environment or from the
+gitignored `.secrets`. That suite is what turns the table above into a test: for
+each button it fetches the Payment Link, its price and its product, and fails
+when a price, the tax behaviour, the redirect or the invoice setting has drifted
+since. The deploy script passes only the `CLOUDFLARE_*` values from `.secrets`
+to wrangler, so nothing else in that file can reach a deploy.
 
 ## Tests
 
-`pnpm test` runs ten suites:
+`pnpm test` runs eleven suites:
 
 - **server** — routing, content types, redirects, the friendly 404, request
   methods, and that a URL can never climb out of the folders it serves.
@@ -208,8 +213,13 @@ file to wrangler.
   hyphens, no cliches, one action), and the vendored engine is intact.
 - **school** — the coursework page describes rather than links the private
   repositories, and keeps the copy on the same house rules.
-- **services** — three offers with their prices and inclusions, one action each,
-  and a buy button that emails until a real Payment Link is pasted in.
+- **services** — the prices and the questions, one checkout per offer, heading
+  levels that never skip, every id used once, and every link pointed at a page
+  this site really serves.
+- **stripe** — the buttons sell with real Payment Links that carry the settings
+  the page promises and charge the price the page shows. It reads
+  `STRIPE_SECRET_KEY` from the environment or from `.secrets`; without a key the
+  five account checks skip rather than fail, so a fresh clone and CI stay green.
 - **project** — the promises this project makes about itself: no runtime
   dependencies, the pipeline files exist, git stays clean.
 
