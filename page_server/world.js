@@ -36,9 +36,9 @@ export const world = {
       clip: "/world/dive-2.mp4",
       accent: "#ff6b5a",
       eyebrow: "Selected work",
-      title: "Three sites, taken end to end.",
-      body: "Two client sites with calculators, clear prices and lead forms, plus the front end of the MigaLabs site: design system, dashboards and the animated Ethereum Academy.",
-      tags: ["MigaLabs", "OmniPrompt Marketing", "PromptOps AI"],
+      title: "Coursework, taken end to end.",
+      body: "At Epitech: a task manager with proper accounts and sessions, a shell written in C, and a dashboard built from a dataset.",
+      tags: ["Epitech", "C", "Node.js"],
     },
     {
       id: "type-tray",

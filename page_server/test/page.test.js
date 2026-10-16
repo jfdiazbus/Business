@@ -51,14 +51,15 @@ describe("home.html (the deck)", () => {
       expect(project.querySelector("p")?.textContent.trim().length).toBeGreaterThan(20);
     }
 
-    // the lab's code is private, so the live site is the proof
-    expect(document.querySelector('a[href="https://migalabs.io/"]')).toBeTruthy();
+    // the school work leads the slide, and no card sells a client site
+    expect(projects[0].querySelector("h3").textContent.trim()).toBe("EpyTodo");
+    expect(projects[1].querySelector("h3").textContent.trim()).toBe("Tardis");
   });
 
   it("lists where I have worked, years first", () => {
     const rows = [...document.querySelectorAll(".werk-row")];
 
-    expect(rows).toHaveLength(3);
+    expect(rows).toHaveLength(2);
     expect(document.querySelector("#experience")).toBeTruthy();
 
     for (const row of rows) {
@@ -75,13 +76,16 @@ describe("home.html (the deck)", () => {
     ).toContain("juan-felipe-diaz-bustamante");
   });
 
-  it("links the two client sites from the right place", () => {
+  it("sends the work slide to the school page instead of client sites", () => {
     const hrefs = [...document.querySelectorAll(".project a")].map((link) =>
       link.getAttribute("href"),
     );
 
-    expect(hrefs).toContain("/projects/omniprompt-marketing/");
-    expect(hrefs).toContain("/projects/promptops-ai/pitch");
+    // the cards describe school work, so they carry no links of their own
+    expect(hrefs).toEqual([]);
+    expect(document.querySelector(".project:last-of-type h3").textContent.trim()).toBe(
+      "This portfolio",
+    );
   });
 
   it("points every nav link at a section that exists", () => {

@@ -37,12 +37,21 @@
           <a class="brand" href="/"
             >Juan Felipe Diaz Bustamante<span class="role"> — web developer</span></a
           >
-          <nav aria-label="site">
+          <nav id="topbar-nav" aria-label="site">
             <a href="/home" aria-current="page">Portfolio</a>
             <a href="/services">Prices</a>
             <a href="/school">School</a>
           </nav>
           <a class="btn btn--primary" href="/services">See the prices</a>
+          <button
+            class="topbar__menu"
+            type="button"
+            aria-expanded="false"
+            aria-controls="topbar-nav"
+            aria-label="Menu"
+          >
+            <span class="topbar__bars" aria-hidden="true"></span>
+          </button>
         </header>
 
         <main>
@@ -68,44 +77,31 @@
             </div>
 
             <article class="project">
-              <h3>MigaLabs</h3>
-              <p>The site behind a blockchain research lab.</p>
-              <p class="detail">
-                Design system, dashboards, list and detail pages, and the animated Ethereum Academy
-                lessons. The code is private, the live site is not.
+              <h3>EpyTodo</h3>
+              <p>
+                A task manager, where you make an account and keep your own list of things to do.
               </p>
-              <p class="links">
-                <a href="https://migalabs.io/">visit migalabs.io</a>
+              <p class="detail">
+                Accounts and sessions are handled properly, and the tasks live in a MySQL database.
+                Built with Node.js, Express and MySQL.
               </p>
             </article>
 
             <article class="project">
-              <h3>OmniPrompt Marketing</h3>
-              <p>
-                A complete website and a 12-slide presentation for a marketing company that uses AI.
-              </p>
+              <h3>Tardis</h3>
+              <p>A dashboard built from a dataset, with a predictive model behind it.</p>
               <p class="detail">
-                Visitors can see the services, estimate how much they could save, compare prices and
-                request a quote &mdash; everything on one page.
-              </p>
-              <p class="links">
-                <a href="/projects/omniprompt-marketing/">view the website</a>
-                <a href="/projects/omniprompt-marketing/pitch">view the presentation</a>
+                Cleaning and exploring the data first, then a model that guesses the outcome, then a
+                small dashboard to read it by. Written in Python, in notebooks.
               </p>
             </article>
 
             <article class="project">
-              <h3>PromptOps AI</h3>
-              <p>
-                A website and presentation for a company that helps other businesses put AI to work.
-              </p>
+              <h3>minishell</h3>
+              <p>A shell written in C: a prompt that runs your commands.</p>
               <p class="detail">
-                It explains each service with clear prices, a savings calculator and a simple way to
-                get in touch.
-              </p>
-              <p class="links">
-                <a href="/projects/promptops-ai/">view the website</a>
-                <a href="/projects/promptops-ai/pitch">view the presentation</a>
+                Builtins, pipes and redirections, the parts of a terminal you reach for every day,
+                rebuilt from scratch.
               </p>
             </article>
 
@@ -134,23 +130,17 @@
               <li class="werk-row">
                 <span class="werk-when">2026 &ndash; now</span>
                 <span class="werk-what">
-                  <strong>MigaLabs</strong> &mdash; the front end of the lab&rsquo;s own site:
-                  design system, dashboards, list and detail pages, and the animated Ethereum
-                  Academy lessons.
-                </span>
-              </li>
-              <li class="werk-row">
-                <span class="werk-when">2025 &ndash; 2028</span>
-                <span class="werk-what">
-                  <strong>Epitech</strong> &mdash; Software Engineering Bachelor. A task manager, a
-                  shell in C, a data dashboard, and a lot of smaller C projects along the way.
+                  <strong>MigaLabs</strong> &mdash; software engineer, on a training contract in
+                  Barcelona. The front end of the lab&rsquo;s own site: design system, dashboards,
+                  list and detail pages, and the animated Ethereum Academy lessons.
                 </span>
               </li>
               <li class="werk-row">
                 <span class="werk-when">2022 &ndash; 2023</span>
                 <span class="werk-what">
-                  <strong>Alvatroz Partners</strong> &mdash; IT Head intern: the API routes behind
-                  the company&rsquo;s web page, and automation that checks the invoices.
+                  <strong>Alvatroz Partners</strong> &mdash; IT intern in Barcelona, from November
+                  2022 to September 2023. The API routes behind the company&rsquo;s web page, and
+                  automation that checks the invoices.
                 </span>
               </li>
             </ul>
@@ -167,8 +157,8 @@
 
             <p>
               I&rsquo;m a web developer who likes to keep things simple: pages that load fast, work
-              on any device, and don&rsquo;t need heavy tools to run. Both client websites above are
-              built that way, and so is this one.
+              on any device, and don&rsquo;t need heavy tools to run. The projects above are built
+              that way, and so is this one.
             </p>
             <p>
               I also write the business plans and pricing behind these projects, so I understand the

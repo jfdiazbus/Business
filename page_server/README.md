@@ -26,6 +26,7 @@ work, and a static build that ships to Cloudflare or to a Docker container.
 | `home.html`                       | The five slide deck, served at `/home` — the words live here            |
 | `school.html`                     | The Epitech coursework, served at `/school`                             |
 | `services.html`, `thanks.html`    | The prices, and where Stripe sends buyers (`/services`, `/thanks`)      |
+| `terms.html`                      | Terms and privacy, served at `/terms`                                   |
 | `style.css`                       | The look: the tokens, the type scale, the spacing scale, then the rules |
 | `index.js`                        | The local server. No dependencies, only Node's own modules              |
 | `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                             |
@@ -48,12 +49,14 @@ Everything you might want to change is in `home.html` (the deck) or `world.js`
 - **Contact details** — search for `juan-felipe.diaz-bustamante` and replace
   the email, and update the GitHub link if you like.
 - **Project descriptions** — each project is an `<article class="project">`
-  block. Change the text; the links point at the two client sites that live
-  next to this folder.
+  block. They describe the school work from `~/Epitech`; change the text there,
+  and keep the two featured ones (`EpyTodo`, `Tardis`) first, because the tests
+  pin them.
 - **Slides** — each slide is a `<section class="slide">`; the number in its
   heading row (`3 / 5`) is plain text, so update it if you add or remove a slide.
 - **Where I have worked** — the rows live under `<ul class="werk">`, one
-  `.werk-row` each, with the years in the left column.
+  `.werk-row` each, with the years in the left column. They mirror the
+  Experience section of the LinkedIn profile.
 - **School work** — the coursework is in `school.html`, served at `/school`.
 
 ## The style
