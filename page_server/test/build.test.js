@@ -140,7 +140,6 @@ describe("the build", () => {
       "projects",
       "school.html",
       "services.html",
-      "services.js",
       "slides.js",
       "style.css",
       "thanks.html",

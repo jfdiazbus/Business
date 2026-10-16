@@ -27,7 +27,6 @@ that ships to Cloudflare or to a Docker container.
 | `home.html`                       | The five slide deck, served at `/home` — the words live here            |
 | `school.html`                     | The Epitech coursework, served at `/school`                             |
 | `services.html`, `thanks.html`    | The prices, and where Stripe sends buyers (`/services`, `/thanks`)      |
-| `services.js`                     | The three Stripe Payment Links, and the email fallback until they exist |
 | `style.css`                       | The look: paper, green bars, red accents, the slides                    |
 | `index.js`                        | The local server. No dependencies, only Node's own modules              |
 | `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                             |
@@ -158,10 +157,11 @@ for the buyer, and a redirect to `/thanks`. Payment methods are left to Stripe
 (dynamic payment methods), which is why its checkout offers card, Klarna,
 Bancontact and Amazon Pay rather than card alone.
 
-Those links are **test links**. `buyHref` in `services.js` refuses any link
-containing `/test_` on every host except localhost, so they work while you run
-the dev server and the live site keeps falling back to email. That guard is what
-stops a sandbox link from taking a real customer's card.
+Those links sit directly in the three buy buttons in `services.html`, so the page
+sells without any JavaScript. They are **test links**, so the buttons lead to
+the Stripe sandbox: a visitor can only pay with Stripe's test cards, no money
+moves, and Stripe labels the page as a sandbox. Swap in live links before you
+send anyone to `/services`.
 
 ### Going live
 
@@ -172,7 +172,8 @@ stops a sandbox link from taking a real customer's card.
    `automatic_tax` silently collects **zero**: the checkout shows a tax line of
    €0.00 and raises no error. Settle that with your accountant, not with me.
 3. Recreate the three Payment Links in **live mode** with the same settings as
-   the table above, and paste their URLs over the `test_` ones in `services.js`.
+   the table above, and swap their URLs into the three buy buttons in
+   `services.html`.
 4. Buy one with a card from Stripe's test list in the sandbox, then make one real
    live purchase and refund it.
 
