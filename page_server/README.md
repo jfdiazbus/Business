@@ -49,6 +49,7 @@ and a rewrite table in the local server — so nothing ships an `_redirects` fil
 | `services.html`, `thanks.html`    | The prices, and where Stripe sends buyers (`/services`, `/thanks`)         |
 | `terms.html`                      | Terms and privacy, served at `/terms`                                      |
 | `style.css`                       | The look: the tokens, the type scale, the spacing scale, then the rules    |
+| `docs/style.md`                   | Why the site looks the way it does, and how to change it                   |
 | `index.js`                        | The local server. No dependencies, only Node's own modules                 |
 | `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                                |
 | `scripts/deploy.mjs`              | Builds and uploads, reading credentials from `.secrets`                    |
