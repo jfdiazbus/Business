@@ -173,26 +173,17 @@ export async function boundaryFrames() {
   }
 }
 
-/** The cardstock edge that leads a wipe across the screen. */
-async function renderPaperEdge() {
+/** The sheet edge that leads a wipe across the screen. */
+async function renderSheetEdge() {
   const w = 150;
-  const holes = [];
-  for (let y = 34; y < CAM.h; y += 34) {
-    holes.push(
-      `<circle cx="34" cy="${y}" r="9" fill="${"#c8c1ad"}"/>`,
-      `<circle cx="${w - 34}" cy="${y}" r="9" fill="#c8c1ad"/>`,
-    );
-  }
-
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${CAM.h}" viewBox="0 0 ${w} ${CAM.h}">
-    <rect x="0" y="0" width="${w}" height="${CAM.h}" fill="#f7f5ef"/>
-    <rect x="0" y="0" width="${w}" height="${CAM.h}" fill="none" stroke="rgba(27,27,24,0.18)" stroke-width="3"/>
-    <rect x="${w - 5}" y="0" width="5" height="${CAM.h}" fill="rgba(27,27,24,0.10)"/>
-    ${holes.join("")}
+    <rect x="0" y="0" width="${w}" height="${CAM.h}" fill="#141414"/>
+    <rect x="0" y="0" width="${w}" height="${CAM.h}" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="3"/>
+    <rect x="${w - 5}" y="0" width="5" height="${CAM.h}" fill="rgba(0,0,0,0.45)"/>
   </svg>`;
 
-  const page = path.join(SVG_DIR, "paper-edge.html");
-  const png = path.join(OUT_DIR, "paper-edge.png");
+  const page = path.join(SVG_DIR, "sheet-edge.html");
+  const png = path.join(OUT_DIR, "sheet-edge.png");
   await writeFile(
     page,
     `<!doctype html><html><body style="margin:0;background:transparent">${svg}</body></html>`,
@@ -206,7 +197,7 @@ async function renderPaperEdge() {
 export async function connectors({ log = () => {} } = {}) {
   await mkdir(OUT_DIR, { recursive: true });
   await boundaryFrames();
-  const edge = await renderPaperEdge();
+  const edge = await renderSheetEdge();
   const made = [];
 
   for (let i = 0; i < SCENES.length - 1; i += 1) {

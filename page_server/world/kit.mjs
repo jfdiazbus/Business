@@ -3,24 +3,29 @@
 // grid with one light direction, so five hand-made scenes read as one world.
 
 export const P = {
-  paper: "#f0eee6",
-  paperLight: "#fbfaf6",
-  paperTop: "#f7f4ec",
-  paperMid: "#d9d2c0",
-  paperDark: "#c5bda9",
-  paperDeep: "#aea68f",
-  wall: "#dcd6c6",
-  wallDeep: "#cbc4b1",
-  bar: "#dde7d4",
-  barMid: "#cbdabd",
-  barDeep: "#b5c9a5",
-  ink: "#1b1b18",
-  inkSoft: "#5f5c52",
-  inkFaint: "#9a9488",
-  ribbon: "#b03024",
-  ribbonDeep: "#8d2318",
-  cut: "rgba(27,27,24,0.16)",
-  shadow: "rgba(27,27,24,0.20)",
+  // The world is dark now, so the value ramp runs from the page background up
+  // to the lit faces, and "ink" is the light that draws the edges. The names
+  // are the ones the scenes were drawn against: paper* is the surface stack,
+  // bar* used to be the green bar paper and is now a neutral, ribbon is the one
+  // accent that survives.
+  paper: "#0a0a0a", // the page background, so posters seam invisibly
+  paperLight: "#313131", // brightest lit face
+  paperTop: "#272727",
+  paperMid: "#1f1f1f",
+  paperDark: "#181818",
+  paperDeep: "#121212",
+  wall: "#1f1f1f",
+  wallDeep: "#181818",
+  bar: "#272727",
+  barMid: "#1f1f1f",
+  barDeep: "#181818",
+  ink: "#f5f5f5",
+  inkSoft: "#a3a3a3",
+  inkFaint: "#6b6b6b",
+  ribbon: "#ff5c4d",
+  ribbonDeep: "#b03024",
+  cut: "rgba(255,255,255,0.10)",
+  shadow: "rgba(0,0,0,0.55)",
 };
 
 /** One isometric unit in pixels. The world is drawn in grid units. */

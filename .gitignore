@@ -13,6 +13,7 @@ page_server/dist/
 
 # scroll world intermediates (the shipped film lives in page_server/world/out)
 page_server/world/build/
+page_server/world/out/sheet-edge.png
 
 # credentials — never commit these
 .env
