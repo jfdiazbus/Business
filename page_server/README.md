@@ -1,8 +1,29 @@
 # page_server — my portfolio
 
 A portfolio in plain HTML and CSS: a written page for each part of the work, a
-scroll driven film, and a prices page that takes payments. A tiny zero-dependency Node server for local
-work, and a static build that ships to Cloudflare or to a Docker container.
+scroll driven film, and a prices page that takes payments. No framework, no
+runtime dependency, no build step beyond copying files. A tiny Node server for
+local work, and a static build that ships to Cloudflare or to a Docker container.
+
+It is live at **<https://portfolio.jfdiazbus.workers.dev>**.
+
+If you are here to change how it looks, read **[`docs/style.md`](docs/style.md)**
+first: it explains where every value lives and what not to break. This file is
+about running, testing and shipping it.
+
+### The pages
+
+| Route       | Page                      |
+| ----------- | ------------------------- |
+| `/`         | the film: a scroll tour   |
+| `/home`     | the portfolio             |
+| `/school`   | the coursework            |
+| `/services` | the prices, and checkout  |
+| `/thanks`   | where Stripe sends buyers |
+| `/terms`    | terms and privacy         |
+
+Pretty URLs are the host's job — Cloudflare `html_handling`, nginx `try_files`,
+and a rewrite table in the local server — so nothing ships an `_redirects` file.
 
 ## Everyday commands
 
@@ -35,7 +56,8 @@ work, and a static build that ships to Cloudflare or to a Docker container.
 | `bar.js`                          | Turns the bar solid once the page scrolls                                  |
 | `world.html`, `world.js`          | The front page: the scroll world, and its config                           |
 | `world/`                          | The film: scene sources, the render + motion steps, and `out/`             |
-| `test/`                           | Tests for the server, the page, the styles, the build and the pipelines    |
+| `docs/style.md`                   | Why the site looks the way it does, and how to change it                   |
+| `test/`                           | Tests for the server, the pages, the styles, the build and the pipelines   |
 | `Dockerfile`, `docker/nginx.conf` | The container that serves `dist/`                                          |
 | `.secrets`                        | Your Cloudflare credentials. Gitignored — never committed                  |
 | `.node-version`                   | Pins the Node version Cloudflare's builder uses                            |
@@ -49,9 +71,10 @@ Everything you might want to change is in `home.html` (the portfolio) or
 - **Contact details** — search for `juan-felipe.diaz-bustamante` and replace
   the email, and update the GitHub link if you like.
 - **Project descriptions** — each project is an `<article class="project">`
-  block. They describe the school work from `~/Epitech`; change the text there,
-  and keep the two featured ones (`EpyTodo`, `Tardis`) first, because the tests
-  pin them.
+  block: a title, one sentence saying what it is, and a `.detail` paragraph
+  saying how it works. The coursework behind them is in `~/Epitech`; the tests
+  check that there are four, each with a title and a description, but they do not
+  pin the names.
 - **Sections** — the portfolio is one `<section class="block" id="...">` per part:
   experience, education, projects and contact. Adding or renaming one means
   changing the bar's nav and the world's sections as well, so all three stay in
@@ -219,8 +242,45 @@ to wrangler, so nothing else in that file can reach a deploy.
   the page promises and charge the price the page shows. It reads
   `STRIPE_SECRET_KEY` from the environment or from `.secrets`; without a key the
   five account checks skip rather than fail, so a fresh clone and CI stay green.
+- **terms** — the page names the seller, answers what a buyer needs before
+  paying (prices, delivery, refunds, the 14 day right to cancel, data), and is
+  reachable from every footer.
 - **project** — the promises this project makes about itself: no runtime
   dependencies, the pipeline files exist, git stays clean.
+
+## Conventions
+
+Worth knowing before you change anything, because the tests enforce most of it:
+
+- **Copy rules.** No hyphens inside sentences, sentence case headings, no
+  clichés (elevate, seamless, unleash, next gen, game changer, delve), second
+  person, active voice. Four suites check the text they cover.
+- **No runtime dependencies.** `index.js` and the browser code use nothing but
+  the platform. Adding a dependency needs a reason and a note here.
+- **Secrets never enter the repository.** `.secrets` is gitignored and excluded
+  from the Docker image; only `CLOUDFLARE_*` values from it reach wrangler.
+- **Commit messages** start with a bracketed verb: `[ADD]`, `[CHANGE]`, `[FIX]`,
+  then a plain sentence, then why.
+- **Every page is checked twice.** Once by a test that loads it, once by hand
+  with Lighthouse at 390px wide; the expectation is 100 for accessibility, and
+  the only audit allowed to fail is `is-crawlable` on `/thanks`, which is
+  `noindex` on purpose.
+
+## Still to do
+
+- **Stripe is in sandbox mode.** The buy buttons work, but they take Stripe's
+  test cards until an account is activated and three live links are pasted in.
+  See "Going live" above, and the tax registration in particular: without one,
+  Stripe collects zero tax and says nothing at all.
+- **The layout and copy have not been checked by a designer**, and the terms
+  have not been read by a lawyer.
+- **Privacy is a section of the terms, not its own page.** If analytics or any
+  third party is ever added, it needs one.
+- **The film is the heaviest thing here**, at about 13MB. Dark gradients are
+  expensive to compress, and the clips have to keep their keyframes close
+  together because the engine scrubs them.
+- **Cloudflare's Workers Builds check** was failing on a dashboard setting
+  (branch previews), which is why deploys have been made by hand.
 
 ## Deploying to Cloudflare
 
