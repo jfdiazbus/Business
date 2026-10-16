@@ -72,7 +72,11 @@ function diveGraph(layers) {
   return parts.join(";");
 }
 
-function encodeArgs(output, { crf = 20, gop = 8 } = {}) {
+// The engine scrubs these clips: it sets currentTime while the video is paused,
+// so frames have to be seekable and keyframes cannot be far apart. That is the
+// only reason the GOP is short, and it costs size: dark gradients compress
+// badly. CRF 23 with a keyframe every half second is the balance struck here.
+function encodeArgs(output, { crf = 23, gop = 16 } = {}) {
   return [
     "-c:v",
     "libx264",
@@ -247,7 +251,7 @@ export async function connectors({ log = () => {} } = {}) {
       graph,
       "-map",
       "[out]",
-      ...encodeArgs(output, { crf: 20, gop: 8 }),
+      ...encodeArgs(output),
     ]);
 
     const { size } = await statSize(output);
