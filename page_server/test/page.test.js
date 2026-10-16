@@ -85,8 +85,8 @@ describe("home.html (the deck)", () => {
       link.getAttribute("href"),
     );
 
-    expect(hrefs).toContain("/projects/omniprompt-marketing/index.html");
-    expect(hrefs).toContain("/projects/promptops-ai/pitch.html");
+    expect(hrefs).toContain("/projects/omniprompt-marketing/");
+    expect(hrefs).toContain("/projects/promptops-ai/pitch");
   });
 
   it("points every nav link at a section that exists", () => {

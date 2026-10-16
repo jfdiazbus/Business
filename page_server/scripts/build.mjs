@@ -63,11 +63,6 @@ export const HEADERS = `/projects/*/assets/*
   Cache-Control: public, max-age=3600
 `;
 
-// The deck lives at /home; everything else in dist is already addressable.
-export const REDIRECTS = `/home /home.html 200
-/school /school.html 200
-`;
-
 const skipDotFiles = (src) => !src.split(path.sep).some((segment) => segment.startsWith("."));
 
 /** The scroll world's film, posters and the engine that plays them. */
@@ -114,7 +109,6 @@ export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPAC
     "utf8",
   );
   await writeFile(path.join(outDir, "_headers"), HEADERS, "utf8");
-  await writeFile(path.join(outDir, "_redirects"), REDIRECTS, "utf8");
   await copyWorld({ outDir });
 
   const brokenLinks = [

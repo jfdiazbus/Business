@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { access, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,6 +17,11 @@ let outDir;
 
 const read = (rel) => readFile(path.join(outDir, rel), "utf8");
 const size = (rel) => stat(path.join(outDir, rel)).then((info) => info.size);
+const exists = (rel) =>
+  access(path.join(outDir, rel)).then(
+    () => true,
+    () => false,
+  );
 
 beforeAll(async () => {
   outDir = await mkdtemp(path.join(os.tmpdir(), "portfolio-build-"));
@@ -52,8 +57,9 @@ describe("the build", () => {
     expect(home).toContain("A few things");
 
     // /home is a rewrite, so the deck is addressable without the extension
-    expect(await read("_redirects")).toContain("/home /home.html 200");
-    expect(await read("_redirects")).toContain("/school /school.html 200");
+    // pretty URLs are the host's job (Cloudflare html_handling, nginx try_files),
+    // so the build ships no _redirects for them
+    expect(await exists("_redirects")).toBe(false);
   });
 
   it("copies the script that makes the slides behave like a deck", async () => {
@@ -124,7 +130,6 @@ describe("the build", () => {
     expect(entries.sort()).toEqual([
       "404.html",
       "_headers",
-      "_redirects",
       "docs",
       "home.html",
       "index.html",
