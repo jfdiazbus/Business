@@ -64,7 +64,7 @@ Two rules follow from this, and both were learned the hard way:
 ## Type
 
 Geist for everything the reader reads, Geist Mono for anything that is data:
-prices, the slide counter, email addresses, years. Mono is a signal, so it is
+prices, email addresses, and years. Mono is a signal, so it is
 worth being sparing with.
 
 The type scale is the only place a size may come from, and both `clamp()` calls
@@ -117,24 +117,29 @@ view())` guard.** Two tests fail the build otherwise.
   anywhere.
 - A reveal moves content into place. It does not fade it in.
 
-## The deck
+## The pages
 
-`/home` is five screens that snap. The rules, and the reasons:
+`/home`, `/school`, `/services`, `/thanks` and `/terms` are the same kind of
+page: one `h1`, then `.block` sections separated by hairlines, read by scrolling.
+`/home` is the portfolio, and its sections are the names the whole site is
+organised by — **experience, education, projects, contact** — which the world's
+scenes and the bar's nav both mirror.
 
-- `scroll-snap-type: y mandatory` plus `scroll-snap-stop: always`, so one gesture
-  is one slide and a flick cannot skip past one. Proximity was tried and felt
-  broken: the reader nudged at the next slide and nothing moved.
-- A keypress turns the page in `TURN` (300ms) on an ease out, computed in
-  `slides.js` rather than left to the browser, which takes its own time for a
-  full screen of travel.
-- A keypress and a flick land in **the same place**: both use the slide's
-  `scroll-margin-top`, so neither leaves a heading under the bar.
-- A slide taller than the window is revealed by repeated presses, and once only
-  `REVEAL` (96px) is left below the fold, the next press moves on. Without that
-  the deck stalled: every later press aimed at a reveal the snapping would not
-  allow.
-- The slide counter (`2 / 5`) is plain text in the slide, so the nav does not
-  have to double as a position indicator.
+Rules worth keeping:
+
+- **One `h1` per page**, and it is the thing the page is for. Deeper headings are
+  `h2`, and they never skip a level: a test checks the sequence.
+- **One action per page.** The bar carries one button, and it is the action that
+  page is _missing_ rather than a repeat of the one it already has: the pages
+  that explain things send you to the prices, and the prices page sends you to
+  email.
+- **Ids are used once**, and any link to `#something` has to land on something.
+- **The page reads without JavaScript.** On `/services` the buy buttons are plain
+  links, so a sale works with scripts blocked.
+
+There was a five slide deck here once, with snapping, a slide counter and
+keypress handling. It is gone: a written page reads better, and the film already
+does the travelling.
 
 ## Adding a page
 
@@ -162,16 +167,17 @@ tractor feed strips down the edges, an ASCII ruler between sections, dot leaders
 on the rows, and a figlet banner on the title page. It read as a template of that
 idea rather than as a site, so it was replaced:
 
-| Removed                      | Replaced by                                               |
-| ---------------------------- | --------------------------------------------------------- |
-| Sprocket strips, paper feed  | a flat background and a fixed bar                         |
-| `====` ASCII ruler           | a one pixel hairline                                      |
-| Dot leaders                  | a hairline that fills the row                             |
-| `>` sigils before headings   | sentence case headings                                    |
-| Figlet banner, `pnpm banner` | a real `h1`, which is also what a search engine reads     |
-| Bracketed link labels `[ ]`  | plain labels; the shape of the button carries the meaning |
-| Monospace for everything     | Geist for prose, Geist Mono for data                      |
-| Green bar cards              | flat cards with a hairline border and a large price       |
+| Removed                            | Replaced by                                               |
+| ---------------------------------- | --------------------------------------------------------- |
+| Sprocket strips, paper feed        | a flat background and a fixed bar                         |
+| `====` ASCII ruler                 | a one pixel hairline                                      |
+| Dot leaders                        | a hairline that fills the row                             |
+| `>` sigils before headings         | sentence case headings                                    |
+| Figlet banner, `pnpm banner`       | a real `h1`, which is also what a search engine reads     |
+| Bracketed link labels `[ ]`        | plain labels; the shape of the button carries the meaning |
+| Monospace for everything           | Geist for prose, Geist Mono for data                      |
+| Green bar cards                    | flat cards with a hairline border and a large price       |
+| Five slide deck, snapping, counter | one written page per part of the work, read by scrolling  |
 
 Two things were kept on purpose: the `:-)` in the favicon and the footer, which
 is a signature rather than decoration, and the film's print shop, which is the
@@ -218,8 +224,7 @@ pnpm build         # dist/, and it fails on a broken link
 | ----------------------------- | ------------------------------------------------------------------------ |
 | `style`                       | tokens, contrast, flat backgrounds, upright type, the motion guards      |
 | `bar`                         | the solid state, the menu, and that nothing listens to scroll            |
-| `slides`                      | what a keypress does, and how long a page turn takes                     |
-| `page`                        | the deck's words, headings, links and shell                              |
+| `page`                        | the portfolio's four sections, the heading order, links and shell        |
 | `services`                    | prices, one action per offer, heading order, routes, the copy rules      |
 | `terms`                       | the seller, the buyer's questions, the cancellation right, the data note |
 | `stripe`                      | the payment links against the live Stripe account, and price drift       |

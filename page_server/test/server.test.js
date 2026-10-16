@@ -49,7 +49,7 @@ describe("the development server", () => {
     expect(html).toContain("Juan Felipe");
   });
 
-  it("serves the four slide deck at /home", async () => {
+  it("serves the portfolio page at /home", async () => {
     const response = await fetch(`${base}/home`);
 
     expect(response.status).toBe(200);
@@ -57,8 +57,8 @@ describe("the development server", () => {
 
     const html = await response.text();
     expect(html).toContain("Websites, presentations and small tools");
-    expect(html).toContain("A few things");
-    expect(html).toContain('src="slides.js"');
+    expect(html).toContain('id="experience"');
+    expect(html).toContain('src="/bar.js"');
   });
 
   it("serves the school work at /school", async () => {

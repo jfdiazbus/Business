@@ -196,7 +196,7 @@ function workbench() {
     labelText(
       p(gx + 0.05, gy - 0.04, 4.62)[0],
       p(gx + 0.05, gy - 0.04, 4.62)[1],
-      tone === P.barMid ? "OMNIPROMPT" : "PROMPTOPS",
+      tone === P.barMid ? "EDUCATION" : "EPITECH",
       { size: 24, fill: P.inkSoft, weight: 600 },
     ),
   ];
@@ -251,7 +251,10 @@ function workbench() {
         { w: 1.3, h: 1.1, accent: P.barMid },
       ],
     }),
-    board(2860, 1030, { dx: 2.8, items: [{ w: 1.5, h: 1.2, accent: P.ribbon, label: "TODO" }] }),
+    board(2860, 1030, {
+      dx: 2.8,
+      items: [{ w: 1.5, h: 1.2, accent: P.ribbon, label: "EXPERIENCE" }],
+    }),
     box(projector(3360, 1300), {
       x: 0,
       y: 0,
@@ -506,7 +509,7 @@ function archiveShelf() {
       inset: 0.2,
       size: 0.1,
     }),
-    labelText(p(1.66, 2.98, 2.9)[0], p(1.66, 2.98, 2.9)[1], "PLANS & PRICING", {
+    labelText(p(1.66, 2.98, 2.9)[0], p(1.66, 2.98, 2.9)[1], "PROJECTS", {
       size: 22,
       fill: P.ribbon,
       weight: 700,
@@ -661,7 +664,7 @@ function mailSlot() {
       left: P.paperDark,
       sw: 1.6,
     }),
-    labelText(p(0.8, 0.7, 2.7)[0] - 2, p(0.8, 0.7, 2.7)[1], "OUTGOING", {
+    labelText(p(0.8, 0.7, 2.7)[0] - 2, p(0.8, 0.7, 2.7)[1], "CONTACT", {
       size: 22,
       fill: P.inkSoft,
       weight: 600,

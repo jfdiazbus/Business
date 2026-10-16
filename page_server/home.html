@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <a class="skip" href="#work">skip to my projects</a>
+    <a class="skip" href="#experience">skip to the portfolio</a>
 
     <div class="sheet">
       <div class="page">
@@ -37,146 +37,57 @@
           <a class="brand" href="/"
             >Juan Felipe Diaz Bustamante<span class="role"> — web developer</span></a
           >
-          <nav aria-label="site">
+          <nav id="topbar-nav" aria-label="site">
             <a href="/home" aria-current="page">Portfolio</a>
             <a href="/services">Prices</a>
             <a href="/school">School</a>
           </nav>
           <a class="btn btn--primary" href="/services">See the prices</a>
+          <button
+            class="topbar__menu"
+            type="button"
+            aria-expanded="false"
+            aria-controls="topbar-nav"
+            aria-label="Menu"
+          >
+            <span class="topbar__bars" aria-hidden="true"></span>
+          </button>
         </header>
 
         <main>
-          <!-- slide 1: the title page -->
-          <section class="slide hero" aria-labelledby="title">
-            <h1 id="title">Websites, presentations and small tools</h1>
+          <h1 class="page-title">Websites, presentations and small tools</h1>
+          <p class="lede">
+            Hi! I&rsquo;m Juan Felipe. Mostly for companies that work with AI, and I build the whole
+            thing: the design, the code and the words. Pages that load fast, work on any device, and
+            don&rsquo;t need heavy tools to run.
+          </p>
+          <p class="tour"><a href="/">walk through the print shop</a></p>
 
-            <p class="lede">
-              Hi! I&rsquo;m Juan Felipe. Mostly for companies that work with AI, and I build the
-              whole thing: the design, the code and the words.
-            </p>
-            <p class="tour"><a href="/">walk through the print shop</a></p>
-            <p class="scroll-hint" aria-hidden="true">v&nbsp;&nbsp;keep scrolling</p>
-          </section>
-
-          <!-- slide 2: the work -->
-          <section class="slide" id="work" aria-labelledby="work-title">
+          <section class="block" id="experience" aria-labelledby="experience-title">
             <div class="rule" aria-hidden="true"></div>
-            <div class="slide-top">
-              <h2 class="heading" id="work-title">A few things I&rsquo;ve built</h2>
-              <span class="fill" aria-hidden="true"></span>
-              <span class="count" aria-hidden="true">2 / 5</span>
-            </div>
-
-            <article class="project">
-              <h3>MigaLabs</h3>
-              <p>The site behind a blockchain research lab.</p>
-              <p class="detail">
-                Design system, dashboards, list and detail pages, and the animated Ethereum Academy
-                lessons. The code is private, the live site is not.
-              </p>
-              <p class="links">
-                <a href="https://migalabs.io/">visit migalabs.io</a>
-              </p>
-            </article>
-
-            <article class="project">
-              <h3>OmniPrompt Marketing</h3>
-              <p>
-                A complete website and a 12-slide presentation for a marketing company that uses AI.
-              </p>
-              <p class="detail">
-                Visitors can see the services, estimate how much they could save, compare prices and
-                request a quote &mdash; everything on one page.
-              </p>
-              <p class="links">
-                <a href="/projects/omniprompt-marketing/">view the website</a>
-                <a href="/projects/omniprompt-marketing/pitch">view the presentation</a>
-              </p>
-            </article>
-
-            <article class="project">
-              <h3>PromptOps AI</h3>
-              <p>
-                A website and presentation for a company that helps other businesses put AI to work.
-              </p>
-              <p class="detail">
-                It explains each service with clear prices, a savings calculator and a simple way to
-                get in touch.
-              </p>
-              <p class="links">
-                <a href="/projects/promptops-ai/">view the website</a>
-                <a href="/projects/promptops-ai/pitch">view the presentation</a>
-              </p>
-            </article>
-
-            <article class="project">
-              <h3>This portfolio</h3>
-              <p>The page you are reading right now.</p>
-              <p class="detail">
-                Hand-coded with HTML and CSS &mdash; fast, simple, and it works on any screen. You
-                are here :-)
-              </p>
-            </article>
-
-            <p class="more"><a href="/school">see the school work</a></p>
-          </section>
-
-          <!-- slide 3: where I have worked -->
-          <section class="slide" id="experience" aria-labelledby="experience-title">
-            <div class="rule" aria-hidden="true"></div>
-            <div class="slide-top">
-              <h2 class="heading" id="experience-title">Where I&rsquo;ve worked</h2>
-              <span class="fill" aria-hidden="true"></span>
-              <span class="count" aria-hidden="true">3 / 5</span>
-            </div>
+            <h2 class="heading" id="experience-title">Experience</h2>
 
             <ul class="werk">
               <li class="werk-row">
                 <span class="werk-when">2026 &ndash; now</span>
                 <span class="werk-what">
-                  <strong>MigaLabs</strong> &mdash; the front end of the lab&rsquo;s own site:
-                  design system, dashboards, list and detail pages, and the animated Ethereum
-                  Academy lessons.
-                </span>
-              </li>
-              <li class="werk-row">
-                <span class="werk-when">2025 &ndash; 2028</span>
-                <span class="werk-what">
-                  <strong>Epitech</strong> &mdash; Software Engineering Bachelor. A task manager, a
-                  shell in C, a data dashboard, and a lot of smaller C projects along the way.
+                  <strong>MigaLabs</strong> &mdash; software engineer, on a training contract in
+                  Barcelona. The front end of the lab&rsquo;s own site: design system, dashboards,
+                  list and detail pages, and the animated Ethereum Academy lessons.
                 </span>
               </li>
               <li class="werk-row">
                 <span class="werk-when">2022 &ndash; 2023</span>
                 <span class="werk-what">
-                  <strong>Alvatroz Partners</strong> &mdash; IT Head intern: the API routes behind
-                  the company&rsquo;s web page, and automation that checks the invoices.
+                  <strong>Alvatroz Partners</strong> &mdash; IT intern in Barcelona, from November
+                  2022 to September 2023. The API routes behind the company&rsquo;s web page, and
+                  automation that checks the invoices.
                 </span>
               </li>
             </ul>
-          </section>
 
-          <!-- slide 4: about -->
-          <section class="slide" id="about" aria-labelledby="about-title">
-            <div class="rule" aria-hidden="true"></div>
-            <div class="slide-top">
-              <h2 class="heading" id="about-title">A bit about me</h2>
-              <span class="fill" aria-hidden="true"></span>
-              <span class="count" aria-hidden="true">4 / 5</span>
-            </div>
-
-            <p>
-              I&rsquo;m a web developer who likes to keep things simple: pages that load fast, work
-              on any device, and don&rsquo;t need heavy tools to run. Both client websites above are
-              built that way, and so is this one.
-            </p>
-            <p>
-              I also write the business plans and pricing behind these projects, so I understand the
-              companies I build for &mdash; not just the code.
-            </p>
-
-            <h3 class="heading heading--sub">What I&rsquo;m good at</h3>
-            <ul class="leaders">
+            <h3 class="heading heading--sub" id="skills-title">What I&rsquo;m good at</h3>
+            <ul class="leaders" aria-labelledby="skills-title">
               <li class="leader">
                 <span class="k">websites</span><span class="fill" aria-hidden="true"></span
                 ><span class="v">clean pages that load fast and work on phones</span>
@@ -196,14 +107,76 @@
             </ul>
           </section>
 
-          <!-- slide 4: contact, and the end of the deck -->
-          <section class="slide" id="contact" aria-labelledby="contact-title">
+          <section class="block" id="education" aria-labelledby="education-title">
             <div class="rule" aria-hidden="true"></div>
-            <div class="slide-top">
-              <h2 class="heading" id="contact-title">Want to work together?</h2>
-              <span class="fill" aria-hidden="true"></span>
-              <span class="count" aria-hidden="true">5 / 5</span>
-            </div>
+            <h2 class="heading" id="education-title">Education</h2>
+
+            <p>
+              I study software engineering at Epitech, starting in 2025. Most of it is project work:
+              a task manager with real accounts and sessions, a shell written in C, a dashboard
+              built from a dataset, and a long list of smaller C projects along the way.
+            </p>
+
+            <ul class="leaders">
+              <li class="leader">
+                <span class="k">epitech</span><span class="fill" aria-hidden="true"></span
+                ><span class="v">Software Engineering Bachelor, 2025 &ndash; 2028</span>
+              </li>
+              <li class="leader">
+                <span class="k">languages</span><span class="fill" aria-hidden="true"></span
+                ><span class="v">C, Python, JavaScript, SQL</span>
+              </li>
+            </ul>
+
+            <p class="more"><a href="/school">the whole school list</a></p>
+          </section>
+
+          <section class="block" id="projects" aria-labelledby="projects-title">
+            <div class="rule" aria-hidden="true"></div>
+            <h2 class="heading" id="projects-title">Projects</h2>
+
+            <article class="project">
+              <h3>EpyTodo</h3>
+              <p>
+                A task manager, where you make an account and keep your own list of things to do.
+              </p>
+              <p class="detail">
+                Accounts and sessions are handled properly, and the tasks live in a MySQL database.
+                Built with Node.js, Express and MySQL.
+              </p>
+            </article>
+
+            <article class="project">
+              <h3>Tardis</h3>
+              <p>A dashboard built from a dataset, with a predictive model behind it.</p>
+              <p class="detail">
+                Cleaning and exploring the data first, then a model that guesses the outcome, then a
+                small dashboard to read it by. Written in Python, in notebooks.
+              </p>
+            </article>
+
+            <article class="project">
+              <h3>minishell</h3>
+              <p>A shell written in C: a prompt that runs your commands.</p>
+              <p class="detail">
+                Builtins, pipes and redirections, the parts of a terminal you reach for every day,
+                rebuilt from scratch.
+              </p>
+            </article>
+
+            <article class="project">
+              <h3>This portfolio</h3>
+              <p>The page you are reading right now.</p>
+              <p class="detail">
+                Hand coded with HTML and CSS &mdash; fast, simple, and it works on any screen. You
+                are here :-)
+              </p>
+            </article>
+          </section>
+
+          <section class="block" id="contact" aria-labelledby="contact-title">
+            <div class="rule" aria-hidden="true"></div>
+            <h2 class="heading" id="contact-title">Contact</h2>
 
             <p>The fastest way to reach me is email. I usually reply within a day.</p>
             <ul class="leaders">
@@ -234,23 +207,22 @@
                 >
               </li>
             </ul>
-
-            <footer class="slide-foot">
-              <div class="rule rule--thin" aria-hidden="true"></div>
-              <p class="eof">Thanks for reading! :-)</p>
-              <p class="colophon">Hand-coded by Juan Felipe with HTML and CSS, 2026.</p>
-              <p class="links">
-                <a href="/services">What I charge</a>
-                <a href="/terms">Terms and privacy</a>
-                <a href="mailto:juan-felipe.diaz-bustamante@epitech.eu">Email</a>
-              </p>
-            </footer>
           </section>
         </main>
+
+        <footer class="block">
+          <div class="rule rule--thin" aria-hidden="true"></div>
+          <p class="eof">Thanks for reading! :-)</p>
+          <p class="colophon">Hand-coded by Juan Felipe with HTML and CSS, 2026.</p>
+          <p class="links">
+            <a href="/services">What I charge</a>
+            <a href="/terms">Terms and privacy</a>
+            <a href="mailto:juan-felipe.diaz-bustamante@epitech.eu">Email</a>
+          </p>
+        </footer>
       </div>
     </div>
 
-    <script type="module" src="slides.js"></script>
     <script type="module" src="/bar.js"></script>
   </body>
 </html>
