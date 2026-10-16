@@ -100,7 +100,7 @@ function printRoom() {
       w: 6.8,
       d: 4.4,
       h: 2.1,
-      banner: "HELLO",
+      banner: "PRESENTATION",
       marks: 2,
     }),
     paperStack(projector(HERO_X - 820, HERO_Y + 150), { x: 0, y: 0, w: 2.6, d: 2, sheets: 6 }),
@@ -115,7 +115,7 @@ function printRoom() {
         { w: 1.4, h: 1.3, marks: 4 },
       ],
     }),
-    board(2760, 1020, { dx: 3.2, items: [{ w: 1.6, h: 1.25, accent: P.ribbon, label: "PAPER" }] }),
+    board(2760, 1020, { dx: 3.2, items: [{ w: 1.6, h: 1.25, accent: P.ribbon, label: "PRINT" }] }),
     paperStack(projector(3300, 1290), { x: 0, y: 0, w: 2.4, d: 1.8, sheets: 5 }),
   ].join("");
 
