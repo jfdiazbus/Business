@@ -142,38 +142,48 @@ scratch and is not committed; `world/out` is the film the site ships.
 Links**, so there is no secret key in the repository and no Stripe JavaScript on
 the page.
 
-Until a link is pasted into `services.js`, that offer's button **emails you
-instead**, so the page never points at a broken checkout. Each offer upgrades on
-its own, so you can wire them one at a time.
+### What is already built
 
-The ten minute setup:
+The Stripe sandbox (`portfolio sandbox`, test mode) holds the whole catalogue:
 
-1. Create a Stripe account and activate it: business details, bank account,
-   identity. This is the slow part and the only part that cannot be automated.
-2. Create three Payment Links in the dashboard, one per offer, each with:
-   - **after completion → redirect to** `https://<your-site>/thanks`
-   - **automatic tax** on, so VAT is handled at checkout
-   - **promotion codes** allowed, and customer **name and address** collected
-   - a custom field asking what they need, so the brief arrives with the payment
-   - a description matching what the page promises at that price
-3. Copy each link (they look like `https://buy.stripe.com/...`) into
-   `services.js`:
+| offer   | product               | price                           | payment link                     |
+| ------- | --------------------- | ------------------------------- | -------------------------------- |
+| website | `prod_VS81qc5gCuzX3n` | €100, `tax_behavior: exclusive` | `plink_1URDmBGLxtix6XhLp751bJpA` |
+| api     | `prod_VS82wT5zix7Ps6` | €200, `tax_behavior: exclusive` | `plink_1URDmLGLxtix6XhLsFrXUBIa` |
+| full    | `prod_VS8246T28j4pCS` | €500, `tax_behavior: exclusive` | `plink_1URDmLGLxtix6XhLsMK2kqLi` |
 
-   ```js
-   export const paymentLinks = {
-     website: "https://buy.stripe.com/...",
-     api: "https://buy.stripe.com/...",
-     full: "https://buy.stripe.com/...",
-   };
-   ```
+Each link carries automatic tax, promotion codes, a VAT ID field for EU
+businesses, a "What do you need?" brief field, an invoice created automatically
+for the buyer, and a redirect to `/thanks`. Payment methods are left to Stripe
+(dynamic payment methods), which is why its checkout offers card, Klarna,
+Bancontact and Amazon Pay rather than card alone.
 
-4. Buy one with a card from Stripe's test list before going live, and check that
-   you land on `/thanks`.
+Those links are **test links**. `buyHref` in `services.js` refuses any link
+containing `/test_` on every host except localhost, so they work while you run
+the dev server and the live site keeps falling back to email. That guard is what
+stops a sandbox link from taking a real customer's card.
+
+### Going live
+
+1. Activate the Stripe account: business details, bank account, identity. This
+   is the slow part and the only part that cannot be automated.
+2. Set a head office address under **Tax > Settings**, then add a registration
+   for each place you are registered to collect tax. Until both exist,
+   `automatic_tax` silently collects **zero**: the checkout shows a tax line of
+   €0.00 and raises no error. Settle that with your accountant, not with me.
+3. Recreate the three Payment Links in **live mode** with the same settings as
+   the table above, and paste their URLs over the `test_` ones in `services.js`.
+4. Buy one with a card from Stripe's test list in the sandbox, then make one real
+   live purchase and refund it.
 
 Two things to remember: the amount charged lives in Stripe, so the page and the
 dashboard can drift apart — check both when a price changes. And selling to
 consumers inside the EU means VAT in the buyer's country (the OSS scheme):
 Stripe Tax calculates it, but you have to be enrolled.
+
+Nothing here needs a Stripe API key: Payment Links are public URLs. Do not put
+one in `.secrets` either, because the deploy script exports every value in that
+file to wrangler.
 
 ## Tests
 

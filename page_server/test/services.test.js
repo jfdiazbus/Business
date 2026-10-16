@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
-import { buyHref } from "../services.js";
+import { buyHref, paymentLinks } from "../services.js";
 
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const html = readFileSync(path.join(PROJECT_ROOT, "services.html"), "utf8");
@@ -95,12 +95,32 @@ describe("the prices page", () => {
 
 describe("the payment links", () => {
   it("uses a real Payment Link once one is pasted in", () => {
-    const links = { website: "https://buy.stripe.com/test_abc123" };
+    const links = { website: "https://buy.stripe.com/8x23cv8bvABC" };
 
-    expect(buyHref("website", links)).toBe("https://buy.stripe.com/test_abc123");
-    expect(buyHref("website", { website: "  https://buy.stripe.com/test_abc123  " })).toContain(
-      "buy.stripe.com",
+    expect(buyHref("website", links)).toBe("https://buy.stripe.com/8x23cv8bvABC");
+    expect(buyHref("website", { website: "  https://buy.stripe.com/8x23cv8bvABC  " })).toBe(
+      "https://buy.stripe.com/8x23cv8bvABC",
     );
+  });
+
+  it("keeps a sandbox link off the live site, and on localhost while testing", () => {
+    const sandbox = { website: "https://buy.stripe.com/test_8x23cv8bv5MR" };
+
+    expect(buyHref("website", sandbox, "localhost")).toBe(sandbox.website);
+    expect(buyHref("website", sandbox, "localhost:3000")).toBe(sandbox.website);
+    expect(buyHref("website", sandbox, "127.0.0.1")).toBe(sandbox.website);
+
+    // the live site, a branch preview, and an unknown host all fall back to email
+    expect(buyHref("website", sandbox, "portfolio.jfdiazbus.workers.dev")).toBeNull();
+    expect(buyHref("website", sandbox, "prompt-portfolio.jfdiazbus.workers.dev")).toBeNull();
+    expect(buyHref("website", sandbox, "")).toBeNull();
+  });
+
+  it("ships links that are the right shape, live ones or none", () => {
+    for (const [offer, url] of Object.entries(paymentLinks)) {
+      expect(["website", "api", "full"], offer).toContain(offer);
+      if (url) expect(url, offer).toMatch(/^https:\/\/buy\.stripe\.com\/\S+$/);
+    }
   });
 
   it("refuses anything that is not a Payment Link, so nobody lands nowhere", () => {

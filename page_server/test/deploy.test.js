@@ -47,8 +47,20 @@ describe("the secrets file", () => {
     expect(await readSecrets(path.join(PROJECT_ROOT, "definitely-not-here"))).toEqual({});
   });
 
-  it("ships a template with nothing filled in", async () => {
-    expect(await readSecrets(SECRETS_FILE)).toEqual({});
+  it("points at the gitignored file beside the project", () => {
+    expect(SECRETS_FILE).toBe(path.join(PROJECT_ROOT, ".secrets"));
+  });
+
+  it("treats an unfilled template as no secrets, so a blank value is not a token", () => {
+    // The local .secrets file is gitignored and is meant to be filled in, so
+    // this guards the template shape rather than whatever is on this machine.
+    const template = "CLOUDFLARE_API_TOKEN=\nCLOUDFLARE_ACCOUNT_ID=\n# a comment\n\n";
+
+    expect(parseSecrets(template)).toEqual({});
+  });
+
+  it("survives the file not existing at all", async () => {
+    expect(await readSecrets(path.join(PROJECT_ROOT, ".secrets-absent"))).toEqual({});
   });
 
   it("cannot be committed", async () => {
