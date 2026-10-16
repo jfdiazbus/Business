@@ -7,7 +7,6 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
-import { buyHref, paymentLinks } from "../services.js";
 
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const html = readFileSync(path.join(PROJECT_ROOT, "services.html"), "utf8");
@@ -43,17 +42,12 @@ describe("the prices page", () => {
     }
   });
 
-  it("gives every offer one buy button, which emails until Stripe is wired", () => {
-    const buttons = [...document.querySelectorAll("[data-buy]")];
-
-    expect(buttons).toHaveLength(3);
-
-    for (const button of buttons) {
-      expect(["website", "api", "full"]).toContain(button.dataset.buy);
-      // no link yet means email, never a dead or empty href
-      expect(button.getAttribute("href")).toMatch(/^mailto:/);
-      expect(button.dataset.fallback.length).toBeGreaterThan(10);
+  it("gives every offer exactly one action", () => {
+    for (const offer of document.querySelectorAll("#services .project")) {
+      expect(offer.querySelectorAll(".buy")).toHaveLength(1);
     }
+
+    expect(document.querySelectorAll("#services .buy")).toHaveLength(3);
   });
 
   it("answers the questions that stop people buying", () => {
@@ -93,49 +87,26 @@ describe("the prices page", () => {
   });
 });
 
-describe("the payment links", () => {
-  it("uses a real Payment Link once one is pasted in", () => {
-    const links = { website: "https://buy.stripe.com/8x23cv8bvABC" };
+describe("the buy buttons", () => {
+  it("sends each offer straight to Stripe, with no email in the way", () => {
+    const buttons = [...document.querySelectorAll(".buy")];
 
-    expect(buyHref("website", links)).toBe("https://buy.stripe.com/8x23cv8bvABC");
-    expect(buyHref("website", { website: "  https://buy.stripe.com/8x23cv8bvABC  " })).toBe(
-      "https://buy.stripe.com/8x23cv8bvABC",
-    );
-  });
+    expect(buttons).toHaveLength(3);
 
-  it("keeps a sandbox link off the live site, and on localhost while testing", () => {
-    const sandbox = { website: "https://buy.stripe.com/test_8x23cv8bv5MR" };
-
-    expect(buyHref("website", sandbox, "localhost")).toBe(sandbox.website);
-    expect(buyHref("website", sandbox, "localhost:3000")).toBe(sandbox.website);
-    expect(buyHref("website", sandbox, "127.0.0.1")).toBe(sandbox.website);
-
-    // the live site, a branch preview, and an unknown host all fall back to email
-    expect(buyHref("website", sandbox, "portfolio.jfdiazbus.workers.dev")).toBeNull();
-    expect(buyHref("website", sandbox, "prompt-portfolio.jfdiazbus.workers.dev")).toBeNull();
-    expect(buyHref("website", sandbox, "")).toBeNull();
-  });
-
-  it("ships links that are the right shape, live ones or none", () => {
-    for (const [offer, url] of Object.entries(paymentLinks)) {
-      expect(["website", "api", "full"], offer).toContain(offer);
-      if (url) expect(url, offer).toMatch(/^https:\/\/buy\.stripe\.com\/\S+$/);
-    }
-  });
-
-  it("refuses anything that is not a Payment Link, so nobody lands nowhere", () => {
-    for (const value of [
-      "",
-      "   ",
-      "#",
-      "https://example.com/pay",
-      "buy.stripe.com/x",
-      undefined,
-    ]) {
-      expect(buyHref("website", { website: value }), String(value)).toBeNull();
+    const hrefs = buttons.map((button) => button.getAttribute("href"));
+    for (const button of buttons) {
+      expect(button.getAttribute("href"), text(button)).toMatch(
+        /^https:\/\/buy\.stripe\.com\/\S+$/,
+      );
+      expect(text(button)).toMatch(/^\[ buy /);
     }
 
-    expect(buyHref("removed-offer", { website: "https://buy.stripe.com/test_a" })).toBeNull();
+    // three offers, three different checkouts
+    expect(new Set(hrefs).size).toBe(3);
+
+    // and the buy action is never an email, nor something rewritten at runtime
+    expect(document.querySelector('#services a[href^="mailto:"]')).toBeNull();
+    expect(document.querySelector('script[src="services.js"]')).toBeNull();
   });
 });
 
