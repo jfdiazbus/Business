@@ -1,8 +1,8 @@
 # page_server — my portfolio
 
-A five-slide portfolio deck printed on tractor-feed green-bar paper: plain HTML
-and CSS, a tiny zero-dependency Node server for local work, and a static build
-that ships to Cloudflare or to a Docker container.
+A portfolio in plain HTML and CSS: a five screen deck, a scroll driven film, and
+a prices page that takes payments. A tiny zero-dependency Node server for local
+work, and a static build that ships to Cloudflare or to a Docker container.
 
 ## Everyday commands
 
@@ -13,7 +13,6 @@ that ships to Cloudflare or to a Docker container.
 | `pnpm dev`        | The same, but reloads when you edit a file                        |
 | `pnpm test`       | Run the tests                                                     |
 | `pnpm build`      | Write the deployable site to `dist/`                              |
-| `pnpm banner`     | Redraw the HELLO banner                                           |
 | `pnpm format`     | Tidy the code with Prettier                                       |
 | `pnpm run deploy` | Build and ship `dist/` to Cloudflare                              |
 
@@ -27,12 +26,12 @@ that ships to Cloudflare or to a Docker container.
 | `home.html`                       | The five slide deck, served at `/home` — the words live here            |
 | `school.html`                     | The Epitech coursework, served at `/school`                             |
 | `services.html`, `thanks.html`    | The prices, and where Stripe sends buyers (`/services`, `/thanks`)      |
-| `style.css`                       | The look: paper, green bars, red accents, the slides                    |
+| `style.css`                       | The look: the tokens, the type scale, the spacing scale, then the rules |
 | `index.js`                        | The local server. No dependencies, only Node's own modules              |
 | `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                             |
-| `scripts/banner.mjs`              | Draws the banner with figlet                                            |
 | `scripts/deploy.mjs`              | Builds and uploads, reading credentials from `.secrets`                 |
-| `slides.js`                       | One keypress per slide, and marks the slide you are on                  |
+| `slides.js`                       | One keypress per slide, so the deck reads without a mouse               |
+| `bar.js`                          | Turns the bar solid once the page scrolls                               |
 | `world.html`, `world.js`          | The front page: the scroll world, and its config                        |
 | `world/`                          | The film: scene sources, the render + motion steps, and `out/`          |
 | `test/`                           | Tests for the server, the page, the styles, the build and the pipelines |
@@ -57,50 +56,48 @@ Everything you might want to change is in `home.html` (the deck) or `world.js`
   `.werk-row` each, with the years in the left column.
 - **School work** — the coursework is in `school.html`, served at `/school`.
 
-## The banner
+## The style
 
-The banner is ASCII art drawn with [figlet](https://figlet.org). Instead of
-editing it by hand, change the word and run:
+One typeface for the interface (Geist) and a monospace for prices and data
+(Geist Mono), flat surfaces, hairlines instead of boxes, and one red accent.
+Every colour pair is checked against WCAG AA on the background: body text is
+19.7:1, soft text 7.8:1, the accent 7.0:1. `--ink-faint` is 4.1:1, so it is only
+used for non-text marks.
 
-```bash
-pnpm banner
-```
-
-That rewrites the `<pre class="banner">` block in `home.html`. A test checks
-the banner still matches a real figlet rendering, so it can never drift.
+The tokens live at the top of `style.css`, in three blocks: colours, then the
+type scale, then the spacing scale. Nothing below them invents a size or a
+spacing value of its own. The colour values are also the only place the palette
+is written down, and `world/kit.mjs` holds the matching set the film is drawn
+with.
 
 ## How it moves
 
-The page is a five-slide deck printed on one continuous sheet of paper: the
-title page, the work, about, and contact. Every slide fills the screen and
-snaps into place as you scroll.
+The deck is five screens tall and snaps one screen at a time: the title page,
+the work, about, and contact.
 
-- The name and nav bar stay pinned to the top, so any slide can reach any
-  other, and each slide prints its own rule as it arrives.
-- Slides are numbered in their heading row (`2 / 4`, `3 / 4`), the way a
-  printed deck would be.
-- The tractor-feed holes advance as you scroll, and a small red print head
-  rides down the strip so you can see how far you are.
-- Project cards and dot leaders print in as they come into view — the green
-  bar sweeps across, then the words settle.
+- The bar stays pinned to the top, so any page can reach any other. It starts
+  clear over the top of the page and turns solid once you scroll.
+- Slides are numbered in their heading row (`2 / 5`).
+- Sections, cards and hairlines arrive as they come into view.
 - The "keep scrolling" cue on the title page leaves as soon as you start.
 
-The snapping, the printing and the paper feed are CSS alone
-(`animation-timeline` and `scroll-snap-type`). The one script on the page is
-`slides.js` — a hundred lines with no imports. It gives the deck one keypress
-per slide (arrows, page keys, space, home, end) and marks the slide you are on
-in the nav, because CSS snapping on its own would pull a keyboard nudge back
-where it started. On a screen too short for a slide, a keypress reveals the
-rest of it instead of skipping past the content.
+The snapping and the arrivals are CSS alone (`animation-timeline` and
+`scroll-snap-type`). Two small scripts do what CSS cannot. `slides.js` gives the
+deck one keypress per slide (arrows, page keys, space, home, end), because CSS
+snapping on its own would pull a keyboard nudge back where it started; on a
+screen too short for a slide, a keypress reveals the rest of it instead of
+skipping past the content. `bar.js` turns the bar solid when the page moves,
+watching a one pixel sentinel rather than listening to every scroll event.
 
-Without that script the page still reads fine — it just scrolls like a long
-page. Where scroll timelines or snapping are not supported, or for anyone who
-asked their system for reduced motion, the slides stop snapping and everything
-appears complete. Printing gives one page per slide, with all of it visible.
+Without those scripts the pages still read fine: the bar stays clear and the
+deck scrolls like a long page. Where scroll timelines or snapping are not
+supported, or for anyone who asked their system for reduced motion, the slides
+stop snapping and everything appears complete. Printing gives one page per
+slide, in black on white.
 
 ## The scroll world
 
-The front page (`/`) is a scroll driven flight through a paper print shop, five
+The front page (`/`) is a scroll driven flight through a print shop, five
 scenes long, with each scene's copy pinned over it. The five slide deck lives at
 `/home` (a rewrite to `home.html`), the coursework at `/school`, and the world
 links back to both.

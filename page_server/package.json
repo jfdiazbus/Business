@@ -1,7 +1,7 @@
 {
   "name": "page_server",
   "version": "1.0.0",
-  "description": "ASCII portfolio printed on green-bar paper — built to static files, served by a zero-dependency Node server, deployed to Cloudflare.",
+  "description": "ASCII portfolio printed on green-bar paper \u2014 built to static files, served by a zero-dependency Node server, deployed to Cloudflare.",
   "type": "module",
   "private": true,
   "license": "ISC",
@@ -12,7 +12,6 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "banner": "node scripts/banner.mjs",
     "build": "node scripts/build.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -21,7 +20,6 @@
     "deploy": "node scripts/deploy.mjs"
   },
   "devDependencies": {
-    "figlet": "^1.12.0",
     "jsdom": "^30.1.2",
     "prettier": "^3.9.10",
     "vitest": "^5.0.4",

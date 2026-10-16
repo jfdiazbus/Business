@@ -146,13 +146,6 @@ describe("knowing which slide you are on", () => {
     expect(nearestSlide([0], 500)).toBe(0);
   });
 
-  it("maps a slide to the nav link that points at it", () => {
-    expect(navHrefFor({ id: "work" })).toBe("#work");
-    expect(navHrefFor({ id: "" })).toBeNull();
-    expect(navHrefFor({})).toBeNull();
-    expect(navHrefFor(null)).toBeNull();
-  });
-
   it("reads the slides the same way the page is marked up", () => {
     expect(SLIDE_SELECTOR).toBe("main > .slide");
   });

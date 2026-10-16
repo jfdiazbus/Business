@@ -23,7 +23,7 @@ describe("the project", () => {
 
     expect(pkg.dependencies ?? {}).toEqual({});
     expect(Object.keys(pkg.devDependencies).sort()).toEqual(
-      ["figlet", "jsdom", "prettier", "vitest", "wrangler"].sort(),
+      ["jsdom", "prettier", "vitest", "wrangler"].sort(),
     );
   });
 
@@ -47,7 +47,7 @@ describe("the project", () => {
   it("exposes the commands the pipelines call", async () => {
     const pkg = JSON.parse(await read("package.json"));
 
-    for (const script of ["start", "dev", "build", "test", "deploy", "banner"]) {
+    for (const script of ["start", "dev", "build", "test", "deploy"]) {
       expect(pkg.scripts[script], script).toBeTruthy();
     }
     expect(pkg.scripts.deploy).toContain("scripts/deploy.mjs");
@@ -135,7 +135,7 @@ describe("the project", () => {
     for (const file of ["home.html", "world.html", "style.css", "index.js", "vitest.config.js"]) {
       expect(await exists(file), file).toBe(true);
     }
-    for (const file of ["scripts/build.mjs", "scripts/banner.mjs"]) {
+    for (const file of ["scripts/build.mjs", "scripts/deploy.mjs", "bar.js"]) {
       expect(await exists(file), file).toBe(true);
     }
   });

@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
-import { renderBanner } from "../scripts/banner.mjs";
 
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const html = readFileSync(path.join(PROJECT_ROOT, "home.html"), "utf8");
@@ -17,26 +16,21 @@ describe("home.html (the deck)", () => {
     expect(document.querySelector('meta[name="viewport"]')).toBeTruthy();
   });
 
-  it("has exactly one h1, and it names the developer", () => {
+  it("has exactly one h1, and it says what the page is", () => {
     const headings = document.querySelectorAll("h1");
 
     expect(headings).toHaveLength(1);
-    expect(headings[0].textContent).toContain("Juan Felipe Diaz Bustamante");
+    expect(headings[0].textContent.trim()).toBe("Websites, presentations and small tools");
+    // the name lives in the bar, which is on every page
+    expect(document.querySelector(".brand").textContent).toContain("Juan Felipe Diaz Bustamante");
   });
 
-  it("builds the banner from real figlet art", () => {
-    const lines = [...document.querySelectorAll(".banner .line")].map((line) =>
-      line.textContent.replace(/[ \t]+$/, ""),
-    );
-
-    expect(lines).toEqual(renderBanner());
-    expect(lines.length).toBeGreaterThan(3);
+  it("keeps ascii art out of the page", () => {
+    expect(document.querySelector(".banner")).toBeNull();
+    expect(document.querySelector("pre")).toBeNull();
   });
 
-  it("skips the decoration for screen readers", () => {
-    const banner = document.querySelector(".banner");
-
-    expect(banner.getAttribute("aria-hidden")).toBe("true");
+  it("lets a keyboard visitor skip the bar", () => {
     expect(document.querySelector('.skip[href="#work"]')).toBeTruthy();
     expect(document.getElementById("work")).toBeTruthy();
   });
@@ -94,13 +88,18 @@ describe("home.html (the deck)", () => {
     const navLinks = [...document.querySelectorAll(".topbar nav a")];
 
     expect(navLinks.map((link) => link.getAttribute("href"))).toEqual([
-      "#work",
-      "#about",
-      "#contact",
+      "/home",
+      "/services",
+      "/school",
     ]);
 
+    // exactly one of them is the page you are on
+    expect(document.querySelectorAll('.topbar nav a[aria-current="page"]')).toHaveLength(1);
+
+    // the bar is a site nav now: routes, not in-page anchors
     for (const link of navLinks) {
-      expect(document.getElementById(link.getAttribute("href").slice(1))).toBeTruthy();
+      expect(link.getAttribute("href"), link.textContent).toMatch(/^\/[a-z]*$/);
+      expect(link.textContent.trim().length).toBeGreaterThan(0);
     }
   });
 
@@ -168,11 +167,11 @@ describe("home.html (the deck)", () => {
     expect(last.querySelector("footer .colophon")).toBeTruthy();
   });
 
-  it("loads one small module, and no frameworks", () => {
+  it("loads two small modules, and no frameworks", () => {
     const scripts = [...document.querySelectorAll("script[src]")];
 
-    expect(scripts.map((script) => script.getAttribute("src"))).toEqual(["slides.js"]);
-    expect(scripts[0].getAttribute("type")).toBe("module");
+    expect(scripts.map((script) => script.getAttribute("src"))).toEqual(["slides.js", "/bar.js"]);
+    for (const script of scripts) expect(script.getAttribute("type")).toBe("module");
   });
 
   it("offers the scroll world from the title page", () => {

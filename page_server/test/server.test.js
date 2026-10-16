@@ -56,7 +56,7 @@ describe("the development server", () => {
     expect(response.headers.get("content-type")).toContain("text/html");
 
     const html = await response.text();
-    expect(html).toContain('class="banner"');
+    expect(html).toContain("Websites, presentations and small tools");
     expect(html).toContain("A few things");
     expect(html).toContain('src="slides.js"');
   });
@@ -87,7 +87,7 @@ describe("the development server", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/css");
-    expect(await response.text()).toContain("--ribbon");
+    expect(await response.text()).toContain("--accent");
   });
 
   it("serves the client sites under /projects/, with and without the extension", async () => {

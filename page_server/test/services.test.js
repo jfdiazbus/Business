@@ -39,7 +39,7 @@ describe("the prices page", () => {
     expect(meta("description").length).toBeGreaterThan(40);
     expect(og("title")).toBeTruthy();
     expect(og("description")).toBeTruthy();
-    expect(meta("color-scheme")).toBe("light");
+    expect(meta("color-scheme")).toBe("dark");
     expect(services.querySelector('link[rel="icon"]')).toBeTruthy();
 
     // one page title, and one main heading to go with it
@@ -124,7 +124,7 @@ describe("the prices page", () => {
 
       expect(actions).toHaveLength(1);
       expect(actions[0].getAttribute("href")).toMatch(/^https:\/\//);
-      expect(text(actions[0])).toMatch(/^\[ buy /);
+      expect(text(actions[0])).toMatch(/^buy /);
     }
 
     expect(services.querySelectorAll("#services .buy")).toHaveLength(3);
@@ -167,9 +167,13 @@ describe("the prices page", () => {
     }
   });
 
-  it("does not sell with a script, or with leftovers from the old fallback", () => {
-    expect(services.querySelectorAll("script")).toHaveLength(0);
+  it("does not sell with a script: the buy buttons are plain links", () => {
     expect(services.querySelectorAll("[data-buy], [data-fallback]")).toHaveLength(0);
+
+    // nothing has to run for a sale: the href is the checkout
+    for (const buy of services.querySelectorAll(".buy")) {
+      expect(buy.getAttribute("href")).toMatch(/^https:\/\//);
+    }
   });
 });
 
@@ -204,7 +208,7 @@ describe("the thank you page", () => {
 describe("the two pages together", () => {
   it("wears the same shell, so the site does not change costume mid flow", () => {
     const shell = (doc) => ({
-      name: text(doc.querySelector(".who")),
+      name: text(doc.querySelector(".brand")),
       stylesheet: doc.querySelector('link[rel="stylesheet"]')?.getAttribute("href"),
       favicon: doc.querySelector('link[rel="icon"]')?.getAttribute("href"),
       colophon: text(doc.querySelector(".colophon")),
@@ -219,9 +223,11 @@ describe("the two pages together", () => {
     }
   });
 
-  it("loads no script on either page", () => {
+  it("loads one small script on either page, for the bar alone", () => {
     for (const page of [services, thanks]) {
-      expect(page.querySelectorAll("script")).toHaveLength(0);
+      const scripts = [...page.querySelectorAll("script[src]")];
+
+      expect(scripts.map((script) => script.getAttribute("src"))).toEqual(["/bar.js"]);
     }
   });
 });

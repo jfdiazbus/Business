@@ -27,10 +27,11 @@ export const PAGE_FILES = [
   ["style.css", "style.css"],
   ["slides.js", "slides.js"],
   ["world.js", "world.js"],
+  ["bar.js", "bar.js"],
 ];
 
 /** Files built by world/motion.mjs that are not shipped (intermediates). */
-export const WORLD_SKIP = ["paper-edge.png"];
+export const WORLD_SKIP = ["sheet-edge.png"];
 
 /** folders copied from the workspace into dist/projects/ */
 export const PROJECT_DIRS = ["promptops-ai", "omniprompt-marketing"];
@@ -59,6 +60,9 @@ export const HEADERS = `/projects/*/assets/*
   Cache-Control: public, max-age=3600
 
 /world.js
+  Cache-Control: public, max-age=3600
+
+/bar.js
   Cache-Control: public, max-age=3600
 
 

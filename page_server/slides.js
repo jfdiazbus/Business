@@ -1,9 +1,10 @@
 // slides.js — makes the deck behave like a deck.
 //
-// The slides snap and print with CSS alone. This adds the two things CSS
-// cannot do: one keypress (or nav click) per slide, and a nav that shows which
-// slide you are on. Without this file the page still reads fine — it scrolls
-// like a long page.
+// The slides snap and print with CSS alone. This adds the one thing CSS cannot
+// do: one keypress per slide, so the deck can be read without a mouse. Which
+// slide you are on is printed in the slide itself ("2 / 5"), so nothing here has
+// to mark up the navigation. Without this file the page still reads fine — it
+// scrolls like a long page.
 //
 // The decisions are kept in small functions so they can be tested without a
 // browser; only the wiring below touches the DOM.
@@ -24,11 +25,6 @@ export function nearestSlide(tops, scrollY) {
     (best, top, index) => (Math.abs(top - scrollY) < Math.abs(tops[best] - scrollY) ? index : best),
     0,
   );
-}
-
-/** The href of the nav link that belongs to a slide, if it has one. */
-export function navHrefFor(slide) {
-  return slide && slide.id ? `#${slide.id}` : null;
 }
 
 /**
@@ -69,30 +65,16 @@ export function edgeTarget({ box, direction, scrollY, viewportHeight }) {
 
 if (typeof document !== "undefined") {
   const slides = [...document.querySelectorAll(SLIDE_SELECTOR)];
-  const links = [...document.querySelectorAll(".topbar nav a")];
   const calm = matchMedia("(prefers-reduced-motion: reduce)");
   const scrollTo = (top) => window.scrollTo({ top, behavior: calm.matches ? "auto" : "smooth" });
 
   const tops = () => slides.map((slide) => slide.getBoundingClientRect().top + window.scrollY);
-
-  const mark = (index) => {
-    const href = navHrefFor(slides[index]);
-
-    for (const link of links) {
-      if (href !== null && link.getAttribute("href") === href) {
-        link.setAttribute("aria-current", "true");
-      } else {
-        link.removeAttribute("aria-current");
-      }
-    }
-  };
 
   const show = (index) => {
     const slide = slides[index];
     if (!slide) return;
 
     slide.scrollIntoView({ behavior: calm.matches ? "auto" : "smooth", block: "start" });
-    mark(index);
   };
 
   document.addEventListener("keydown", (event) => {
@@ -125,22 +107,4 @@ if (typeof document !== "undefined") {
 
     show(move.index);
   });
-
-  let queued = false;
-
-  addEventListener(
-    "scroll",
-    () => {
-      if (queued) return;
-      queued = true;
-
-      requestAnimationFrame(() => {
-        queued = false;
-        mark(nearestSlide(tops(), window.scrollY));
-      });
-    },
-    { passive: true },
-  );
-
-  mark(nearestSlide(tops(), window.scrollY));
 }
