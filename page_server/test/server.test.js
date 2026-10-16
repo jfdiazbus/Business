@@ -72,6 +72,16 @@ describe("the development server", () => {
     expect(html).toContain("Tardis");
   });
 
+  it("serves the prices and the thank you page", async () => {
+    const prices = await fetch(`${base}/services`);
+    expect(prices.status).toBe(200);
+    expect(await prices.text()).toContain("€500");
+
+    const thanks = await fetch(`${base}/thanks`);
+    expect(thanks.status).toBe(200);
+    expect(await thanks.text()).toContain("Thank you");
+  });
+
   it("serves the stylesheet with the right content type", async () => {
     const response = await fetch(`${base}/style.css`);
 

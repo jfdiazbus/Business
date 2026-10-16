@@ -103,7 +103,7 @@ describe("the copy, by the landing page rules", () => {
 
     expect(withCta).toHaveLength(1);
     expect(last.cta.primary.href).toMatch(/^mailto:/);
-    expect(last.cta.secondary.href).toBe("/home"); // the deck lives at /home now
+    expect(last.cta.secondary.href).toBe("/services"); // the prices page
     for (const action of Object.values(last.cta)) {
       expect(action.label).not.toMatch(/learn more|submit|click here/i);
     }

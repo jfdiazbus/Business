@@ -18,7 +18,13 @@ export const INDEX_FILES = ["index.html", "home.html"];
 
 // The built site serves the scroll world at / and the deck at /home; in the
 // source they are world.html and home.html, so the dev server maps both.
-export const REWRITES = { "/": "world.html", "/home": "home.html", "/school": "school.html" };
+export const REWRITES = {
+  "/": "world.html",
+  "/home": "home.html",
+  "/school": "school.html",
+  "/services": "services.html",
+  "/thanks": "thanks.html",
+};
 
 export const MIME = {
   ".html": "text/html; charset=utf-8",

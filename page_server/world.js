@@ -76,7 +76,7 @@ export const world = {
       tags: [],
       cta: {
         primary: { label: "Email me", href: "mailto:juan-felipe.diaz-bustamante@epitech.eu" },
-        secondary: { label: "Read the five slide version", href: "/home" },
+        secondary: { label: "See what I charge", href: "/services" },
       },
     },
   ],

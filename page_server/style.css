@@ -356,6 +356,58 @@ body {
   min-width: 0;
 }
 
+/* -- prices, what is included, and the questions ------------------------ */
+
+.tagline {
+  margin: 0 0 34px;
+  max-width: 36ch;
+  font-size: clamp(19px, 2.6vw, 28px);
+  font-weight: 600;
+  line-height: 1.28;
+}
+
+.price {
+  margin: 0;
+  padding: 12px 14px 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.included {
+  list-style: none;
+  margin: 0;
+  padding: 10px 14px 0;
+}
+
+.included li {
+  padding: 3px 0;
+  color: var(--ink-soft);
+}
+
+.included li::before {
+  content: "· ";
+  color: var(--ink-faint);
+}
+
+.faq {
+  margin: 0;
+  max-width: var(--measure);
+}
+
+.faq dt {
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+.faq dt:first-child {
+  margin-top: 0;
+}
+
+.faq dd {
+  margin: 5px 0 0;
+  color: var(--ink-soft);
+}
+
 /* -- plain sections, for pages that are not a deck ----------------------- */
 
 .block {

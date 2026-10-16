@@ -26,6 +26,8 @@ that ships to Cloudflare or to a Docker container.
 | --------------------------------- | ----------------------------------------------------------------------- |
 | `home.html`                       | The five slide deck, served at `/home` — the words live here            |
 | `school.html`                     | The Epitech coursework, served at `/school`                             |
+| `services.html`, `thanks.html`    | The prices, and where Stripe sends buyers (`/services`, `/thanks`)      |
+| `services.js`                     | The three Stripe Payment Links, and the email fallback until they exist |
 | `style.css`                       | The look: paper, green bars, red accents, the slides                    |
 | `index.js`                        | The local server. No dependencies, only Node's own modules              |
 | `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                             |
@@ -134,9 +136,48 @@ unchanged so it can be pulled from upstream later; `world.js` holds only the
 config (sections, copy, accents) and the deck's paper tokens. `world/build` is
 scratch and is not committed; `world/out` is the film the site ships.
 
+## Taking payments
+
+`/services` sells three fixed prices. The buy buttons are Stripe **Payment
+Links**, so there is no secret key in the repository and no Stripe JavaScript on
+the page.
+
+Until a link is pasted into `services.js`, that offer's button **emails you
+instead**, so the page never points at a broken checkout. Each offer upgrades on
+its own, so you can wire them one at a time.
+
+The ten minute setup:
+
+1. Create a Stripe account and activate it: business details, bank account,
+   identity. This is the slow part and the only part that cannot be automated.
+2. Create three Payment Links in the dashboard, one per offer, each with:
+   - **after completion → redirect to** `https://<your-site>/thanks`
+   - **automatic tax** on, so VAT is handled at checkout
+   - **promotion codes** allowed, and customer **name and address** collected
+   - a custom field asking what they need, so the brief arrives with the payment
+   - a description matching what the page promises at that price
+3. Copy each link (they look like `https://buy.stripe.com/...`) into
+   `services.js`:
+
+   ```js
+   export const paymentLinks = {
+     website: "https://buy.stripe.com/...",
+     api: "https://buy.stripe.com/...",
+     full: "https://buy.stripe.com/...",
+   };
+   ```
+
+4. Buy one with a card from Stripe's test list before going live, and check that
+   you land on `/thanks`.
+
+Two things to remember: the amount charged lives in Stripe, so the page and the
+dashboard can drift apart — check both when a price changes. And selling to
+consumers inside the EU means VAT in the buyer's country (the OSS scheme):
+Stripe Tax calculates it, but you have to be enrolled.
+
 ## Tests
 
-`pnpm test` runs eight suites:
+`pnpm test` runs ten suites:
 
 - **server** — routing, content types, redirects, the friendly 404, request
   methods, and that a URL can never climb out of the folders it serves.
@@ -154,6 +195,10 @@ scratch and is not committed; `world/out` is the film the site ships.
 - **world** — the scroll world's config points at assets that exist, the film
   fits Cloudflare's per file limit, the copy keeps to the house rules (no
   hyphens, no cliches, one action), and the vendored engine is intact.
+- **school** — the coursework page describes rather than links the private
+  repositories, and keeps the copy on the same house rules.
+- **services** — three offers with their prices and inclusions, one action each,
+  and a buy button that emails until a real Payment Link is pasted in.
 - **project** — the promises this project makes about itself: no runtime
   dependencies, the pipeline files exist, git stays clean.
 

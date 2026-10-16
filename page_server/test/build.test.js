@@ -37,10 +37,14 @@ describe("the build", () => {
     const world = await readFile(path.join(PROJECT_ROOT, "world.html"), "utf8");
     const deck = await readFile(path.join(PROJECT_ROOT, "home.html"), "utf8");
     const school = await readFile(path.join(PROJECT_ROOT, "school.html"), "utf8");
+    const services = await readFile(path.join(PROJECT_ROOT, "services.html"), "utf8");
+    const thanks = await readFile(path.join(PROJECT_ROOT, "thanks.html"), "utf8");
 
     expect(await read("index.html")).toBe(world);
     expect(await read("home.html")).toBe(deck);
     expect(await read("school.html")).toBe(school);
+    expect(await read("services.html")).toBe(services);
+    expect(await read("thanks.html")).toBe(thanks);
   });
 
   it("writes the stylesheet", async () => {
@@ -135,8 +139,11 @@ describe("the build", () => {
       "index.html",
       "projects",
       "school.html",
+      "services.html",
+      "services.js",
       "slides.js",
       "style.css",
+      "thanks.html",
       "world",
       "world.js",
     ]);
