@@ -77,13 +77,6 @@ describe("the page fills the screen", () => {
     expect(ruleBody(css, ".sheet")).not.toContain("max-width");
   });
 
-  it("pins the sprocket strips to the viewport, so the paper can feed", () => {
-    const sprocket = ruleBody(css, ".sprocket");
-
-    expect(sprocket).toContain("position: fixed");
-    expect(sprocket).toContain("pointer-events: none");
-  });
-
   it("keeps the words in a centred column", () => {
     const page = ruleBody(css, ".page");
 
@@ -102,9 +95,10 @@ describe("the page fills the screen", () => {
   it("keeps the name and nav reachable from every slide", () => {
     const topbar = ruleBody(css, ".topbar");
 
-    expect(topbar).toContain("position: sticky");
+    expect(topbar).toContain("position: fixed");
     expect(topbar).toMatch(/z-index: \d/);
-    expect(topbar).toContain("background");
+    // the background arrives with the scrolled state, so the bar can start clear
+    expect(ruleBody(css, ".topbar--solid")).toContain("background");
   });
 
   it("centres a slide without cropping one that is taller than the screen", () => {
@@ -113,11 +107,14 @@ describe("the page fills the screen", () => {
     expect(css).not.toMatch(/\.slide\s*\{[^}]*justify-content: center/);
   });
 
-  it("hides the decorative strips on small screens", () => {
-    const small = blocks(css, /@media\s*\(max-width:\s*639px\)\s*\{/)[0].body;
+  it("shortens the bar on small screens", () => {
+    const small = blocks(css, /@media\s*\(max-width:\s*767px\)\s*\{/)[0].body;
 
-    expect(small).toContain(".sprocket");
-    expect(small).toContain("display: none");
+    expect(small).toContain("--bar-h");
+  });
+
+  it("scrolls a long nav sideways rather than wrapping it", () => {
+    expect(ruleBody(css, ".topbar nav")).toContain("overflow-x: auto");
   });
 });
 
@@ -148,7 +145,7 @@ describe("the scroll animations", () => {
     const snapping = blocks(css, MOTION)[0].body;
     const calm = blocks(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{/)[0].body;
 
-    expect(snapping).toContain("scroll-snap-type: y proximity");
+    expect(snapping).toContain("scroll-snap-type: y mandatory");
     expect(calm).toContain("scroll-snap-type: none");
   });
 
@@ -158,20 +155,19 @@ describe("the scroll animations", () => {
     expect(unguarded).not.toMatch(/^\s*animation-timeline\s*:/m);
   });
 
-  it("feeds the paper and rides a print head down the edge", () => {
+  it("draws its hairlines and reveals its sections as you scroll", () => {
     const [scroll] = blocks(css, SUPPORTS);
     const motion = blocks(scroll.body, MOTION)[0].body;
 
-    expect(motion).toContain(".sprocket::before");
-    expect(motion).toContain(".sprocket::after");
-    expect(motion).toContain("animation-timeline: scroll(root block)");
+    expect(motion).toContain(".rule");
+    expect(motion).toContain("wipe-x");
     expect(motion).toContain("animation-timeline: view()");
   });
 
-  it("only shows the print head where the timeline works", () => {
-    const outside = without(css, SUPPORTS);
-
-    expect(outside).not.toContain(".sprocket::after");
+  it("has no tractor feed, print head or ascii ruler left over", () => {
+    for (const gone of [".sprocket", "--dots", "print head", "===="]) {
+      expect(css, gone).not.toContain(gone);
+    }
   });
 
   it("uses keyframes that exist", () => {
@@ -201,16 +197,80 @@ describe("the scroll animations", () => {
     const [scroll] = blocks(css, SUPPORTS);
     const motion = blocks(scroll.body, MOTION)[0].body;
 
-    for (const selector of [".rule", ".heading", ".project h3", ".project p", ".leader .fill"]) {
+    for (const selector of [".rule", ".heading", ".project", ".leader", ".werk-row"]) {
       expect(motion, selector).toContain(selector);
     }
   });
 
-  it("lets the scroll cue leave once the page moves", () => {
+  it("moves exactly one slide per gesture", () => {
+    expect(ruleBody(css, ".slide")).toContain("scroll-snap-stop: always");
+  });
+
+  it("fades the scroll cue as the first slide leaves, not on a document percentage", () => {
     const [scroll] = blocks(css, SUPPORTS);
     const motion = blocks(scroll.body, MOTION)[0].body;
 
     expect(motion).toContain(".scroll-hint");
-    expect(motion).toMatch(/animation-range:\s*0%\s*10%/);
+    expect(motion).toMatch(/animation-range:\s*exit 0% exit 90%/);
+  });
+});
+
+describe("the design tokens", () => {
+  const tokens = Object.fromEntries(
+    [...css.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)].map((match) => [
+      match[1],
+      match[2],
+    ]),
+  );
+
+  const channel = (value) => {
+    const c = value / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+
+  const luminance = (hex) => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+  };
+
+  const contrast = (one, other) => {
+    const [lighter, darker] = [luminance(one), luminance(other)].sort((a, b) => b - a);
+    return (lighter + 0.05) / (darker + 0.05);
+  };
+
+  it("defines every token it uses", () => {
+    const defined = new Set([...css.matchAll(/--([a-z0-9-]+)\s*:/g)].map((match) => match[1]));
+    const used = new Set([...css.matchAll(/var\(--([a-z0-9-]+)/g)].map((match) => match[1]));
+
+    expect([...used].filter((name) => !defined.has(name))).toEqual([]);
+  });
+
+  it("keeps every word legible on the background", () => {
+    expect(tokens.bg, "no background token").toBeTruthy();
+
+    for (const name of ["ink", "ink-soft", "accent"]) {
+      expect(contrast(tokens[name], tokens.bg), name).toBeGreaterThanOrEqual(4.5);
+    }
+
+    // the faint tone is for marks like the little list dots, never for sentences
+    expect(contrast(tokens["ink-faint"], tokens.bg)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("never fades text on its way in", () => {
+    // anything below full opacity is dimmer than the tokens, and the tokens are
+    // already set to the contrast floor
+    expect(ruleBody(css, "@keyframes reveal")).not.toContain("opacity");
+  });
+
+  it("keeps backgrounds flat and type upright", () => {
+    expect(css).not.toMatch(/background[^;{}]*gradient/i);
+    expect(css).not.toContain("font-style: italic");
+    expect(css).not.toMatch(/font-weight:\s*(800|900)/);
+  });
+
+  it("takes its sizes from the type scale", () => {
+    const sizes = [...css.matchAll(/--fs-[a-z0-9]+:\s*(\d+)px/g)].map((match) => Number(match[1]));
+
+    expect(sizes.sort((a, b) => a - b)).toEqual([12, 14, 16, 18, 20, 24, 30, 36, 48, 60]);
   });
 });

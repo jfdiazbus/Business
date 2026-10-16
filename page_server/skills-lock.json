@@ -6,6 +6,16 @@
       "sourceType": "autoskills-registry",
       "computedHash": "2174f783a038a7ca4869c4c18e14726ec13b9c6b705d59253f647d0ca37cb78d"
     },
+    "cloudflare": {
+      "source": "cloudflare/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "4d6a83421587be79602210c00c15475bb1f7e0fe9715935f15b473fea7351ec9"
+    },
+    "cloudflare-deploy": {
+      "source": "openai/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "a0e0265fb534369d95944a58ab25159b7838f62abdcd86afa2266d69b3309561"
+    },
     "connect-recommend": {
       "source": "docs.stripe.com",
       "sourceUrl": "https://docs.stripe.com",
@@ -111,6 +121,21 @@
       "source": "antfu/skills",
       "sourceType": "autoskills-registry",
       "computedHash": "bbb3d22f611fb721b9b475f014b323882732dc3f724e0f3de229c38795d77e8f"
+    },
+    "web-perf": {
+      "source": "cloudflare/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "11a1e86ab32c0acedcb291f159a75fd22c15e251bbd85e7db1bc9ef86e6371e8"
+    },
+    "workers-best-practices": {
+      "source": "cloudflare/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "6b7003971822236bb9e4ab8cb623276442c93de29f844acb519a94c8a6fac2ec"
+    },
+    "wrangler": {
+      "source": "cloudflare/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "0ed898a7205a09839dbf279d0759f4ab3f07d45189b216383a813e6e8179b09d"
     }
   }
 }

@@ -197,12 +197,16 @@ describe("the vendored engine", () => {
     expect(engine.length).toBeGreaterThan(8000);
   });
 
-  it("reads its theme from the page's paper tokens", async () => {
+  it("feeds the engine the same tokens the site uses, so the world matches", async () => {
     const page = await read("world.html");
 
     for (const token of ["--sw-bg", "--sw-ink", "--sw-ink-soft", "--sw-accent", "--sw-font-body"]) {
       expect(page, token).toContain(token);
     }
-    expect(page).toContain("--paper: #f0eee6");
+
+    expect(page).toContain("--sw-bg: var(--bg)");
+    expect(page).toContain("--sw-accent: var(--accent)");
+    expect(page).toContain("--bg: #0a0a0a");
+    expect(page).not.toContain("--paper");
   });
 });

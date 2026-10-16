@@ -52,6 +52,19 @@ export function cliArgs(argv = process.argv.slice(2)) {
   return argv.filter((arg) => arg !== "--");
 }
 
+/**
+ * Only the Cloudflare variables reach wrangler. `.secrets` also holds the
+ * Stripe key the stripe suite reads, and a child process that only uploads
+ * files has no business being handed it.
+ */
+export function wranglerEnv(secrets, env = process.env) {
+  const cloudflare = Object.fromEntries(
+    Object.entries(secrets).filter(([name]) => name.startsWith("CLOUDFLARE_")),
+  );
+
+  return { ...env, ...cloudflare };
+}
+
 /** Hands the built folder to wrangler, inheriting our terminal and logs. */
 export function upload({ args = [], env = process.env } = {}) {
   return new Promise((resolve) => {
@@ -84,7 +97,7 @@ export async function deploy({ args = cliArgs() } = {}) {
 
   console.log(`built ${path.relative(PROJECT_ROOT, outDir) || "."}`);
 
-  return upload({ args, env: { ...process.env, ...secrets } });
+  return upload({ args, env: wranglerEnv(secrets) });
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);

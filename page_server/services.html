@@ -8,8 +8,8 @@
       name="description"
       content="Three fixed prices: a website for €100, a small API for €200, or the whole website service, design through to handover, for €500."
     />
-    <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#f0eee6" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a0a0a" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="What I charge — Juan Felipe Diaz Bustamante" />
     <meta
@@ -18,12 +18,12 @@
     />
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f0eee6'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='14' font-weight='bold' text-anchor='middle' fill='%23b03024'%3E:-)%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='14' font-weight='bold' text-anchor='middle' fill='%23ff6b5a'%3E:-)%3C/text%3E%3C/svg%3E"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
@@ -32,26 +32,36 @@
     <a class="skip" href="#services">skip to the prices</a>
 
     <div class="sheet">
-      <div class="sprocket" aria-hidden="true"></div>
-
       <div class="page">
         <header class="topbar">
-          <p class="who">Juan Felipe Diaz Bustamante <span class="role">— what I charge</span></p>
-          <nav aria-label="sections">
-            <a href="/home">[ the portfolio ]</a>
-            <a href="#faq">[ questions ]</a>
-            <a href="#contact">[ contact ]</a>
+          <a class="brand" href="/"
+            >Juan Felipe Diaz Bustamante<span class="role"> — what I charge</span></a
+          >
+          <nav id="topbar-nav" aria-label="site">
+            <a href="/home">Portfolio</a>
+            <a href="/services" aria-current="page">Prices</a>
+            <a href="/school">School</a>
           </nav>
+          <a class="btn btn--primary" href="mailto:juan-felipe.diaz-bustamante@epitech.eu"
+            >Email me</a
+          >
+          <button
+            class="topbar__menu"
+            type="button"
+            aria-expanded="false"
+            aria-controls="topbar-nav"
+            aria-label="Menu"
+          >
+            <span class="topbar__bars" aria-hidden="true"></span>
+          </button>
         </header>
 
         <main>
-          <h1 class="sr-only">What I charge — Juan Felipe Diaz Bustamante</h1>
+          <h1 class="page-title">What I charge</h1>
 
           <section class="block" id="services" aria-labelledby="services-title">
             <div class="rule" aria-hidden="true"></div>
-            <h2 class="heading" id="services-title">
-              <span class="sigil">&gt;</span> Three prices
-            </h2>
+            <h2 class="heading" id="services-title">Three prices</h2>
 
             <p class="tagline">
               Fixed prices, and you know exactly what you get before you pay. Pick the one that fits
@@ -71,7 +81,7 @@
               </ul>
               <p class="links">
                 <a class="buy" href="https://buy.stripe.com/test_8x23cv8bv5MRbqmgSJabK00"
-                  >[ buy a website ]</a
+                  >buy a website</a
                 >
               </p>
             </article>
@@ -88,7 +98,7 @@
               </ul>
               <p class="links">
                 <a class="buy" href="https://buy.stripe.com/test_5kQ8wPfDX6QV8ea5a1abK01"
-                  >[ buy an API ]</a
+                  >buy an API</a
                 >
               </p>
             </article>
@@ -106,7 +116,7 @@
               </ul>
               <p class="links">
                 <a class="buy" href="https://buy.stripe.com/test_8x2eVdgI13EJ51YdGxabK02"
-                  >[ buy the whole service ]</a
+                  >buy the whole service</a
                 >
               </p>
             </article>
@@ -123,9 +133,7 @@
 
           <section class="block" id="faq" aria-labelledby="faq-title">
             <div class="rule" aria-hidden="true"></div>
-            <h2 class="heading" id="faq-title">
-              <span class="sigil">&gt;</span> Questions I get asked
-            </h2>
+            <h2 class="heading" id="faq-title">Questions I get asked</h2>
 
             <dl class="faq">
               <dt>What do you need from me?</dt>
@@ -170,9 +178,7 @@
 
           <section class="block" id="contact" aria-labelledby="contact-title">
             <div class="rule" aria-hidden="true"></div>
-            <h2 class="heading" id="contact-title">
-              <span class="sigil">&gt;</span> Not sure which one?
-            </h2>
+            <h2 class="heading" id="contact-title">Not sure which one?</h2>
             <p>Tell me what you are trying to do and I will tell you which of the three it is.</p>
             <ul class="leaders">
               <li class="leader">
@@ -192,7 +198,7 @@
                 >
               </li>
             </ul>
-            <p class="more"><a href="/home">[ back to the portfolio ]</a></p>
+            <p class="more"><a href="/home">back to the portfolio</a></p>
           </section>
         </main>
 
@@ -200,10 +206,14 @@
           <div class="rule rule--thin" aria-hidden="true"></div>
           <p class="eof">Thanks for reading! :-)</p>
           <p class="colophon">Hand-coded by Juan Felipe with HTML and CSS, 2026.</p>
+          <p class="links">
+            <a href="/services">What I charge</a>
+            <a href="/terms">Terms and privacy</a>
+            <a href="mailto:juan-felipe.diaz-bustamante@epitech.eu">Email</a>
+          </p>
         </footer>
       </div>
-
-      <div class="sprocket sprocket--r" aria-hidden="true"></div>
     </div>
+    <script type="module" src="/bar.js"></script>
   </body>
 </html>

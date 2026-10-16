@@ -12,6 +12,7 @@ import {
   parseSecrets,
   readSecrets,
   wranglerEntry,
+  wranglerEnv,
 } from "../scripts/deploy.mjs";
 
 const REPO_ROOT = path.resolve(PROJECT_ROOT, "..");
@@ -61,6 +62,19 @@ describe("the secrets file", () => {
 
   it("survives the file not existing at all", async () => {
     expect(await readSecrets(path.join(PROJECT_ROOT, ".secrets-absent"))).toEqual({});
+  });
+
+  it("keeps everything but the Cloudflare variables out of wrangler's environment", () => {
+    // .secrets also holds the Stripe key the stripe suite reads; the deploy
+    // child process only uploads files and should never be handed it.
+    const env = wranglerEnv(
+      { CLOUDFLARE_API_TOKEN: "cf-token", STRIPE_SECRET_KEY: "sk_test_never" },
+      { PATH: "/usr/bin" },
+    );
+
+    expect(env.CLOUDFLARE_API_TOKEN).toBe("cf-token");
+    expect(env.STRIPE_SECRET_KEY).toBeUndefined();
+    expect(env.PATH).toBe("/usr/bin");
   });
 
   it("cannot be committed", async () => {

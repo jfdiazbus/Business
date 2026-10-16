@@ -16,7 +16,8 @@ export const SVG_DIR = path.join(BUILD_DIR, "svg");
 export const PNG_DIR = path.join(BUILD_DIR, "png");
 
 const CHROME = "/usr/bin/google-chrome";
-const FONT = "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap";
+const FONT =
+  "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap";
 
 function wrapper(svg) {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">

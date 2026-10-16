@@ -57,7 +57,7 @@ describe("the build", () => {
 
     expect(index).toContain("The print shop");
     expect(index).toContain('src="/world/engine.js"');
-    expect(home).toContain('class="banner"');
+    expect(home).toContain("Websites, presentations and small tools");
     expect(home).toContain("A few things");
 
     // /home is a rewrite, so the deck is addressable without the extension
@@ -80,7 +80,7 @@ describe("the build", () => {
     expect(files.filter((name) => name.startsWith("wipe-"))).toHaveLength(4);
     expect(files.filter((name) => name.startsWith("still-")).length).toBeGreaterThanOrEqual(5);
     // the paper edge is a build intermediate, not a shipped asset
-    expect(files).not.toContain("paper-edge.png");
+    expect(files).not.toContain("sheet-edge.png");
 
     const headers = await read("_headers");
     expect(headers).toContain("/world/*.mp4");
@@ -134,6 +134,7 @@ describe("the build", () => {
     expect(entries.sort()).toEqual([
       "404.html",
       "_headers",
+      "bar.js",
       "docs",
       "home.html",
       "index.html",
@@ -142,6 +143,7 @@ describe("the build", () => {
       "services.html",
       "slides.js",
       "style.css",
+      "terms.html",
       "thanks.html",
       "world",
       "world.js",

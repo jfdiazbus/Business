@@ -21,7 +21,7 @@ export const world = {
       label: "The print room",
       still: "/world/still-1.webp",
       clip: "/world/dive-1.mp4",
-      accent: "#b03024",
+      accent: "#ff6b5a",
       scroll: 1.1,
       linger: 0.35,
       eyebrow: "Hello",
@@ -34,7 +34,7 @@ export const world = {
       label: "The workbench",
       still: "/world/still-2.webp",
       clip: "/world/dive-2.mp4",
-      accent: "#6f8f5f",
+      accent: "#ff6b5a",
       eyebrow: "Selected work",
       title: "Three sites, taken end to end.",
       body: "Two client sites with calculators, clear prices and lead forms, plus the front end of the MigaLabs site: design system, dashboards and the animated Ethereum Academy.",
@@ -45,7 +45,7 @@ export const world = {
       label: "The type tray",
       still: "/world/still-3.webp",
       clip: "/world/dive-3.mp4",
-      accent: "#5f5c52",
+      accent: "#ff6b5a",
       eyebrow: "How I work",
       title: "No frameworks, nothing to maintain.",
       body: "If it opens in a browser it works, which keeps hosting cheap and the code easy to hand over.",
@@ -56,7 +56,7 @@ export const world = {
       label: "The archive shelf",
       still: "/world/still-4.webp",
       clip: "/world/dive-4.mp4",
-      accent: "#8a6a3f",
+      accent: "#ff6b5a",
       eyebrow: "Beyond the code",
       title: "Plans, prices and coursework.",
       body: "Positioning, packaging and pricing so a site says something worth reading, and at Epitech a task manager, a shell in C and a data dashboard.",
@@ -67,7 +67,7 @@ export const world = {
       label: "The mail slot",
       still: "/world/still-5.webp",
       clip: "/world/dive-5.mp4",
-      accent: "#b03024",
+      accent: "#ff6b5a",
       scroll: 1.1,
       linger: 0.35,
       eyebrow: "Get in touch",
@@ -116,6 +116,27 @@ if (typeof document !== "undefined" && typeof mountScrollWorld === "function") {
       list.findIndex((dot) => dot.classList.contains("is-active")),
     );
   const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // The engine draws one dot per scene but gives them no accessible name, and
+  // the engine is vendored, so they are named here instead.
+  const nameDots = (list) => {
+    list.forEach((dot, index) => {
+      const section = world.sections[index];
+      if (section && !dot.getAttribute("aria-label")) {
+        dot.setAttribute("aria-label", `Go to ${section.label.toLowerCase()}`);
+      }
+      dot.setAttribute("aria-current", dot.classList.contains("is-active") ? "true" : "false");
+    });
+  };
+
+  const seen = dots();
+  nameDots(seen);
+
+  // scrolling moves the active dot, so keep the announcement in step
+  if (typeof MutationObserver === "function") {
+    const observer = new MutationObserver(() => nameDots(dots()));
+    for (const dot of seen) observer.observe(dot, { attributes: true, attributeFilter: ["class"] });
+  }
 
   let lockedUntil = 0;
   const LOCK = 700; // ms; a smooth jump takes about this long

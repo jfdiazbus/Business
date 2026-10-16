@@ -1,19 +1,74 @@
-/* page_server — a portfolio printed on tractor-feed green-bar paper */
+/* page_server — a dark, flat, type-led portfolio.
+ *
+ * One typeface for the interface (Geist) plus a monospace for prices, numbers
+ * and anything that is data, flat surfaces, hairlines instead of boxes, and one
+ * red accent. No gradients in backgrounds, no shadows on cards, no decoration
+ * that is not doing a job.
+ *
+ * Every colour pair below is checked against WCAG AA on --bg: --ink is 19.7:1,
+ * --ink-soft is 7.8:1, --accent is 7.0:1. --ink-faint is 4.1:1 and is only ever
+ * used for non-text marks like hairline dots.
+ */
 
 :root {
-  --paper: #f0eee6;
-  --paper-edge: #e5e1d4;
-  --desk: #cdc9ba; /* the dark showing through the punched holes */
-  --bar: #dde7d4;
-  --ink: #1b1b18;
-  --ink-soft: #5f5c52;
-  --ribbon: #b03024;
-  --measure: 74ch;
+  /* surfaces */
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface-2: #1f1f1f;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  /* text */
+  --ink: #ffffff;
+  --ink-soft: #a3a3a3;
+  --ink-faint: #737373;
+
+  /* the one accent, lightened so it stays legible on near black */
+  --accent: #ff6b5a;
+  --accent-deep: #b03024;
+
+  /* type: one step per Tailwind step, so nothing is invented ad hoc */
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-base: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 20px;
+  --fs-2xl: 24px;
+  --fs-3xl: 30px;
+  --fs-4xl: 36px;
+  --fs-5xl: 48px;
+  --fs-6xl: 60px;
+
+  /* spacing scale */
+  --sp-25: 2px;
+  --sp-50: 4px;
+  --sp-75: 8px;
+  --sp-100: 12px;
+  --sp-200: 16px;
+  --sp-300: 24px;
+  --sp-400: 32px;
+  --sp-500: 40px;
+  --sp-600: 48px;
+  --sp-700: 64px;
+  --sp-800: 80px;
+  --sp-900: 96px;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-full: 9999px;
+
+  --measure: 68ch;
   --page-max: 1120px;
-  --hole-pitch: 34px; /* one sprocket hole per repeat */
-  /* the dot leaders, shared by skill rows and slide headings */
-  --dots: "................................................................................................................................................................................................";
-  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  --page-pad: clamp(20px, 5vw, 64px);
+  --bar-h: 72px;
+
+  /* motion: mass and spring, never a default ease */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --slow: 500ms;
+
+  --sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
 }
 
 *,
@@ -22,20 +77,19 @@
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--mono);
-  font-size: 15px;
-  line-height: 1.65;
+html {
+  background: var(--bg);
+  /* an anchor never lands underneath the fixed bar */
+  scroll-padding-top: var(--bar-h);
 }
 
 /* the deck scrolls one slide at a time, when the browser can snap */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
-    scroll-snap-type: y proximity;
+    /* mandatory, so one gesture is one slide: proximity leaves the visitor
+       nudging at the next slide before anything moves */
+    scroll-snap-type: y mandatory;
   }
 }
 
@@ -46,9 +100,34 @@ body {
   }
 }
 
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+[id] {
+  scroll-margin-top: var(--bar-h);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
 :focus-visible {
-  outline: 2px solid var(--ribbon);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
+  border-radius: var(--sp-25);
 }
 
 .sr-only {
@@ -69,139 +148,312 @@ body {
 }
 
 .skip:focus {
-  left: 10px;
-  top: 10px;
-  z-index: 20;
-  background: var(--paper);
-  color: var(--ribbon);
-  padding: 8px 12px;
-  border: 1px solid var(--ribbon);
+  left: var(--sp-100);
+  top: var(--sp-100);
+  z-index: 60;
+  padding: var(--sp-75) var(--sp-100);
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-full);
   text-decoration: none;
+  font-size: var(--fs-sm);
 }
 
-/* -- the sheet: paper fills the whole page ------------------------------ */
+/* Any link that is not part of a styled row still has to be readable: without
+   this, an anchor inside a paragraph falls back to the browser's own link
+   colour, which is unreadable on a near black background. */
+a {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  text-underline-offset: 3px;
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
+
+/* -- the sheet: one flat background behind everything -------------------- */
 
 .sheet {
   position: relative;
   min-height: 100vh;
   min-height: 100svh;
-  background: var(--paper);
-}
-
-/* the tractor-feed edges stay put while the paper feeds past them */
-.sprocket {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 2;
-  width: var(--hole-pitch);
-  overflow: hidden;
-  background: var(--paper-edge);
-  border-right: 1px dashed rgba(27, 27, 24, 0.22);
-  pointer-events: none;
-}
-
-.sprocket--r {
-  left: auto;
-  right: 0;
-  border-right: 0;
-  border-left: 1px dashed rgba(27, 27, 24, 0.22);
-}
-
-/* the holes, on a strip long enough that the feed never shows a gap */
-.sprocket::before {
-  content: "";
-  position: absolute;
-  inset: calc(var(--hole-pitch) * -5) 0 0;
-  background: radial-gradient(
-      circle at calc(var(--hole-pitch) / 2) calc(var(--hole-pitch) / 2),
-      var(--desk) 0 5.5px,
-      transparent 6px
-    )
-    0 0 / var(--hole-pitch) var(--hole-pitch) repeat-y;
+  background: var(--bg);
 }
 
 .page {
   max-width: var(--page-max);
   margin: 0 auto;
-  /* the slides bring their own vertical space */
-  padding: 0 clamp(20px, 5vw, 72px);
+  padding: 0 var(--page-pad);
 }
 
-/* -- header ------------------------------------------------------------- */
+/* -- the bar ------------------------------------------------------------- */
 
-/* the name and nav ride along, so the deck is reachable from any slide */
+/* Transparent over the top of the page, then solid once you scroll. The
+   script only flips the class; the look lives here. */
 .topbar {
-  position: sticky;
-  top: 0;
-  z-index: 3;
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-  padding-block: 10px;
-  background: var(--paper);
-  border-bottom: 1px dashed rgba(27, 27, 24, 0.18);
-  font-size: 14px;
+  align-items: center;
+  gap: var(--sp-300);
+  height: var(--bar-h);
+  padding: 0 var(--page-pad);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--slow) var(--ease),
+    border-color var(--slow) var(--ease);
 }
 
-.who {
-  margin: 0;
+.topbar--solid {
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom-color: var(--line);
+}
+
+.brand {
+  flex: 0 0 auto;
+  color: var(--ink);
+  font-size: var(--fs-sm);
   font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.role {
+.brand .role {
   color: var(--ink-soft);
   font-weight: 400;
 }
 
 .topbar nav {
   display: flex;
-  gap: 16px;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--sp-300);
+  /* a long enough nav scrolls sideways on a phone rather than wrapping */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topbar nav::-webkit-scrollbar {
+  display: none;
 }
 
 .topbar nav a {
   color: var(--ink-soft);
+  font-size: var(--fs-sm);
   text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--slow) var(--ease);
 }
 
 .topbar nav a:hover,
-.topbar nav a:focus-visible,
-.topbar nav a[aria-current="true"] {
-  color: var(--ribbon);
+.topbar nav a:focus-visible {
+  color: var(--ink);
 }
 
-/* the slide you are looking at gets noticed */
+/* the page (or slide) you are looking at */
 .topbar nav a[aria-current="true"] {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.topbar nav a[aria-current="true"]::after {
+  content: "";
+  display: block;
+  height: 2px;
+  margin-top: var(--sp-50);
+  background: var(--accent);
+  border-radius: var(--r-full);
+}
+
+/* -- the phone menu ------------------------------------------------------ */
+
+/* Hidden until the script says it can drive it. Without bar.js the nav stays a
+   plain scrollable row, so the links are never behind a button that cannot
+   open. */
+.topbar__menu {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  cursor: pointer;
+}
+
+.topbar__bars,
+.topbar__bars::before,
+.topbar__bars::after {
+  display: block;
+  width: 16px;
+  height: 2px;
+  border-radius: var(--r-full);
+  background: var(--ink);
+}
+
+.topbar__bars {
+  position: relative;
+}
+
+.topbar__bars::before,
+.topbar__bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+
+.topbar__bars::before {
+  top: -5px;
+}
+
+.topbar__bars::after {
+  top: 5px;
+}
+
+/* the lines rotate into an X rather than disappearing */
+.topbar--open .topbar__bars {
+  background: transparent;
+}
+
+.topbar--open .topbar__bars::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.topbar--open .topbar__bars::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .topbar__bars,
+  .topbar__bars::before,
+  .topbar__bars::after {
+    transition:
+      transform var(--slow) var(--ease),
+      top var(--slow) var(--ease),
+      background-color var(--slow) var(--ease);
+  }
+}
+
+/* -- buttons ------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-75);
+  padding: var(--sp-75) var(--sp-100);
+  border: 1px solid transparent;
+  border-radius: var(--r-full);
+  font-family: var(--sans);
+  font-size: var(--fs-sm);
   font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-/* -- section headings --------------------------------------------------- */
+.btn--primary {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.btn--ghost {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.topbar .btn {
+  flex: 0 0 auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn {
+    transition:
+      background-color var(--slow) var(--ease),
+      border-color var(--slow) var(--ease),
+      transform var(--slow) var(--ease);
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn--ghost:hover {
+    border-color: var(--ink);
+  }
+
+  .btn--primary:hover {
+    background: color-mix(in srgb, var(--ink) 88%, var(--bg));
+  }
+}
+
+/* -- page titles --------------------------------------------------------- */
+
+/* The h1 leads the page, capped so its lines break where the thought breaks,
+   with room above it for the fixed bar. */
+.page-title {
+  margin: 0 0 var(--sp-400);
+  padding-block-start: calc(var(--bar-h) + var(--sp-700));
+  max-width: 22ch;
+  font-size: clamp(var(--fs-3xl), 6vw, var(--fs-6xl));
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.page-title + p {
+  margin-top: calc(var(--sp-400) * -1 + var(--sp-200));
+}
+
+/* -- section headings ---------------------------------------------------- */
 
 .heading {
-  margin: 0 0 16px;
-  font-size: 17px;
+  margin: 0 0 var(--sp-200);
+  font-size: var(--fs-xl);
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .heading--sub {
-  font-size: 15px;
-  margin-top: 36px;
+  margin-top: var(--sp-600);
+  font-size: var(--fs-lg);
 }
 
-.sigil {
-  color: var(--ribbon);
-  font-weight: 700;
+/* a hairline between sections, where the page used to print a row of equals */
+.rule {
+  height: 1px;
+  margin: var(--sp-700) 0 var(--sp-600);
+  background: var(--line);
+  user-select: none;
 }
 
-/* the heading row of a slide: name ......... 2 / 4 */
+.rule--thin {
+  background: color-mix(in srgb, var(--line) 60%, transparent);
+  margin-block: var(--sp-500);
+}
+
+/* the heading row of a slide: the name, then where you are */
 .slide-top {
   display: flex;
   align-items: baseline;
-  gap: 1.2ch;
-  margin: 0 0 16px;
+  gap: var(--sp-200);
+  margin: 0 0 var(--sp-300);
 }
 
 .slide-top .heading {
@@ -209,58 +461,39 @@ body {
 }
 
 .slide-top .fill {
-  flex: 1 1 8ch;
-  min-width: 8ch;
-  overflow: hidden;
-  white-space: nowrap;
-  color: var(--ink-soft);
+  flex: 1 1 auto;
+  height: 1px;
+  min-width: var(--sp-300);
+  background: var(--line);
 }
 
 .slide-top .count {
   flex: 0 0 auto;
-  font-size: 13.5px;
-  font-weight: 600;
   color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  font-weight: 500;
 }
 
-/* -- ascii rules -------------------------------------------------------- */
-
-.rule {
-  overflow: hidden;
-  white-space: nowrap;
-  line-height: 1;
-  font-size: 14px;
-  color: var(--ink-soft);
-  opacity: 0.5;
-  margin: clamp(40px, 9vh, 96px) 0 28px;
-  user-select: none;
-}
-
-.rule::after {
-  content: "====================================================================================================================================";
-}
-
-.rule--thin::after {
-  content: "------------------------------------------------------------------------------------------------------------------------------------";
-}
-
-/* -- slides: one screen each, snapping like a deck ---------------------- */
+/* -- slides: one screen each, snapping like a deck ----------------------- */
 
 .slide {
   display: flex;
   flex-direction: column;
   min-block-size: 100vh;
   min-block-size: 100svh;
-  /* the top padding is room for the sticky header above it */
-  padding-block: clamp(72px, 9vh, 96px) clamp(32px, 6vh, 64px);
+  /* the top padding is room for the fixed bar above it */
+  padding-block: calc(var(--bar-h) + var(--sp-500)) var(--sp-600);
   scroll-snap-align: start;
+  /* never let one flick skip past a slide */
+  scroll-snap-stop: always;
 }
 
 /* centring with auto margins, so a slide taller than the screen
    (a narrow phone, say) still starts at its first line instead of being
    cropped at the top the way `justify-content: center` would crop it */
 .slide > .rule:first-child {
-  margin-block: auto 28px;
+  margin-block: auto var(--sp-300);
 }
 
 .slide:not(.hero) > :last-child {
@@ -269,29 +502,25 @@ body {
 
 /* slide 1: the title page */
 .hero {
-  padding-block-start: clamp(20px, 5vh, 44px);
+  padding-block-start: calc(var(--bar-h) + var(--sp-400));
 }
 
-.banner {
-  /* the auto top margin balances the block against the scroll cue below */
-  margin: auto 0 22px;
-  padding: 0;
-  font-family: var(--mono);
-  /* 36 characters wide: ~3.45vw keeps the art inside the column at every width,
-     44px is as large as the 1120px page allows */
-  font-size: clamp(11px, 3.45vw, 44px);
-  line-height: 1.1;
-  overflow-x: auto;
-}
-
-.banner .line {
-  display: block;
+.hero h1 {
+  /* the headline sits in the optical middle of the screen, balanced against the
+     scroll cue below it */
+  margin: auto 0 var(--sp-300);
+  max-width: 24ch;
+  font-size: clamp(var(--fs-4xl), 7vw, var(--fs-6xl));
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 .lede {
   margin: 0;
-  max-width: 66ch;
-  font-size: 16px;
+  max-width: 60ch;
+  font-size: var(--fs-lg);
+  color: var(--ink-soft);
 }
 
 .page p {
@@ -301,31 +530,34 @@ body {
 /* a small, quiet cue that there is more below — it leaves once you scroll */
 .scroll-hint {
   margin: auto 0 0;
-  padding-top: 40px;
-  font-size: 14px;
+  padding-top: var(--sp-500);
   color: var(--ink-soft);
+  font-size: var(--fs-sm);
 }
 
 /* aside links: the tour from the title page, the school work from the listing */
 .tour,
 .more {
-  margin: 20px 0 0;
+  margin: var(--sp-300) 0 0;
 }
 
 .tour a,
 .more a {
-  color: var(--ribbon);
+  color: var(--ink);
   text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 1px;
 }
 
 .tour a:hover,
 .tour a:focus-visible,
 .more a:hover,
 .more a:focus-visible {
-  text-decoration: underline;
+  border-bottom-color: var(--accent);
+  color: var(--accent);
 }
 
-/* -- where I have worked: the years in the left column, like a printed CV -- */
+/* -- where I have worked: a row per job, divided by hairlines ------------ */
 
 .werk {
   list-style: none;
@@ -337,18 +569,16 @@ body {
 .werk-row {
   display: flex;
   align-items: baseline;
-  gap: 1.2ch;
-  padding: 9px 0;
-}
-
-.werk-row + .werk-row {
-  border-top: 1px dashed rgba(27, 27, 24, 0.16);
+  gap: var(--sp-200);
+  padding: var(--sp-100) 0;
+  border-top: 1px solid var(--line);
 }
 
 .werk-when {
-  flex: 0 0 12ch;
-  font-weight: 600;
+  flex: 0 0 14ch;
   color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
 }
 
 .werk-what {
@@ -359,34 +589,44 @@ body {
 /* -- prices, what is included, and the questions ------------------------ */
 
 .tagline {
-  margin: 0 0 34px;
-  max-width: 36ch;
-  font-size: clamp(19px, 2.6vw, 28px);
+  margin: 0 0 var(--sp-600);
+  max-width: 24ch;
+  font-size: clamp(var(--fs-3xl), 5vw, var(--fs-5xl));
   font-weight: 600;
-  line-height: 1.28;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
 }
 
 .price {
   margin: 0;
-  padding: 12px 14px 0;
-  font-size: 24px;
-  font-weight: 700;
+  font-family: var(--mono);
+  font-size: var(--fs-4xl);
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 .included {
   list-style: none;
   margin: 0;
-  padding: 10px 14px 0;
+  padding: 0;
 }
 
 .included li {
-  padding: 3px 0;
+  position: relative;
+  padding: var(--sp-75) 0 var(--sp-75) var(--sp-300);
   color: var(--ink-soft);
+  border-top: 1px solid var(--line);
 }
 
 .included li::before {
-  content: "· ";
-  color: var(--ink-faint);
+  content: "";
+  position: absolute;
+  left: var(--sp-50);
+  top: 1.15em;
+  width: var(--sp-50);
+  height: var(--sp-50);
+  border-radius: var(--r-full);
+  background: var(--ink-faint);
 }
 
 .faq {
@@ -395,8 +635,9 @@ body {
 }
 
 .faq dt {
-  margin-top: 20px;
-  font-weight: 600;
+  margin-top: var(--sp-400);
+  font-size: var(--fs-lg);
+  font-weight: 500;
 }
 
 .faq dt:first-child {
@@ -404,68 +645,90 @@ body {
 }
 
 .faq dd {
-  margin: 5px 0 0;
+  margin: var(--sp-75) 0 0;
   color: var(--ink-soft);
 }
 
 /* -- plain sections, for pages that are not a deck ----------------------- */
 
 .block {
-  padding-block: clamp(40px, 8vh, 92px);
+  padding-block: var(--sp-800);
 }
 
 .block .heading--sub {
-  margin-top: 44px;
+  margin-top: var(--sp-600);
 }
 
-/* the school list carries longer lines than the deck's skill rows */
 .block .leaders {
   max-width: 92ch;
 }
 
-/* -- project cards ------------------------------------------------------ */
+/* -- cards --------------------------------------------------------------- */
 
 .project {
-  border: 1px solid rgba(27, 27, 24, 0.3);
-  margin: 0 0 14px;
+  padding: var(--sp-400);
+  margin: 0 0 var(--sp-200);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
   max-width: 78ch;
 }
 
 .project h3 {
-  margin: 0;
-  padding: 7px 14px;
-  background: var(--bar);
-  font-size: 15px;
-  font-weight: 700;
+  margin: 0 0 var(--sp-100);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-.project p {
-  margin: 0;
-  padding: 8px 14px 0;
-}
-
-.project p.detail {
+.project > p {
+  margin: 0 0 var(--sp-300);
   color: var(--ink-soft);
+}
+
+.project .price {
+  margin-bottom: var(--sp-200);
 }
 
 .project .links {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 20px;
-  padding: 8px 14px 10px;
+  align-items: center;
+  gap: var(--sp-100) var(--sp-300);
+  margin-top: var(--sp-400);
 }
 
 .project .links a {
-  color: var(--ribbon);
+  color: var(--ink);
   text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 1px;
 }
 
 .project .links a:hover,
 .project .links a:focus-visible {
-  text-decoration: underline;
+  border-bottom-color: var(--accent);
+  color: var(--accent);
 }
 
-/* -- dot-leader rows ---------------------------------------------------- */
+/* the buy buttons: one clear action per offer */
+.project .links a.buy {
+  padding: var(--sp-75) var(--sp-200);
+  border: 0;
+  border-radius: var(--r-full);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.project .links a.buy:hover,
+.project .links a.buy:focus-visible {
+  background: color-mix(in srgb, var(--ink) 88%, var(--bg));
+  color: var(--bg);
+}
+
+/* -- contact rows ------------------------------------------------------- */
 
 .leaders {
   list-style: none;
@@ -478,234 +741,293 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0 1.2ch;
-  font-size: 14.5px;
-  padding: 6px 0;
+  gap: 0 var(--sp-200);
+  padding: var(--sp-100) 0;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
 }
 
 .leader .k {
   flex: 0 0 auto;
-  min-width: 13ch;
-  font-weight: 600;
-}
-
-.leader .fill {
-  flex: 1 1 8ch;
-  min-width: 8ch;
-  overflow: hidden;
-  white-space: nowrap;
+  min-width: 12ch;
   color: var(--ink-soft);
 }
 
-.leader .fill::after,
-.slide-top .fill::after {
-  content: var(--dots);
+.leader .fill {
+  flex: 1 1 auto;
+  min-width: var(--sp-300);
+  height: 1px;
+  background: var(--line);
 }
 
 .leader .v {
   flex: 0 1 auto;
   overflow-wrap: anywhere;
+  font-family: var(--mono);
 }
 
 .leader .v a {
-  color: var(--ribbon);
+  color: var(--ink);
   text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 1px;
 }
 
 .leader .v a:hover,
 .leader .v a:focus-visible {
-  text-decoration: underline;
+  border-bottom-color: var(--accent);
+  color: var(--accent);
 }
 
-/* -- footer: the last lines of the deck --------------------------------- */
+/* -- footer -------------------------------------------------------------- */
 
 .slide-foot {
-  margin-block-start: clamp(28px, 5vh, 48px);
+  margin-block-start: var(--sp-600);
 }
 
 .eof {
-  margin: 0 0 6px;
-  font-size: 16px;
-  font-weight: 600;
+  margin: 0 0 var(--sp-50);
+  font-size: var(--fs-base);
+  font-weight: 500;
 }
 
 .colophon {
   margin: 0;
-  font-size: 13.5px;
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+}
+
+.colophon a {
   color: var(--ink-soft);
 }
 
-/* -- motion: the banner prints on arrival ------------------------------- */
-
-@media (prefers-reduced-motion: no-preference) {
-  .banner .line {
-    animation: print 0.1s steps(2, end) both;
-    animation-delay: calc(var(--i, 0) * 65ms);
-  }
+footer .links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-200);
+  margin: var(--sp-300) 0 0;
+  font-size: var(--fs-xs);
 }
 
-@keyframes print {
+footer .links a {
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+footer .links a:hover,
+footer .links a:focus-visible {
+  color: var(--ink);
+}
+
+/* -- motion: content arrives, it does not appear ------------------------- */
+
+/* A reveal settles into place; it does not fade in. Anything dimmer than the
+   tokens themselves is not legible on a near black background, so fading text
+   means text that cannot be read while it arrives: an audit cannot tell that
+   apart from text that is simply too dim. The movement carries the reveal. */
+@keyframes reveal {
   from {
-    opacity: 0;
+    translate: 0 var(--sp-100);
   }
   to {
-    opacity: 1;
-  }
-}
-
-/* the print head sweeping across a line of type */
-@keyframes wipe {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-/* the paper advancing through the tractor feed */
-@keyframes feed {
-  from {
     translate: 0 0;
   }
-  to {
-    translate: 0 calc(var(--hole-pitch) * 5);
-  }
 }
 
-/* the print head travelling down the page as you read */
-@keyframes head {
+/* a hairline draws itself across */
+@keyframes wipe-x {
   from {
-    translate: 0 12px;
+    transform: scaleX(0);
   }
   to {
-    translate: 0 calc(100svh - 26px);
+    transform: scaleX(1);
   }
 }
 
-/* -- scroll: the page prints itself as you go down ---------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .page-title,
+  .hero h1,
+  .lede {
+    animation: reveal var(--slow) var(--ease) both;
+  }
+}
+
+/* -- scroll: sections arrive as they come into view ---------------------- */
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    /* the holes advance with the scroll, as if the paper were feeding */
-    .sprocket::before {
-      animation: feed linear both;
-      animation-timeline: scroll(root block);
-    }
-
-    /* the print head rides down the sprocket strip, marking a hole as it goes */
-    .sprocket::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: calc(50% - 5.5px);
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      background: var(--ribbon);
-      animation: head linear both;
-      animation-timeline: scroll(root block);
-    }
-
-    /* the scroll cue leaves as soon as you start */
-    .scroll-hint {
-      animation: print 0.2s linear both;
-      animation-direction: reverse;
-      animation-timeline: scroll(root block);
-      animation-range: 0% 10%;
-    }
-
-    /* rules print across the sheet */
     .rule {
-      animation: wipe linear both;
+      transform-origin: left center;
+      animation: wipe-x linear both;
       animation-timeline: view();
-      animation-range: entry 4% cover 26%;
+      animation-range: entry 4% cover 20%;
     }
 
-    /* headings and their red marker arrive first, words settle after */
-    .heading {
-      animation: print 0.12s steps(2, end) both;
+    .heading,
+    .tagline {
+      animation: reveal linear both;
       animation-timeline: view();
       animation-range: entry 6% cover 22%;
     }
 
-    /* a card prints: the green bar sweeps across, then the words */
-    .project h3 {
-      animation: wipe linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 14%;
-    }
-
-    .project p,
-    .project .links,
+    .project,
+    .leader,
+    .werk-row,
+    .faq dt,
+    .faq dd,
+    .included li,
     .count,
     .eof,
     .colophon {
-      animation: print 0.12s steps(2, end) both;
+      animation: reveal linear both;
       animation-timeline: view();
-      animation-range: entry 4% cover 18%;
+      animation-range: entry 0% cover 18%;
     }
 
-    /* dot leaders draw across the row, the value settles after */
-    .leader .fill,
-    .slide-top .fill {
-      animation: wipe linear both;
+    /* the scroll cue leaves exactly as the first slide does, so the advice and
+       the movement line up instead of drifting apart */
+    .scroll-hint {
+      animation: reveal 0.3s linear both;
+      animation-direction: reverse;
       animation-timeline: view();
-      animation-range: entry 0% cover 14%;
-    }
-
-    .leader .v {
-      animation: print 0.1s steps(2, end) both;
-      animation-timeline: view();
-      animation-range: entry 4% cover 18%;
+      animation-range: exit 0% exit 90%;
     }
   }
 }
 
-/* -- small screens ------------------------------------------------------ */
+/* -- small screens ------------------------------------------------------- */
 
-@media (max-width: 639px) {
-  .sprocket {
+@media (max-width: 767px) {
+  :root {
+    --bar-h: 60px;
+  }
+
+  .brand .role {
+    display: none;
+  }
+
+  /* the bar keeps its actions, and the nav scrolls if the labels are long */
+  .topbar {
+    gap: var(--sp-200);
+  }
+
+  .project {
+    padding: var(--sp-300);
+  }
+}
+
+@media (max-width: 767px) {
+  .topbar--enhanced .topbar__menu {
+    display: inline-flex;
+  }
+
+  /* the row would collide with the button, so the panel carries the links */
+  .topbar--enhanced nav {
+    position: fixed;
+    inset: var(--bar-h) 0 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--sp-200) var(--page-pad) var(--sp-600);
+    background: color-mix(in srgb, var(--bg) 96%, transparent);
+    backdrop-filter: blur(16px);
+    overflow-y: auto;
+  }
+
+  .topbar--enhanced.topbar--open nav {
+    display: flex;
+  }
+
+  .topbar--enhanced nav a {
+    padding: var(--sp-200) 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-2xl);
+    color: var(--ink);
+  }
+
+  /* a full width row does not need the current page underline */
+  .topbar--enhanced nav a[aria-current]::after {
+    display: none;
+  }
+
+  /* the panel already links the prices */
+  .topbar--enhanced > .btn {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .topbar--open nav a {
+      animation: reveal 350ms var(--ease) both;
+    }
+
+    .topbar--open nav a:nth-child(2) {
+      animation-delay: 50ms;
+    }
+
+    .topbar--open nav a:nth-child(3) {
+      animation-delay: 100ms;
+    }
+  }
+}
+
+@media (max-width: 479px) {
+  .topbar:not(.topbar--enhanced) .btn {
     display: none;
   }
 }
 
-/* -- print: it is a printout, after all --------------------------------- */
+/* -- print: it is still a document -------------------------------------- */
 
 @media print {
-  /* a paper printout shows everything, so no scroll-driven states may hide it */
+  /* a printed page shows everything, so no scroll-driven state may hide it */
   *,
   *::before,
   *::after {
     animation: none !important;
   }
 
+  html,
   body {
     background: #fff;
+    color: #000;
   }
 
   .sheet {
     min-height: 0;
+    background: #fff;
   }
 
   /* a printed deck is a stack of pages, not a stack of screens */
   .topbar {
     position: static;
+    height: auto;
+    border: 0;
   }
 
   .slide {
     min-block-size: 0;
-    padding-block: 0 clamp(20px, 4vh, 40px);
+    padding-block: 0 var(--sp-600);
   }
 
-  .sprocket,
-  .scroll-hint,
   .topbar nav,
+  .topbar .btn,
+  .scroll-hint,
   .skip {
     display: none;
   }
 
   .project {
     break-inside: avoid;
+    border-color: #ccc;
+    background: #fff;
+  }
+
+  .price,
+  .included li,
+  .faq dd,
+  .colophon,
+  .lede {
+    color: #000;
   }
 }
