@@ -14,3 +14,5 @@ compatibility_date = "2026-10-15"
 [assets]
 directory = "./dist"
 not_found_handling = "404-page"
+# /home and /school are served from home.html and school.html, with no redirect.
+html_handling = "auto-trailing-slash"

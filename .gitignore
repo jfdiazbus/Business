@@ -1,5 +1,9 @@
 # dependencies
 node_modules/
+
+# agent skills installed by the skills CLI (the lock file records them)
+.agents/
+/skills-lock.json
 .pnpm-store/
 
 # build output

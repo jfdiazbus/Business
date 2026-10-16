@@ -72,6 +72,16 @@ describe("the development server", () => {
     expect(html).toContain("Tardis");
   });
 
+  it("serves the prices and the thank you page", async () => {
+    const prices = await fetch(`${base}/services`);
+    expect(prices.status).toBe(200);
+    expect(await prices.text()).toContain("€500");
+
+    const thanks = await fetch(`${base}/thanks`);
+    expect(thanks.status).toBe(200);
+    expect(await thanks.text()).toContain("Thank you");
+  });
+
   it("serves the stylesheet with the right content type", async () => {
     const response = await fetch(`${base}/style.css`);
 
@@ -80,14 +90,18 @@ describe("the development server", () => {
     expect(await response.text()).toContain("--ribbon");
   });
 
-  it("serves the client sites under /projects/", async () => {
+  it("serves the client sites under /projects/, with and without the extension", async () => {
     for (const project of ["promptops-ai", "omniprompt-marketing"]) {
-      const response = await fetch(`${base}/projects/${project}/index.html`);
-      expect(response.status, `${project} index`).toBe(200);
-      expect(response.headers.get("content-type")).toContain("text/html");
+      for (const pathname of [`/projects/${project}/`, `/projects/${project}/index.html`]) {
+        const response = await fetch(`${base}${pathname}`);
+        expect(response.status, pathname).toBe(200);
+        expect(response.headers.get("content-type")).toContain("text/html");
+      }
 
-      const deck = await fetch(`${base}/projects/${project}/pitch.html`);
-      expect(deck.status, `${project} deck`).toBe(200);
+      for (const pathname of [`/projects/${project}/pitch`, `/projects/${project}/pitch.html`]) {
+        const response = await fetch(`${base}${pathname}`);
+        expect(response.status, pathname).toBe(200);
+      }
     }
   });
 

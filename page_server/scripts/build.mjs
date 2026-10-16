@@ -22,6 +22,9 @@ export const PAGE_FILES = [
   ["world.html", "index.html"],
   ["home.html", "home.html"],
   ["school.html", "school.html"],
+  ["services.html", "services.html"],
+  ["thanks.html", "thanks.html"],
+  ["services.js", "services.js"],
   ["style.css", "style.css"],
   ["slides.js", "slides.js"],
   ["world.js", "world.js"],
@@ -59,13 +62,11 @@ export const HEADERS = `/projects/*/assets/*
 /world.js
   Cache-Control: public, max-age=3600
 
+/services.js
+  Cache-Control: public, max-age=3600
+
 /projects/*
   Cache-Control: public, max-age=3600
-`;
-
-// The deck lives at /home; everything else in dist is already addressable.
-export const REDIRECTS = `/home /home.html 200
-/school /school.html 200
 `;
 
 const skipDotFiles = (src) => !src.split(path.sep).some((segment) => segment.startsWith("."));
@@ -114,7 +115,6 @@ export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPAC
     "utf8",
   );
   await writeFile(path.join(outDir, "_headers"), HEADERS, "utf8");
-  await writeFile(path.join(outDir, "_redirects"), REDIRECTS, "utf8");
   await copyWorld({ outDir });
 
   const brokenLinks = [
@@ -122,6 +122,8 @@ export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPAC
       ...(await checkLinks(outDir, "index.html")),
       ...(await checkLinks(outDir, "home.html")),
       ...(await checkLinks(outDir, "school.html")),
+      ...(await checkLinks(outDir, "services.html")),
+      ...(await checkLinks(outDir, "thanks.html")),
     ]),
   ];
 

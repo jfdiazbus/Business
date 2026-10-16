@@ -26,6 +26,8 @@ that ships to Cloudflare or to a Docker container.
 | --------------------------------- | ----------------------------------------------------------------------- |
 | `home.html`                       | The five slide deck, served at `/home` — the words live here            |
 | `school.html`                     | The Epitech coursework, served at `/school`                             |
+| `services.html`, `thanks.html`    | The prices, and where Stripe sends buyers (`/services`, `/thanks`)      |
+| `services.js`                     | The three Stripe Payment Links, and the email fallback until they exist |
 | `style.css`                       | The look: paper, green bars, red accents, the slides                    |
 | `index.js`                        | The local server. No dependencies, only Node's own modules              |
 | `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                             |
@@ -134,9 +136,58 @@ unchanged so it can be pulled from upstream later; `world.js` holds only the
 config (sections, copy, accents) and the deck's paper tokens. `world/build` is
 scratch and is not committed; `world/out` is the film the site ships.
 
+## Taking payments
+
+`/services` sells three fixed prices. The buy buttons are Stripe **Payment
+Links**, so there is no secret key in the repository and no Stripe JavaScript on
+the page.
+
+### What is already built
+
+The Stripe sandbox (`portfolio sandbox`, test mode) holds the whole catalogue:
+
+| offer   | product               | price                           | payment link                     |
+| ------- | --------------------- | ------------------------------- | -------------------------------- |
+| website | `prod_VS81qc5gCuzX3n` | €100, `tax_behavior: exclusive` | `plink_1URDmBGLxtix6XhLp751bJpA` |
+| api     | `prod_VS82wT5zix7Ps6` | €200, `tax_behavior: exclusive` | `plink_1URDmLGLxtix6XhLsFrXUBIa` |
+| full    | `prod_VS8246T28j4pCS` | €500, `tax_behavior: exclusive` | `plink_1URDmLGLxtix6XhLsMK2kqLi` |
+
+Each link carries automatic tax, promotion codes, a VAT ID field for EU
+businesses, a "What do you need?" brief field, an invoice created automatically
+for the buyer, and a redirect to `/thanks`. Payment methods are left to Stripe
+(dynamic payment methods), which is why its checkout offers card, Klarna,
+Bancontact and Amazon Pay rather than card alone.
+
+Those links are **test links**. `buyHref` in `services.js` refuses any link
+containing `/test_` on every host except localhost, so they work while you run
+the dev server and the live site keeps falling back to email. That guard is what
+stops a sandbox link from taking a real customer's card.
+
+### Going live
+
+1. Activate the Stripe account: business details, bank account, identity. This
+   is the slow part and the only part that cannot be automated.
+2. Set a head office address under **Tax > Settings**, then add a registration
+   for each place you are registered to collect tax. Until both exist,
+   `automatic_tax` silently collects **zero**: the checkout shows a tax line of
+   €0.00 and raises no error. Settle that with your accountant, not with me.
+3. Recreate the three Payment Links in **live mode** with the same settings as
+   the table above, and paste their URLs over the `test_` ones in `services.js`.
+4. Buy one with a card from Stripe's test list in the sandbox, then make one real
+   live purchase and refund it.
+
+Two things to remember: the amount charged lives in Stripe, so the page and the
+dashboard can drift apart — check both when a price changes. And selling to
+consumers inside the EU means VAT in the buyer's country (the OSS scheme):
+Stripe Tax calculates it, but you have to be enrolled.
+
+Nothing here needs a Stripe API key: Payment Links are public URLs. Do not put
+one in `.secrets` either, because the deploy script exports every value in that
+file to wrangler.
+
 ## Tests
 
-`pnpm test` runs eight suites:
+`pnpm test` runs ten suites:
 
 - **server** — routing, content types, redirects, the friendly 404, request
   methods, and that a URL can never climb out of the folders it serves.
@@ -154,6 +205,10 @@ scratch and is not committed; `world/out` is the film the site ships.
 - **world** — the scroll world's config points at assets that exist, the film
   fits Cloudflare's per file limit, the copy keeps to the house rules (no
   hyphens, no cliches, one action), and the vendored engine is intact.
+- **school** — the coursework page describes rather than links the private
+  repositories, and keeps the copy on the same house rules.
+- **services** — three offers with their prices and inclusions, one action each,
+  and a buy button that emails until a real Payment Link is pasted in.
 - **project** — the promises this project makes about itself: no runtime
   dependencies, the pipeline files exist, git stays clean.
 

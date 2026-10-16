@@ -18,7 +18,13 @@ export const INDEX_FILES = ["index.html", "home.html"];
 
 // The built site serves the scroll world at / and the deck at /home; in the
 // source they are world.html and home.html, so the dev server maps both.
-export const REWRITES = { "/": "world.html", "/home": "home.html", "/school": "school.html" };
+export const REWRITES = {
+  "/": "world.html",
+  "/home": "home.html",
+  "/school": "school.html",
+  "/services": "services.html",
+  "/thanks": "thanks.html",
+};
 
 export const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -239,7 +245,18 @@ export function createAppServer({
       }
 
       let target = found.file;
-      const info = await stat(target).catch(() => null);
+      let info = await stat(target).catch(() => null);
+
+      // A path with no extension finds its .html, the way Cloudflare and nginx
+      // do it, so /projects/x/pitch works locally as well as deployed.
+      if (!info && path.extname(target) === "") {
+        const withExtension = `${target}.html`;
+        const found = await stat(withExtension).catch(() => null);
+        if (found?.isFile()) {
+          target = withExtension;
+          info = found;
+        }
+      }
 
       if (!info) {
         sendError(res, 404, {

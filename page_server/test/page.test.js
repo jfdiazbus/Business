@@ -73,8 +73,9 @@ describe("home.html (the deck)", () => {
     }
   });
 
-  it("points at the school work, and at LinkedIn", () => {
+  it("points at the school work, the prices, and LinkedIn", () => {
     expect(document.querySelector('.more a[href="/school"]')).toBeTruthy();
+    expect(document.querySelector('.leader a[href="/services"]')).toBeTruthy();
     expect(
       document.querySelector('a[href^="https://www.linkedin.com/in/"]')?.getAttribute("href"),
     ).toContain("juan-felipe-diaz-bustamante");
@@ -85,8 +86,8 @@ describe("home.html (the deck)", () => {
       link.getAttribute("href"),
     );
 
-    expect(hrefs).toContain("/projects/omniprompt-marketing/index.html");
-    expect(hrefs).toContain("/projects/promptops-ai/pitch.html");
+    expect(hrefs).toContain("/projects/omniprompt-marketing/");
+    expect(hrefs).toContain("/projects/promptops-ai/pitch");
   });
 
   it("points every nav link at a section that exists", () => {
