@@ -47,7 +47,7 @@ describe("the project", () => {
   it("exposes the commands the pipelines call", async () => {
     const pkg = JSON.parse(await read("package.json"));
 
-    for (const script of ["start", "dev", "dev:worker", "build", "test", "deploy"]) {
+    for (const script of ["start", "dev", "build", "test", "deploy"]) {
       expect(pkg.scripts[script], script).toBeTruthy();
     }
     expect(pkg.scripts.deploy).toContain("scripts/deploy.mjs");

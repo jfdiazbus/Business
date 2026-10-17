@@ -25,10 +25,6 @@ export const PAGE_FILES = [
   ["services.html", "services.html"],
   ["thanks.html", "thanks.html"],
   ["terms.html", "terms.html"],
-  ["blog.html", "blog-shell.html"],
-  ["blog-write.html", "blog-editor.html"],
-  ["blog.js", "blog.js"],
-  ["blog-write.js", "blog-write.js"],
   ["style.css", "style.css"],
   ["world.js", "world.js"],
   ["bar.js", "bar.js"],
@@ -127,8 +123,6 @@ export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPAC
       ...(await checkLinks(outDir, "services.html")),
       ...(await checkLinks(outDir, "thanks.html")),
       ...(await checkLinks(outDir, "terms.html")),
-      ...(await checkLinks(outDir, "blog-shell.html")),
-      ...(await checkLinks(outDir, "blog-editor.html")),
     ]),
   ];
 
@@ -144,8 +138,6 @@ export function collectInternalLinks(html) {
 /** The file a site-absolute link should resolve to inside dist. */
 export function resolveAsset(outDir, href) {
   const clean = href.split("#")[0].split("?")[0];
-  const prettyPages = { "/blog": "blog-shell.html", "/blog/write": "blog-editor.html" };
-  if (prettyPages[clean]) return path.join(outDir, prettyPages[clean]);
   let rel = clean.replace(/^\/+/, "");
   if (rel === "" || rel.endsWith("/")) rel += "index.html";
   return path.join(outDir, rel);
