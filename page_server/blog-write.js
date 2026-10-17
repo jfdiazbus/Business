@@ -1,7 +1,3 @@
-const loginPanel = document.querySelector("#blog-login");
-const loginForm = document.querySelector("#blog-login-form");
-const loginStatus = document.querySelector("#login-status");
-const configNote = document.querySelector("#blog-config-note");
 const writer = document.querySelector("#blog-writer");
 const writerStatus = document.querySelector("#writer-status");
 const postForm = document.querySelector("#post-form");
@@ -340,44 +336,9 @@ async function loadPosts() {
 }
 
 async function openWriter() {
-  loginPanel.hidden = true;
-  writer.hidden = false;
   await loadPosts();
   if (!post) newPost();
 }
-
-async function checkSession() {
-  try {
-    const response = await fetch("/api/blog/admin/session", { credentials: "same-origin" });
-    const result = await response.json();
-    if (!result.configured) configNote.hidden = false;
-    if (result.authenticated) await openWriter();
-  } catch {
-    loginStatus.textContent = "The editor could not connect to the blog service.";
-  }
-}
-
-loginForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  loginStatus.textContent = "Signing in…";
-  const password = loginForm.elements.password.value;
-  try {
-    await api("/api/blog/admin/login", { method: "POST", body: JSON.stringify({ password }) });
-    loginForm.reset();
-    loginStatus.textContent = "";
-    await openWriter();
-  } catch (cause) {
-    loginStatus.textContent = cause.message;
-  }
-});
-
-document.querySelector("#logout-button").addEventListener("click", async () => {
-  await api("/api/blog/admin/logout", { method: "POST", body: "{}" }).catch(() => {});
-  writer.hidden = true;
-  loginPanel.hidden = false;
-  post = null;
-  loginStatus.textContent = "Signed out.";
-});
 
 document.querySelector("#new-post").addEventListener("click", () => newPost(templateInput.value));
 
@@ -444,4 +405,4 @@ async function save(status) {
 
 saveDraft.addEventListener("click", () => save("draft"));
 publishPost.addEventListener("click", () => save("published"));
-checkSession();
+openWriter();
