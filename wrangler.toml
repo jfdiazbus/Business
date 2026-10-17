@@ -9,7 +9,19 @@
 # the test suite compares them.
 
 name = "portfolio"
+main = "page_server/worker.js"
 compatibility_date = "2026-10-15"
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 0.01
 
 # Branch (pull request) builds run `wrangler preview`, which refuses to run
 # without this block. It can be empty: assets and compatibility stay above.
@@ -17,6 +29,20 @@ compatibility_date = "2026-10-15"
 
 [assets]
 directory = "./page_server/dist"
+binding = "ASSETS"
+run_worker_first = ["/api/blog*", "/blog*"]
 not_found_handling = "404-page"
 # /home and /school are served from home.html and school.html, with no redirect.
 html_handling = "auto-trailing-slash"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-blog"
+database_id = "1863d20f-307d-44d5-9d69-24f0ba876a81"
+preview_database_id = "1c82447f-b392-46bb-975c-4e99474f32a2"
+migrations_dir = "page_server/migrations"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "portfolio-blog-media"
+preview_bucket_name = "portfolio-blog-media-preview"

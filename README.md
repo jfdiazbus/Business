@@ -21,6 +21,10 @@ The two client sites and the two plans are copied into the built site by
 `page_server/scripts/build.mjs`, which is why they sit beside `page_server/`
 rather than inside it.
 
+The site's routes are `/` for the film, `/home` for the portfolio, `/school` for
+coursework, `/services` for prices, `/thanks` after checkout, `/terms` for terms
+and privacy, and `/blog` for posts. `/blog/write` is the private writing desk.
+
 ## Working on the site
 
 Start with **[`page_server/README.md`](page_server/README.md)**: running it
@@ -32,7 +36,8 @@ decisions, and the rules a change has to keep, are in
 cd page_server
 pnpm install     # once
 pnpm dev         # http://localhost:3000
-pnpm test        # 161 tests, twelve suites
+pnpm dev:worker  # blog with local D1 and R2 at http://localhost:8787
+pnpm test        # page, Worker API and security checks
 pnpm build       # writes dist/
 pnpm run deploy  # builds, then ships to Cloudflare
 ```
@@ -52,6 +57,10 @@ directory is left unset.
 - **`/services` takes payment** through Stripe Payment Links, so no secret key
   exists anywhere in this repository. It is in sandbox mode until the account is
   activated: the README explains what that means and what going live requires.
+- **`/blog` is backed by D1 and R2.** The writing desk is password protected;
+  posts use safe content blocks, and the editor supports templates, images,
+  videos and two or three column sections. See `page_server/README.md` for
+  database setup and the R2 activation requirement.
 - **The build copies everything into `page_server/dist/`**, and a Cloudflare
   Worker serves that folder.
 

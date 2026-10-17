@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Write a post — Juan Felipe Diaz</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#writer-main">skip to the editor</a>
+    <div class="sheet">
+      <div class="page">
+        <header class="topbar">
+          <a class="brand" href="/blog"
+            >Juan Felipe Diaz<span class="role"> — writing desk</span></a
+          >
+          <nav id="topbar-nav" aria-label="site">
+            <a href="/blog">Blog</a>
+            <a href="/home">Portfolio</a>
+            <a href="/services">Prices</a>
+          </nav>
+          <a class="btn btn--primary" href="/blog">View blog</a>
+          <button
+            class="topbar__menu"
+            type="button"
+            aria-expanded="false"
+            aria-controls="topbar-nav"
+            aria-label="Menu"
+          >
+            <span class="topbar__bars" aria-hidden="true"></span>
+          </button>
+        </header>
+        <main id="writer-main">
+          <h1 class="page-title">Write a post</h1>
+          <p class="lede">
+            Draft it, add media, arrange the sections, then publish when it is ready.
+          </p>
+
+          <section class="blog-writer" id="blog-writer" aria-label="Blog editor">
+            <p class="blog-status" id="writer-status" role="status" aria-live="polite"></p>
+
+            <div class="blog-editor-layout">
+              <aside class="blog-panel blog-post-list" aria-labelledby="posts-title">
+                <div class="blog-panel-heading">
+                  <h2 class="heading" id="posts-title">Your posts</h2>
+                  <button class="btn btn--ghost" id="new-post" type="button">New post</button>
+                </div>
+                <div id="draft-list" class="blog-draft-list"></div>
+              </aside>
+
+              <form id="post-form" class="blog-panel blog-post-form">
+                <input type="hidden" name="id" />
+                <div class="blog-field">
+                  <label for="post-title">Title</label>
+                  <input id="post-title" name="title" maxlength="140" required />
+                </div>
+                <div class="blog-field">
+                  <label for="post-slug">Address</label>
+                  <input id="post-slug" name="slug" maxlength="80" required />
+                  <small
+                    >Letters, numbers and hyphens. The post will live at /blog/your-address.</small
+                  >
+                </div>
+                <div class="blog-field">
+                  <label for="post-excerpt">Short summary</label>
+                  <textarea id="post-excerpt" name="excerpt" rows="3" maxlength="400"></textarea>
+                </div>
+                <div class="blog-field">
+                  <label for="post-template">Starting template</label>
+                  <select id="post-template" name="template">
+                    <option value="article">Article</option>
+                    <option value="project">Project story with two columns</option>
+                    <option value="photo-story">Photo story</option>
+                  </select>
+                  <small
+                    >Choose a template for a new post. Existing post sections stay as they
+                    are.</small
+                  >
+                </div>
+
+                <div class="blog-blocks-heading">
+                  <div>
+                    <h2 class="heading">Sections</h2>
+                    <p class="blog-muted">
+                      Add text, headings, images, video or a two column section.
+                    </p>
+                  </div>
+                  <label class="blog-add-control">
+                    <span class="sr-only">Section type</span>
+                    <select id="new-block-type">
+                      <option value="paragraph">Paragraph</option>
+                      <option value="heading">Heading</option>
+                      <option value="image">Image</option>
+                      <option value="video">Video</option>
+                      <option value="columns">Two columns</option>
+                    </select>
+                    <button class="btn btn--ghost" id="add-block" type="button">Add section</button>
+                  </label>
+                </div>
+                <div id="block-list" class="blog-block-list"></div>
+
+                <div class="blog-save-row">
+                  <button class="btn btn--ghost" id="save-draft" type="button">Save draft</button>
+                  <button class="btn btn--primary" id="publish-post" type="button">Publish</button>
+                  <a class="blog-preview-link" id="preview-post" href="/blog">View post</a>
+                </div>
+              </form>
+            </div>
+          </section>
+        </main>
+        <footer class="block">
+          <div class="rule rule--thin" aria-hidden="true"></div>
+          <p class="colophon">
+            Only you can write or publish posts. Readers see published posts only.
+          </p>
+          <p class="links"><a href="/blog">Blog</a><a href="/terms">Terms and privacy</a></p>
+        </footer>
+      </div>
+    </div>
+    <script type="module" src="/bar.js"></script>
+    <script type="module" src="/blog-write.js"></script>
+  </body>
+</html>

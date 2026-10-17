@@ -82,6 +82,14 @@ describe("the development server", () => {
     expect(await thanks.text()).toContain("Thank you");
   });
 
+  it("serves the blog pages and resolves a post address to the blog shell", async () => {
+    for (const route of ["/blog", "/blog/write", "/blog/an-example-post"]) {
+      const response = await fetch(`${base}${route}`);
+      expect(response.status, route).toBe(200);
+      expect(await response.text(), route).toContain("<main");
+    }
+  });
+
   it("serves the stylesheet with the right content type", async () => {
     const response = await fetch(`${base}/style.css`);
 

@@ -1,11 +1,20 @@
-# Cloudflare Workers, serving the static build in ./dist.
-#
-#   pnpm build && pnpm deploy
-#
-# The worker has no code of its own: it only hands the files to the visitor.
+# Cloudflare Worker: blog API and static assets.
+# Build the assets with pnpm build, then run pnpm dev:worker or pnpm run deploy.
 
 name = "portfolio"
+main = "./worker.js"
 compatibility_date = "2026-10-15"
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 0.01
 
 # Branch (pull request) builds run `wrangler preview`, which refuses to run
 # without this block. It can be empty: assets and compatibility stay above.
@@ -13,6 +22,20 @@ compatibility_date = "2026-10-15"
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
+run_worker_first = ["/api/blog*", "/blog*"]
 not_found_handling = "404-page"
 # /home and /school are served from home.html and school.html, with no redirect.
 html_handling = "auto-trailing-slash"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-blog"
+database_id = "1863d20f-307d-44d5-9d69-24f0ba876a81"
+preview_database_id = "1c82447f-b392-46bb-975c-4e99474f32a2"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "portfolio-blog-media"
+preview_bucket_name = "portfolio-blog-media-preview"
