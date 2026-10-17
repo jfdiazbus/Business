@@ -13,16 +13,14 @@ about running, testing and shipping it.
 
 ### The pages
 
-| Route         | Page                      |
-| ------------- | ------------------------- |
-| `/`           | the film: a scroll tour   |
-| `/home`       | the portfolio             |
-| `/school`     | the coursework            |
-| `/services`   | the prices, and checkout  |
-| `/thanks`     | where Stripe sends buyers |
-| `/terms`      | terms and privacy         |
-| `/blog`       | published posts           |
-| `/blog/write` | private writing desk      |
+| Route       | Page                      |
+| ----------- | ------------------------- |
+| `/`         | the film: a scroll tour   |
+| `/home`     | the portfolio             |
+| `/school`   | the coursework            |
+| `/services` | the prices, and checkout  |
+| `/thanks`   | where Stripe sends buyers |
+| `/terms`    | terms and privacy         |
 
 Pretty URLs are the host's job — Cloudflare `html_handling`, nginx `try_files`,
 and a rewrite table in the local server — so nothing ships an `_redirects` file.
@@ -33,8 +31,7 @@ and a rewrite table in the local server — so nothing ships an `_redirects` fil
 | ----------------- | ----------------------------------------------------------------- |
 | `pnpm install`    | Install the dev tools (only needed once, and after a fresh clone) |
 | `pnpm start`      | Open it at <http://localhost:3000>                                |
-| `pnpm dev`        | The static site at `http://localhost:3000`                        |
-| `pnpm dev:worker` | Build, then run the Worker with local D1 and R2 at port 8787      |
+| `pnpm dev`        | The same, but reloads when you edit a file                        |
 | `pnpm test`       | Run the tests                                                     |
 | `pnpm build`      | Write the deployable site to `dist/`                              |
 | `pnpm format`     | Tidy the code with Prettier                                       |
@@ -51,15 +48,12 @@ and a rewrite table in the local server — so nothing ships an `_redirects` fil
 | `school.html`                     | The Epitech coursework, served at `/school`                                |
 | `services.html`, `thanks.html`    | The prices, and where Stripe sends buyers (`/services`, `/thanks`)         |
 | `terms.html`                      | Terms and privacy, served at `/terms`                                      |
-| `blog.html`, `blog-write.html`    | The public blog and private writing desk                                   |
 | `style.css`                       | The look: the tokens, the type scale, the spacing scale, then the rules    |
+| `docs/style.md`                   | Why the site looks the way it does, and how to change it                   |
 | `index.js`                        | The local server. No dependencies, only Node's own modules                 |
-| `worker.js`                       | Blog API, admin login, D1 posts, R2 media and static asset fallback        |
-| `migrations/`                     | Versioned D1 schema changes                                                |
 | `scripts/build.mjs`               | Assembles `dist/` for Docker and Cloudflare                                |
 | `scripts/deploy.mjs`              | Builds and uploads, reading credentials from `.secrets`                    |
 | `bar.js`                          | Turns the bar solid once the page scrolls                                  |
-| `blog.js`, `blog-write.js`        | Safe public rendering and the block based editor                           |
 | `world.html`, `world.js`          | The front page: the scroll world, and its config                           |
 | `world/`                          | The film: scene sources, the render + motion steps, and `out/`             |
 | `docs/style.md`                   | Why the site looks the way it does, and how to change it                   |
@@ -165,77 +159,6 @@ unchanged so it can be pulled from upstream later; `world.js` holds only the
 config (sections, copy, accents) and the page's colour tokens. `world/build` is
 scratch and is not committed; `world/out` is the film the site ships.
 
-## Writing the blog
-
-The blog uses **Cloudflare D1** for posts and **Cloudflare R2** for images and
-videos. D1 is a SQL database rather than MongoDB, and it is built into Cloudflare,
-so the Worker can query it directly without a Mongo connection string or an extra
-network service.
-
-- `/blog` lists published posts. `/blog/<address>` shows one post.
-- `/blog/write` is the writing desk. Save a draft, publish it, or load an earlier
-  post to edit it.
-- Start from an article, project story, or photo story template. Add paragraphs,
-  headings, images, video, and two or three column sections. The project story
-  starts with a challenge and approach pair.
-- Posts are validated content blocks, never raw HTML. The public page uses DOM
-  text nodes, so a title or paragraph cannot run as a script.
-- Images may be JPEG, PNG, WebP or GIF up to 12 MB. Videos may be MP4 or WebM up
-  to 32 MB. They are served by the Worker from generated R2 keys.
-
-### Local blog development
-
-Use Wrangler for the blog. The zero dependency Node server serves static files,
-but it does not emulate D1 or R2.
-
-```bash
-cp .dev.vars.example .dev.vars
-# Replace both example values with private values. Keep .dev.vars untracked.
-pnpm exec wrangler d1 migrations apply portfolio-blog --local
-pnpm dev:worker
-```
-
-Open <http://localhost:8787/blog>. Wrangler keeps local D1 and R2 data on your
-machine. Do not use `--remote` while writing test posts.
-
-### Cloudflare blog resources
-
-The production D1 database (`portfolio-blog`) and its separate preview database
-are bound in both Wrangler configs, and their initial migrations are applied.
-The account currently **does not have R2 enabled**. Until R2 is enabled in the
-Cloudflare Dashboard, live media uploads return an explanatory error; local R2
-emulation works.
-
-After enabling R2, create the two buckets named in the configs:
-
-```bash
-pnpm exec wrangler r2 bucket create portfolio-blog-media
-pnpm exec wrangler r2 bucket create portfolio-blog-media-preview
-```
-
-Set two different secrets on the Worker. Wrangler prompts for each value:
-
-```bash
-pnpm exec wrangler secret put BLOG_ADMIN_PASSWORD
-pnpm exec wrangler secret put BLOG_SESSION_SECRET
-```
-
-Use a password of at least 20 characters and a separate random session secret
-of at least 32 characters. Never put either in `wrangler.toml` or in the repo.
-The login allows eight guesses per network address in fifteen minutes and stores
-only a one way address hash for throttling. The session cookie is secure,
-HTTP only, same site, and expires after eight hours. All write requests check the
-session and the request origin.
-
-For future schema changes, create a new SQL file in `migrations/` and apply it
-deliberately to local, preview, and production:
-
-```bash
-pnpm exec wrangler d1 migrations apply portfolio-blog --local
-pnpm exec wrangler d1 migrations apply portfolio-blog --remote --preview
-pnpm exec wrangler d1 migrations apply portfolio-blog --remote
-```
-
 ## Taking payments
 
 `/services` sells three fixed prices. The buy buttons are Stripe **Payment
@@ -294,7 +217,7 @@ to wrangler, so nothing else in that file can reach a deploy.
 
 ## Tests
 
-`pnpm test` runs fourteen suites:
+`pnpm test` runs twelve suites:
 
 - **server** — routing, content types, redirects, the friendly 404, request
   methods, and that a URL can never climb out of the folders it serves.
@@ -306,10 +229,6 @@ to wrangler, so nothing else in that file can reach a deploy.
   and no animation can run without scroll-timeline support or a visitor who is
   happy with motion.
 - **bar** — the solid state, the phone menu, and that nothing listens to scroll.
-- **blog** — the public blog and writer shells, block types, templates and routes.
-- **worker** — drafts stay private, writes require a signed session and same origin,
-  login guesses are throttled, posts publish safely, and video media supports byte
-  ranges so browser players can seek.
 - **build** — `dist/` contains both client sites and the plans, leaks no local
   paths, is repeatable, and has no broken links.
 - **deploy** — credentials stay out of git and out of the image, and an
