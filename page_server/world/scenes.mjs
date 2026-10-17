@@ -196,7 +196,7 @@ function workbench() {
     labelText(
       p(gx + 0.05, gy - 0.04, 4.62)[0],
       p(gx + 0.05, gy - 0.04, 4.62)[1],
-      tone === P.barMid ? "EDUCATION" : "EPITECH",
+      tone === P.barMid ? "EPITECH" : "2025",
       { size: 24, fill: P.inkSoft, weight: 600 },
     ),
   ];
@@ -253,7 +253,7 @@ function workbench() {
     }),
     board(2860, 1030, {
       dx: 2.8,
-      items: [{ w: 1.5, h: 1.2, accent: P.ribbon, label: "EXPERIENCE" }],
+      items: [{ w: 1.5, h: 1.2, accent: P.ribbon, label: "EDUCATION" }],
     }),
     box(projector(3360, 1300), {
       x: 0,
@@ -357,8 +357,11 @@ function typeTray() {
   ].join("");
 
   const mid = [
-    board(1700, 1010, { dx: 3.2, items: [{ w: 1.6, h: 1.2, marks: 3, accent: P.barMid }] }),
-    board(2960, 1030, { dx: 3, items: [{ w: 1.4, h: 1.15, marks: 3 }] }),
+    board(1700, 1010, {
+      dx: 3.2,
+      items: [{ w: 1.6, h: 1.2, accent: P.barMid, label: "EXPERIENCE" }],
+    }),
+    board(2960, 1030, { dx: 3, items: [{ w: 1.4, h: 1.15, marks: 3, label: "MIGALABS" }] }),
     box(projector(3300, 1280), {
       x: 0,
       y: 0,
@@ -686,7 +689,10 @@ function mailSlot() {
 }
 
 /** How fast each layer drifts: far layers crawl, near layers slide past. */
-const SPEEDS = { back: 0.45, mid: 0.7, subject: 1, fore: 1.25 };
+// How fast each layer drifts past the camera. The backdrop is the slowest, which
+// is what caps how far the camera can travel before its bottom edge comes into
+// frame; world/motion.mjs and the world tests both read this.
+export const SPEEDS = { back: 0.45, mid: 0.7, subject: 1, fore: 1.25 };
 
 const BUILDERS = [
   { id: "print-room", title: "The print room", build: printRoom },
