@@ -248,6 +248,14 @@ function sameOrigin(request) {
   return origin !== null && origin === new URL(request.url).origin;
 }
 
+async function requireAdmin(request, env) {
+  if (!env.BLOG_SESSION_SECRET || !env.BLOG_ADMIN_PASSWORD)
+    return error("Blog authoring is not configured", 503);
+  if (!(await hasSession(request, env.BLOG_SESSION_SECRET)))
+    return error("Sign in to write posts", 401);
+  return null;
+}
+
 async function readJson(request) {
   const length = Number(request.headers.get("Content-Length") || 0);
   if (length > MAX_JSON_BYTES) throw new RangeError("Request is too large");
@@ -284,10 +292,51 @@ function decodeSlug(pathname) {
 async function handleAdminApi(request, env, url) {
   const path = url.pathname;
 
-  if (path === "/api/blog/admin/session" && request.method === "GET") {
-    return json({ authenticated: true, configured: true });
+  if (path === "/api/blog/admin/login" && request.method === "POST") {
+    if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+    if (
+      !env.BLOG_ADMIN_PASSWORD ||
+      env.BLOG_ADMIN_PASSWORD.length < 20 ||
+      !env.BLOG_SESSION_SECRET ||
+      env.BLOG_SESSION_SECRET.length < 32 ||
+      !env.DB
+    )
+      return error("Blog authoring is not configured", 503);
+    const address = request.headers.get("CF-Connecting-IP") || "local development";
+    if (await loginIsLimited(env.DB, address, env.BLOG_SESSION_SECRET)) {
+      return error("Too many sign in attempts. Wait fifteen minutes and try again.", 429);
+    }
+    let input;
+    try {
+      input = await readJson(request);
+    } catch (cause) {
+      return error(cause.message, cause instanceof RangeError ? 413 : 400);
+    }
+    if (
+      typeof input.password !== "string" ||
+      !(await sameSecret(input.password, env.BLOG_ADMIN_PASSWORD))
+    ) {
+      return error("The password was not accepted", 401);
+    }
+    const token = await issueSession(env.BLOG_SESSION_SECRET);
+    return json({ authenticated: true }, 200, { "Set-Cookie": setSessionCookie(token) });
   }
 
+  if (path === "/api/blog/admin/logout" && request.method === "POST") {
+    if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+    return json({ authenticated: false }, 200, { "Set-Cookie": clearSessionCookie() });
+  }
+
+  if (path === "/api/blog/admin/session" && request.method === "GET") {
+    const configured = Boolean(env.BLOG_ADMIN_PASSWORD && env.BLOG_SESSION_SECRET);
+    return json({
+      authenticated: configured && (await hasSession(request, env.BLOG_SESSION_SECRET)),
+      configured,
+    });
+  }
+
+  const denied = await requireAdmin(request, env);
+  if (denied) return denied;
   if (!env.DB) return error("Blog database is not configured", 503);
 
   if (path === "/api/blog/admin/posts" && request.method === "GET") {

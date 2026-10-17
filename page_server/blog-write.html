@@ -45,8 +45,31 @@
             Draft it, add media, arrange the sections, then publish when it is ready.
           </p>
 
-          <section class="blog-writer" id="blog-writer" aria-label="Blog editor">
-            <p class="blog-status" id="writer-status" role="status" aria-live="polite"></p>
+          <section class="blog-panel" id="blog-login" aria-labelledby="login-title">
+            <h2 class="heading" id="login-title">Sign in to write</h2>
+            <p id="blog-config-note" class="blog-muted" hidden>
+              The editor needs an admin password. Add <code>BLOG_ADMIN_PASSWORD</code> and
+              <code>BLOG_SESSION_SECRET</code> to the Worker secrets first.
+            </p>
+            <form id="blog-login-form" class="blog-login-form">
+              <label for="blog-password">Admin password</label>
+              <input
+                id="blog-password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+              <button class="btn btn--primary" type="submit">Sign in</button>
+              <p class="blog-status" id="login-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="blog-writer" id="blog-writer" hidden aria-label="Blog editor">
+            <div class="blog-writer-bar">
+              <p class="blog-status" id="writer-status" role="status" aria-live="polite"></p>
+              <button class="btn btn--ghost" id="logout-button" type="button">Sign out</button>
+            </div>
 
             <div class="blog-editor-layout">
               <aside class="blog-panel blog-post-list" aria-labelledby="posts-title">

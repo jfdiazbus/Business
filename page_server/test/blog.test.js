@@ -52,11 +52,13 @@ describe("the public blog", () => {
 });
 
 describe("the private writing desk", () => {
-  it("stays out of search and opens the desk directly", () => {
+  it("stays out of search and starts with a sign in", () => {
     expect(writer.querySelector('meta[name="robots"]')?.content).toContain("noindex");
     expect(text(writer.querySelector("h1"))).toBe("Write a post");
-    expect(writer.querySelector("#blog-login")).toBeNull();
-    expect(writer.querySelector("#blog-writer")).toBeTruthy();
+    expect(
+      writer.querySelector('input[type="password"][autocomplete="current-password"]'),
+    ).toBeTruthy();
+    expect(writer.querySelector("#blog-config-note")).toBeTruthy();
   });
 
   it("offers article, project and photo story templates", () => {
