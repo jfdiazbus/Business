@@ -57,6 +57,15 @@
         font-family: var(--sans);
       }
 
+      /* The engine lays its bar out with space-between, which pushes the nav to
+         the far right. The parts read better at the beginning, beside the brand,
+         and the row wraps rather than overflowing on a phone. */
+      .sw-topbar {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        row-gap: 10px;
+      }
+
       /* the engine's chrome, retuned for a dark sheet */
       .sw-nav {
         background: color-mix(in srgb, #000 50%, transparent);

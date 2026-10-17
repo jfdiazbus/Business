@@ -199,6 +199,11 @@ the edges, the old green bar surfaces went neutral, and the red is the one accen
 `render.mjs` embeds the same font family the site uses, so the scenography and
 the pages agree.
 
+The film moves on one axis: the camera glides down inside a scene, and the join
+between two scenes is a vertical wipe with a full width bar of sheet leading it,
+so the next part arrives from below. That matches the page, which you also read by
+going down.
+
 Two details worth knowing before you touch the encoder in `world/motion.mjs`:
 
 - **The keyframes have to stay close together.** The engine scrubs the clips by
