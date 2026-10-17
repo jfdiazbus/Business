@@ -18,7 +18,8 @@ const html = await read("world.html"); // built to index.html
 const { document } = new JSDOM(html).window;
 
 /** A config path like "/world/dive-1.mp4" is built from world/out/dive-1.mp4. */
-const assetFor = (ref) => path.join(OUT, path.basename(ref));
+// a reference may carry a cache busting version, which is not part of the name
+const assetFor = (ref) => path.join(OUT, path.basename(ref.split("?")[0]));
 
 describe("the film the config points at", () => {
   it("has a poster and a clip for every scene", () => {
@@ -56,16 +57,90 @@ describe("the film the config points at", () => {
       expect(section.label.length).toBeGreaterThan(0);
     }
   });
+
+  it("names its scene after each part of the site, in order", () => {
+    // one scene per part: the pages, the bar's nav and the film all say the same
+    // five words
+    expect(world.sections.map((section) => section.label)).toEqual([
+      "Presentation",
+      "Education",
+      "Experience",
+      "Projects",
+      "Contact",
+    ]);
+  });
+
+  it("travels vertically: the camera moves in y, and nothing glides sideways", async () => {
+    const motion = await read("world/motion.mjs");
+
+    expect(motion).toMatch(/overlay=x=\$\{-CAM\.x0\}:y='-\(/);
+    expect(motion).not.toContain("x='-(");
+  });
+
+  it("keeps the camera inside the backdrop, or the base shows through", async () => {
+    // The backdrop is the only layer covering the whole stage and it travels the
+    // slowest, so the window's bottom edge catches it first. Past that, the frame
+    // gets a black band along the bottom.
+    const { CAM } = await import("../world/motion.mjs");
+    const { SPEEDS } = await import("../world/scenes.mjs");
+
+    const backdropDrift = 1 + SPEEDS.back;
+    expect(CAM.y0 + CAM.travel * backdropDrift).toBeLessThanOrEqual(CAM.h);
+  });
+
+  it("joins the scenes with a vertical wipe", async () => {
+    const motion = await read("world/motion.mjs");
+
+    expect(motion).toContain("xfade=transition=wipeup");
+    expect(motion).not.toContain("wipeleft");
+  });
+
+  it("writes those names into the film itself, not only into the copy beside it", () => {
+    return read("world/scenes.mjs").then((scenes) => {
+      for (const name of [
+        "PRESENTATION",
+        "EDUCATION",
+        "EPITECH",
+        "EXPERIENCE",
+        "MIGALABS",
+        "PROJECTS",
+        "CONTACT",
+      ]) {
+        expect(scenes, name).toContain(`"${name}"`);
+      }
+    });
+  });
 });
 
 describe("the copy, by the landing page rules", () => {
   const sections = world.sections;
 
+  it("titles each scene with the part it belongs to", () => {
+    // the name is the title, at the start of the scene, not a label in a corner
+    for (const section of sections) {
+      expect(section.title, section.id).toBe(section.label);
+    }
+  });
+
   it("says one thing per scene: an eyebrow, a title and a line of body", () => {
     for (const section of sections) {
       expect(section.eyebrow.length, section.id).toBeGreaterThan(2);
-      expect(section.title.length, section.id).toBeGreaterThan(12);
+      expect(section.title.length, section.id).toBeGreaterThan(3);
       expect(section.body.length, section.id).toBeGreaterThan(40);
+    }
+  });
+
+  it("versions the film, so a cached clip is refetched when the bytes change", () => {
+    for (const section of world.sections) {
+      expect(section.clip, section.id).toMatch(/\?v=\d+$/);
+      expect(section.still, section.id).toMatch(/\?v=\d+$/);
+    }
+
+    // the joins are film too: an unversioned one would pair new dives with an
+    // old wipe out of the cache
+    expect(world.connectors.length).toBeGreaterThan(0);
+    for (const connector of world.connectors) {
+      expect(connector).toMatch(/\?v=\d+$/);
     }
   });
 

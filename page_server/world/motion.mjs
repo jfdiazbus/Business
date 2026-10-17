@@ -22,7 +22,14 @@ export const FRAME_DIR = path.join(HERE, "build", "frames");
 export const PREVIEW_DIR = path.join(HERE, "build", "preview");
 
 /** The camera: a 1080p window gliding across the stage, hero centred throughout. */
-export const CAM = { w: 1920, h: 1080, x0: 1110, y0: 700, travel: 420, fps: 30, seconds: 8 };
+// The camera is a 1080p window gliding down a 2160 tall stage, and how far it can
+// glide is set by the backdrop rather than by the window. The backdrop is the only
+// layer that covers the whole stage, and it travels the slowest of them (0.45, so
+// 1.45 times the master travel), which means the window's bottom edge catches up
+// with the backdrop's bottom edge first. 700 + travel * 1.45 has to stay under
+// 1080, so the travel is capped at about 262: go past that and the transparent
+// base shows through as a black band across the bottom of the frame.
+export const CAM = { w: 1920, h: 1080, x0: 1110, y0: 700, travel: 250, fps: 30, seconds: 8 };
 
 /** The wipe between scenes: a sheet feeding across the platen. */
 export const WIPE = { seconds: 1.8, cross: 1.2, hold: 0.3 };
@@ -62,7 +69,7 @@ function diveGraph(layers) {
     const driftFactor = (1 + layer.speed).toFixed(4);
     const label = index === layers.length - 1 ? "film" : `o${index}`;
     parts.push(
-      `[${previous}][l${index}]overlay=x='-(${CAM.x0}+${D("t")}*${driftFactor})':y=${-CAM.y0}:format=rgb:eval=frame[${label}]`,
+      `[${previous}][l${index}]overlay=x=${-CAM.x0}:y='-(${CAM.y0}+${D("t")}*${driftFactor})':format=rgb:eval=frame[${label}]`,
     );
     if (label !== "film") parts.push(`[${label}]format=rgba[o${index}r]`);
     previous = label === "film" ? "film" : `o${index}r`;
@@ -177,13 +184,13 @@ export async function boundaryFrames() {
   }
 }
 
-/** The sheet edge that leads a wipe across the screen. */
+/** The sheet edge that leads a wipe up the screen. */
 async function renderSheetEdge() {
-  const w = 150;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${CAM.h}" viewBox="0 0 ${w} ${CAM.h}">
-    <rect x="0" y="0" width="${w}" height="${CAM.h}" fill="#141414"/>
-    <rect x="0" y="0" width="${w}" height="${CAM.h}" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="3"/>
-    <rect x="${w - 5}" y="0" width="5" height="${CAM.h}" fill="rgba(0,0,0,0.45)"/>
+  const h = 150;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${CAM.w}" height="${h}" viewBox="0 0 ${CAM.w} ${h}">
+    <rect x="0" y="0" width="${CAM.w}" height="${h}" fill="#141414"/>
+    <rect x="0" y="0" width="${CAM.w}" height="${h}" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="3"/>
+    <rect x="0" y="${h - 5}" width="${CAM.w}" height="5" fill="rgba(0,0,0,0.45)"/>
   </svg>`;
 
   const page = path.join(SVG_DIR, "sheet-edge.html");
@@ -193,7 +200,7 @@ async function renderSheetEdge() {
     `<!doctype html><html><body style="margin:0;background:transparent">${svg}</body></html>`,
     "utf8",
   );
-  await shoot(page, png, w, CAM.h);
+  await shoot(page, png, CAM.w, h);
   return png;
 }
 
@@ -210,14 +217,14 @@ export async function connectors({ log = () => {} } = {}) {
     const output = path.join(OUT_DIR, `wipe-${i + 1}.mp4`);
     const total = WIPE.hold + WIPE.cross + WIPE.hold;
 
-    // A holds, the sheet feeds across pushing B in, B holds.
+    // A holds, the sheet feeds up pushing B in, B holds.
     const graph = [
       `[0:v]format=rgba,loop=loop=-1:size=1:start=0,trim=duration=${total},fps=${CAM.fps}[a]`,
       `[1:v]format=rgba,loop=loop=-1:size=1:start=0,trim=duration=${total},fps=${CAM.fps}[b]`,
-      `[a][b]xfade=transition=wipeleft:duration=${WIPE.cross}:offset=${WIPE.hold}[x]`,
-      // the leading edge of the sheet rides across at the same rate
+      `[a][b]xfade=transition=wipeup:duration=${WIPE.cross}:offset=${WIPE.hold}[x]`,
+      // the leading edge of the sheet rides up at the same rate
       `[2:v]format=rgba[e]`,
-      `[x][e]overlay=x='${CAM.w}-(${CAM.w}+150)*(t-${WIPE.hold})/${WIPE.cross}':y=0:format=rgb:eval=frame[film]`,
+      `[x][e]overlay=x=0:y='${CAM.h}-(${CAM.h}+150)*(t-${WIPE.hold})/${WIPE.cross}':format=rgb:eval=frame[film]`,
       `[film]format=yuv420p[out]`,
     ].join(";");
 

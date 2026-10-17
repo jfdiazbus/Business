@@ -121,9 +121,9 @@ load. Printing gives white pages, with the bar at the top of the sheet.
 ## The scroll world
 
 The front page (`/`) is a scroll driven flight through a print shop, five
-scenes long, with each scene's copy pinned over it. The scenes are named after
-the parts of the site: the print room for the introduction, then Experience,
-Education, Projects and Contact. The portfolio lives at `/home` (a rewrite to
+scenes long, with each scene's copy pinned over it. One scene per part of the
+site, and the film says so on the scene itself, as that scene's title:
+**Presentation, Education, Experience, Projects, Contact**. The portfolio lives at `/home` (a rewrite to
 `home.html`), the coursework at `/school`, and the world links back to both.
 
 The film is **made by hand rather than by a video model**. The scenes are drawn
@@ -144,9 +144,12 @@ do the same), and the whole film is about six screens of scroll, so a scene neve
 takes a long scroll to reach. Touch devices keep their native scrolling.
 
 **How the camera works.** It is locked isometric, so nothing rotates or tilts:
-each layer simply slides at its own speed — 0.45 for the wall, 1 for the hero,
-1.25 for the paper sweeping past the lens — and the depth comes from the
-difference. Because the camera only ever travels one way, the velocity matches
+each layer simply glides down at its own speed — 0.45 for the wall, 1 for the
+hero, 1.25 for the paper sweeping past the lens — and the depth comes from the
+difference. Everything travels vertically, in both directions: the camera moves
+down inside a scene, and one scene gives way to the next from below, which is
+why the join is a vertical wipe led by a full width sheet edge rather than a
+sideways sweep. Because the camera only ever travels one way, the velocity matches
 at every seam, and each wipe begins and ends on the _actual_ frames of the
 dives beside it (the `world.test.js` film checks and the preview frames keep
 that honest; measured seam difference is 1.4/255, which is encode noise).

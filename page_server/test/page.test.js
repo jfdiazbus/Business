@@ -31,7 +31,8 @@ describe("the portfolio page", () => {
     const meta = (name) => document.querySelector(`meta[name="${name}"]`)?.content;
 
     expect(document.documentElement.getAttribute("lang")).toBe("en");
-    expect(document.title).toContain("Juan Felipe Diaz Bustamante");
+    expect(document.title).toBe("Portfolio - Juan Felipe Diaz");
+    expect(document.querySelector('meta[property="og:title"]')?.content).toBe(document.title);
     expect(meta("description").length).toBeGreaterThan(40);
     expect(meta("color-scheme")).toBe("dark");
     expect(document.querySelector('meta[property="og:title"]')).toBeTruthy();
