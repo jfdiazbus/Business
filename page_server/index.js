@@ -219,28 +219,24 @@ export function createAppServer({
         return;
       }
       const stripe = new Stripe(secret);
-      const mode = "payment";
       const price =
         typeof body.price === "string" && body.price.startsWith("price_")
           ? body.price
           : "price_...";
       const origin = `http://${req.headers.host || "localhost:" + (process.env.PORT || 3000)}`;
-      const sessionParams = {
-        ui_mode: "hosted",
-        mode,
-        billing_address_collection: "auto",
-        phone_number_collection: { enabled: false },
-        automatic_tax: { enabled: false },
-        allow_promotion_codes: false,
-        submit_type: "auto",
-        integration_identifier: "hosted_web_0001",
-        origin_context: "web",
-        success_url: `${origin}/thanks?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/services`,
-        line_items: [{ price, quantity: 1 }],
-      };
       try {
-        const session = await stripe.checkout.sessions.create(sessionParams);
+        const session = await stripe.checkout.sessions.create({
+          mode: "payment",
+          ui_mode: "hosted_page",
+          success_url: `${origin}/thanks?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${origin}/services`,
+          line_items: [{ price, quantity: 1 }],
+          billing_address_collection: "auto",
+          allow_promotion_codes: false,
+          submit_type: "auto",
+          integration_identifier: "hosted_web_0001",
+          origin_context: "web",
+        });
         const accept = req.headers.accept || "";
         if (accept.includes("application/json")) {
           res.writeHead(200, { "Content-Type": "application/json" });

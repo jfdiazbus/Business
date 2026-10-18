@@ -30,17 +30,15 @@ These parameters were configured in Checkout Studio and are already set correctl
 - [page_server/worker.js](page_server/worker.js)
 - [page_server/index.js](page_server/index.js)
 
-| Parameter                  | Value                                                                                                                                                                                 |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ui_mode                    | `hosted` — Stripe SDK `stripe@18.0.0` is below 21.0.0, so `hosted` is used. SDK 21.0.0+ uses `hosted_page`. If you upgrade `stripe` to 21+, change to `hosted_page` (see note below). |
-| billing_address_collection | `auto`                                                                                                                                                                                |
-| phone_number_collection    | `{"enabled": false}`                                                                                                                                                                  |
-| automatic_tax              | `{"enabled": false}`                                                                                                                                                                  |
-| allow_promotion_codes      | `false`                                                                                                                                                                               |
-| submit_type                | `auto`                                                                                                                                                                                |
-| integration_identifier     | `hosted_web_0001`                                                                                                                                                                     |
-| origin_context             | `web`                                                                                                                                                                                 |
-| payment_method_collection  | `always` — **not set** because `mode` is `payment`. Only include when `mode` is `subscription`. The code conditionally adds it only for `subscription`.                               |
+| Parameter                  | Value                                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ui_mode                    | `hosted_page`                                                                                                                                           |
+| billing_address_collection | `auto`                                                                                                                                                  |
+| allow_promotion_codes      | `false`                                                                                                                                                 |
+| submit_type                | `auto`                                                                                                                                                  |
+| integration_identifier     | `hosted_web_0001`                                                                                                                                       |
+| origin_context             | `web`                                                                                                                                                   |
+| payment_method_collection  | `always` — **not set** because `mode` is `payment`. Only include when `mode` is `subscription`. The code conditionally adds it only for `subscription`. |
 
 ## Setup and Next Steps
 
@@ -84,11 +82,11 @@ cd page_server
 pnpm install
 ```
 
-This installs `stripe@18.0.0` (see `package.json:dependencies`). No API version is pinned when constructing `new Stripe(key)` — leave the second argument empty per instructions.
+This installs `stripe@23.0.0` (see `package.json:dependencies`). No API version is pinned when constructing `new Stripe(key)` — leave the second argument empty per instructions.
 
 ### 3. Project structure of new files
 
-- `page_server/worker.js` — Cloudflare Worker: `POST /api/create-checkout-session` → `stripe.checkout.sessions.create(...)` with fixed_by_ui params, `302→303` redirect to `session.url`, fallback to `env.ASSETS` for static site. Uses `stripe@18.0.0` → `ui_mode: "hosted"`.
+- `page_server/worker.js` — Cloudflare Worker: `POST /api/create-checkout-session` → `stripe.checkout.sessions.create(...)` with fixed_by_ui params, `302→303` redirect to `session.url`, fallback to `env.ASSETS` for static site. Uses `stripe@23.0.0` → `ui_mode: "hosted_page"` (matches snippet).
 - `page_server/index.js` — same endpoint for `pnpm start` / `pnpm dev` local server (reads `process.env.STRIPE_SECRET_KEY`, same params, same redirect logic).
 - `page_server/services.html` — each `.buy` link now carries `data-price="price_..."` (real test Price IDs) and a small `type="module"` script that `POST`s to `/api/create-checkout-session` and redirects to `session.url`. Falls back to the original Payment Link (`https://buy.stripe.com/test_...`) if JS is off or Stripe is not configured.
 - `page_server/wrangler.toml` / `wrangler.toml` — added `main = "./worker.js"` and `[assets] binding = "ASSETS"` with `run_worker_first = ["/api/*"]` so `/api/*` hits the Worker and everything else serves static.
@@ -131,4 +129,4 @@ Hosted Checkout means you never handle card data; Stripe does.
 
 ### 8. ui_mode versioning note
 
-`stripe@18.0.0` (< 21.0.0) uses `ui_mode: "hosted"`. If `package.json:stripe` is upgraded to `21.0.0+`, change to `hosted_page`. If you cannot determine the version, default to `hosted_page` (current code documents the version).
+`stripe@23.0.0` uses `hosted_page` (snippet). If downgraded below 21, use `hosted`. If you cannot determine the version, default to `hosted_page` (current code documents the version).
