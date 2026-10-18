@@ -20,10 +20,10 @@ const BAR = `
     <a class="brand" href="/">Juan Felipe</a>
     <nav id="topbar-nav" aria-label="site">
       <a href="/home">Portfolio</a>
-      <a href="/services">Prices</a>
+      <a href="/services">Services</a>
       <a href="/school">School</a>
     </nav>
-    <a class="btn btn--primary" href="/services">See the prices</a>
+    <a class="btn btn--primary" href="/services">See services</a>
     <button
       class="topbar__menu"
       type="button"

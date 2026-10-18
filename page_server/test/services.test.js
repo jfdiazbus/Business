@@ -25,6 +25,8 @@ const ROUTES = {
   "/services": "services.html",
   "/thanks": "thanks.html",
   "/terms": "terms.html",
+  "/blog": "blog.html",
+  "/blog/write": "blog-write.html",
 };
 
 const text = (node) => node.textContent.replace(/\s+/g, " ").trim();
@@ -36,7 +38,7 @@ describe("the prices page", () => {
     const og = (name) => services.querySelector(`meta[property="og:${name}"]`)?.content;
 
     expect(services.documentElement.getAttribute("lang")).toBe("en");
-    expect(services.title).toContain("What I charge");
+    expect(services.title).toContain("Services");
     expect(meta("description").length).toBeGreaterThan(40);
     expect(og("title")).toBeTruthy();
     expect(og("description")).toBeTruthy();
@@ -45,7 +47,7 @@ describe("the prices page", () => {
 
     // one page title, and one main heading to go with it
     expect(services.querySelectorAll("h1")).toHaveLength(1);
-    expect(text(services.querySelector("h1"))).toContain("What I charge");
+    expect(text(services.querySelector("h1"))).toContain("Services");
   });
 
   it("lets a keyboard visitor skip the top bar", () => {
@@ -102,14 +104,16 @@ describe("the prices page", () => {
     }
   });
 
-  it("offers exactly three things, each with a price", () => {
+  it("offers exactly five things, each with a price", () => {
     const offers = [...services.querySelectorAll("#services .project")];
 
-    expect(offers).toHaveLength(3);
+    expect(offers).toHaveLength(5);
     expect(offers.map((offer) => text(offer.querySelector(".price")))).toEqual([
       "€100",
       "€200",
       "€500",
+      "€20",
+      "€300",
     ]);
 
     for (const offer of offers) {
@@ -128,7 +132,7 @@ describe("the prices page", () => {
       expect(text(actions[0])).toMatch(/^buy /);
     }
 
-    expect(services.querySelectorAll("#services .buy")).toHaveLength(3);
+    expect(services.querySelectorAll("#services .buy")).toHaveLength(5);
   });
 
   it("answers the questions that stop people buying", () => {
@@ -212,7 +216,7 @@ describe("the two pages together", () => {
       name: text(doc.querySelector(".brand")),
       stylesheet: doc.querySelector('link[rel="stylesheet"]')?.getAttribute("href"),
       favicon: doc.querySelector('link[rel="icon"]')?.getAttribute("href"),
-      colophon: text(doc.querySelector(".colophon")),
+      colophon: doc.querySelector(".colophon") ? text(doc.querySelector(".colophon")) : "",
     });
 
     for (const part of ["stylesheet", "favicon", "colophon"]) {

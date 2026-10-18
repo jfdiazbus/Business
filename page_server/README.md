@@ -161,7 +161,7 @@ scratch and is not committed; `world/out` is the film the site ships.
 
 ## Taking payments
 
-`/services` sells three fixed prices. The buy buttons are Stripe **Payment
+`/services` sells five fixed services across two branches: software and implementations. The buy buttons are Stripe **Payment
 Links**, so there is no secret key in the repository and no Stripe JavaScript on
 the page.
 
@@ -174,6 +174,8 @@ The Stripe sandbox (`portfolio sandbox`, test mode) holds the whole catalogue:
 | website | `prod_VS81qc5gCuzX3n` | €100, `tax_behavior: exclusive` | `plink_1URDmBGLxtix6XhLp751bJpA` |
 | api     | `prod_VS82wT5zix7Ps6` | €200, `tax_behavior: exclusive` | `plink_1URDmLGLxtix6XhLsFrXUBIa` |
 | full    | `prod_VS8246T28j4pCS` | €500, `tax_behavior: exclusive` | `plink_1URDmLGLxtix6XhLsMK2kqLi` |
+| stripe  | `prod_VSuODfgBgsKgNw` | €20, `tax_behavior: exclusive`  | `plink_1URya4GLxtix6XhLkq5tH8gE` |
+| ai      | `prod_VSubaJXVocevFb` | €300, `tax_behavior: exclusive` | `plink_1URymsGLxtix6XhLzPZTFWdP` |
 
 Each link carries automatic tax, promotion codes, a VAT ID field for EU
 businesses, a "What do you need?" brief field, an invoice created automatically
