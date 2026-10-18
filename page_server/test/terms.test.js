@@ -22,7 +22,7 @@ describe("the terms page", () => {
     const body = text(terms.body).toLowerCase();
 
     expect(body).toContain("juan felipe diaz bustamante");
-    expect(body).toContain("france");
+    expect(body).toContain("spain");
     expect(terms.querySelector('a[href^="mailto:"]')).toBeTruthy();
     expect(terms.querySelectorAll("h1")).toHaveLength(1);
     expect(text(terms.querySelector("h1"))).toBe("Terms and privacy");

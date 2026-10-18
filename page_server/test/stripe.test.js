@@ -42,14 +42,14 @@ const TEST_LINK = /\/test_/;
 
 describe("the links the page sells with", () => {
   it("gives every offer its own Payment Link", () => {
-    expect(offers).toHaveLength(3);
+    expect(offers).toHaveLength(5);
 
     for (const offer of offers) {
       expect(offer.href, offer.name).toMatch(/^https:\/\/buy\.stripe\.com\/[A-Za-z0-9_]+$/);
       expect(offer.cents, offer.name).toBeGreaterThan(0);
     }
 
-    expect(new Set(offers.map((offer) => offer.href)).size).toBe(3);
+    expect(new Set(offers.map((offer) => offer.href)).size).toBe(5);
   });
 
   it("never sells through an email instead of a checkout", () => {

@@ -77,8 +77,8 @@ export const world = {
       body: "One short email about what you need and when. I answer within a day, with a price and a first sketch.",
       tags: [],
       cta: {
-        primary: { label: "Email me", href: "mailto:juan-felipe.diaz-bustamante@epitech.eu" },
-        secondary: { label: "See what I charge", href: "/services" },
+        primary: { label: "Email me", href: "mailto:jfdiazbus@gmail.com" },
+        secondary: { label: "See services", href: "/services" },
       },
     },
   ],
