@@ -167,15 +167,15 @@ the page.
 
 ### What is already built
 
-The Stripe sandbox (`portfolio sandbox`, test mode) holds the whole catalogue:
+The Stripe account holds the whole catalogue (live). Test mode uses the `portfolio sandbox` with the same products.
 
 | offer   | product               | price                           | payment link                     |
 | ------- | --------------------- | ------------------------------- | -------------------------------- |
-| website | `prod_VS81qc5gCuzX3n` | €100, `tax_behavior: exclusive` | `plink_1URDmBGLxtix6XhLp751bJpA` |
-| api     | `prod_VS82wT5zix7Ps6` | €200, `tax_behavior: exclusive` | `plink_1URDmLGLxtix6XhLsFrXUBIa` |
-| full    | `prod_VS8246T28j4pCS` | €500, `tax_behavior: exclusive` | `plink_1URDmLGLxtix6XhLsMK2kqLi` |
-| stripe  | `prod_VSuODfgBgsKgNw` | €20, `tax_behavior: exclusive`  | `plink_1URya4GLxtix6XhLkq5tH8gE` |
-| ai      | `prod_VSubaJXVocevFb` | €300, `tax_behavior: exclusive` | `plink_1URymsGLxtix6XhLzPZTFWdP` |
+| website | `prod_VS81qc5gCuzX3n` | €100, `tax_behavior: exclusive` | `plink_1URy88FtV5oJWaqwrCBDt5WY` |
+| api     | `prod_VS82wT5zix7Ps6` | €200, `tax_behavior: exclusive` | `plink_1URy89FtV5oJWaqweoW8UIZB` |
+| full    | `prod_VS8246T28j4pCS` | €500, `tax_behavior: exclusive` | `plink_1URy8AFtV5oJWaqwN6lfYAmh` |
+| stripe  | `prod_VSvcXm1WxpEYoU` | €20, `tax_behavior: exclusive`  | `plink_1URzlKFtV5oJWaqwZ94VubMW` |
+| ai      | `prod_VSvcwfh1n8nskr` | €300, `tax_behavior: exclusive` | `plink_1URzlSFtV5oJWaqwZuo6BMOa` |
 
 Each link carries automatic tax, promotion codes, a VAT ID field for EU
 businesses, a "What do you need?" brief field, an invoice created automatically
