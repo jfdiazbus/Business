@@ -21,7 +21,8 @@ describe("the project", () => {
   it("runs with no runtime dependencies", async () => {
     const pkg = JSON.parse(await read("package.json"));
 
-    expect(pkg.dependencies ?? {}).toEqual({});
+    // Stripe Checkout needs the Stripe SDK at runtime; everything else stays zero-deps
+    expect(pkg.dependencies ?? {}).toEqual({ stripe: expect.any(String) });
     expect(Object.keys(pkg.devDependencies).sort()).toEqual(
       ["jsdom", "prettier", "vitest", "wrangler"].sort(),
     );
@@ -33,7 +34,7 @@ describe("the project", () => {
 
     expect(imports.length).toBeGreaterThan(0);
     for (const specifier of imports) {
-      expect(specifier, specifier).toMatch(/^node:/);
+      expect(specifier, specifier).toMatch(/^(node:|stripe)/);
     }
   });
 

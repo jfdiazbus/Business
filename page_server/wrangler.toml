@@ -1,18 +1,23 @@
-# Cloudflare Workers, serving the static build in ./dist.
-#
-#   pnpm build && pnpm deploy
-#
-# The worker has no code of its own: it only hands the files to the visitor.
-
 name = "portfolio"
+main = "./worker.js"
 compatibility_date = "2026-10-15"
 
-# Branch (pull request) builds run `wrangler preview`, which refuses to run
-# without this block. It can be empty: assets and compatibility stay above.
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 0.01
+
 [previews]
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
 not_found_handling = "404-page"
-# /home and /school are served from home.html and school.html, with no redirect.
 html_handling = "auto-trailing-slash"

@@ -81,7 +81,10 @@
                 <li>Five working days once I have your content</li>
               </ul>
               <p class="links">
-                <a class="buy" href="https://buy.stripe.com/test_8x23cv8bv5MRbqmgSJabK00"
+                <a
+                  class="buy"
+                  href="https://buy.stripe.com/7sY14n4Jn9RYcAS7CA5AQ00"
+                  data-price="price_1URy83FtV5oJWaqwYTOp40qz"
                   >buy a website</a
                 >
               </p>
@@ -98,7 +101,10 @@
                 <li>About a week, once we agree what it has to do</li>
               </ul>
               <p class="links">
-                <a class="buy" href="https://buy.stripe.com/test_5kQ8wPfDX6QV8ea5a1abK01"
+                <a
+                  class="buy"
+                  href="https://buy.stripe.com/fZudR9b7L8NUbwO3mk5AQ01"
+                  data-price="price_1URy86FtV5oJWaqwD4iGGeTq"
                   >buy an API</a
                 >
               </p>
@@ -116,7 +122,10 @@
                 <li>Two to three weeks, depending on how quickly we agree on the design</li>
               </ul>
               <p class="links">
-                <a class="buy" href="https://buy.stripe.com/test_8x2eVdgI13EJ51YdGxabK02"
+                <a
+                  class="buy"
+                  href="https://buy.stripe.com/8x2fZhfo17JQdEWaOM5AQ02"
+                  data-price="price_1URy83FtV5oJWaqwNlKbhAwD"
                   >buy the whole service</a
                 >
               </p>
@@ -136,7 +145,10 @@
                 <li>One day once I have access to your Stripe account</li>
               </ul>
               <p class="links">
-                <a class="buy" href="https://buy.stripe.com/test_3cI00j63n1wB9iefOFabK03"
+                <a
+                  class="buy"
+                  href="https://buy.stripe.com/00w7sL1xb5BIeJ04qo5AQ03"
+                  data-price="price_1URzlEFtV5oJWaqwXzKPYPXP"
                   >buy Stripe implementation</a
                 >
               </p>
@@ -156,7 +168,10 @@
                 <li>One week from the day we agree the task and I have access</li>
               </ul>
               <p class="links">
-                <a class="buy" href="https://buy.stripe.com/test_5kQ7sL9fzejn2TQaulabK04"
+                <a
+                  class="buy"
+                  href="https://buy.stripe.com/3cI00jb7L8NU0Sa3mk5AQ04"
+                  data-price="price_1URzlPFtV5oJWaqwF1mFUifx"
                   >buy AI implementation</a
                 >
               </p>
@@ -253,5 +268,35 @@
       </div>
     </div>
     <script type="module" src="/bar.js"></script>
+    <script type="module">
+      // Stripe Checkout: intercept buy clicks and create a hosted session
+      for (const link of document.querySelectorAll("a.buy[data-price]")) {
+        link.addEventListener("click", async (event) => {
+          // Allow fallback to Payment Link if JS fails or Stripe is not configured
+          const price = link.dataset.price;
+          if (!price || !price.startsWith("price_")) return;
+          event.preventDefault();
+          link.setAttribute("aria-busy", "true");
+          try {
+            const response = await fetch("/api/create-checkout-session", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Accept: "application/json" },
+              body: JSON.stringify({ price }),
+            });
+            const data = await response.json().catch(() => ({}));
+            if (data.url) {
+              window.location.href = data.url;
+              return;
+            }
+            // Fallback to Payment Link on error
+            window.location.href = link.href;
+          } catch {
+            window.location.href = link.href;
+          } finally {
+            link.removeAttribute("aria-busy");
+          }
+        });
+      }
+    </script>
   </body>
 </html>
