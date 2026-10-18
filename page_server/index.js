@@ -8,6 +8,7 @@
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
+import Stripe from "stripe";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -197,6 +198,63 @@ export function createAppServer({
 } = {}) {
   return createServer(async (req, res) => {
     const method = req.method ?? "GET";
+    const apiUrl = new URL(req.url ?? "/", "http://localhost");
+
+    if (apiUrl.pathname === "/api/create-checkout-session" && method === "POST") {
+      const secret = process.env.STRIPE_SECRET_KEY;
+      if (!secret) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Stripe is not configured" }));
+        return;
+      }
+      let body = {};
+      try {
+        const chunks = [];
+        for await (const chunk of req) chunks.push(chunk);
+        const text = Buffer.concat(chunks).toString();
+        if (text) body = JSON.parse(text);
+      } catch {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Invalid JSON" }));
+        return;
+      }
+      const stripe = new Stripe(secret);
+      const mode = "payment";
+      const price =
+        typeof body.price === "string" && body.price.startsWith("price_")
+          ? body.price
+          : "price_...";
+      const origin = `http://${req.headers.host || "localhost:" + (process.env.PORT || 3000)}`;
+      const sessionParams = {
+        ui_mode: "hosted",
+        mode,
+        billing_address_collection: "auto",
+        phone_number_collection: { enabled: false },
+        automatic_tax: { enabled: false },
+        allow_promotion_codes: false,
+        submit_type: "auto",
+        integration_identifier: "hosted_web_0001",
+        origin_context: "web",
+        success_url: `${origin}/thanks?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/services`,
+        line_items: [{ price, quantity: 1 }],
+      };
+      try {
+        const session = await stripe.checkout.sessions.create(sessionParams);
+        const accept = req.headers.accept || "";
+        if (accept.includes("application/json")) {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ url: session.url }));
+        } else {
+          res.writeHead(303, { Location: session.url });
+          res.end();
+        }
+      } catch (cause) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: cause?.message || "Checkout failed" }));
+      }
+      return;
+    }
 
     if (method !== "GET" && method !== "HEAD") {
       sendError(res, 405, {
