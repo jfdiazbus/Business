@@ -54,7 +54,9 @@ describe("school.html", () => {
   });
 
   it("has one way to act, one way back, and no dead links", () => {
-    expect([...document.querySelectorAll('a[href^="mailto:"]')].length).toBeGreaterThan(0);
+    expect(
+      [...document.querySelectorAll('a[href^="https://mail.google.com/mail/"]')].length,
+    ).toBeGreaterThan(0);
     expect(document.querySelector('.topbar nav a[href="/home"]')).toBeTruthy();
     expect(document.querySelector('.more a[href="/home"]')).toBeTruthy();
 

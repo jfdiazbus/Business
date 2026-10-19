@@ -53,7 +53,9 @@ describe("the links the page sells with", () => {
   });
 
   it("never sells through an email instead of a checkout", () => {
-    const emails = [...document.querySelectorAll("#services a[href^='mailto:']")].map(text);
+    const emails = [
+      ...document.querySelectorAll("#services a[href^='https://mail.google.com/mail/']"),
+    ].map(text);
 
     expect(emails).toEqual([]);
   });

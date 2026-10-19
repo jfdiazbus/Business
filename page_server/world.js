@@ -77,7 +77,10 @@ export const world = {
       body: "One short email about what you need and when. I answer within a day, with a price and a first sketch.",
       tags: [],
       cta: {
-        primary: { label: "Email me", href: "mailto:jfdiazbus@gmail.com" },
+        primary: {
+          label: "Email me",
+          href: "https://mail.google.com/mail/?view=cm&fs=1&to=jfdiazbus%40gmail.com",
+        },
         secondary: { label: "See services", href: "/services" },
       },
     },

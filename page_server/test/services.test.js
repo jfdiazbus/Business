@@ -158,7 +158,9 @@ describe("the prices page", () => {
 
   it("leaves one way to get in touch and one way back", () => {
     expect(services.querySelector('#contact a[href="/home"]')).toBeTruthy();
-    expect(services.querySelectorAll('a[href^="mailto:"]').length).toBeGreaterThan(0);
+    expect(
+      services.querySelectorAll('a[href^="https://mail.google.com/mail/"]').length,
+    ).toBeGreaterThan(0);
     expect(services.querySelector(".leaders")).toBeTruthy();
   });
 
@@ -195,7 +197,7 @@ describe("the thank you page", () => {
   it("gives the buyer a way back, but never a way to pay twice", () => {
     expect(thanks.querySelector('a[href="/services"]')).toBeTruthy();
     expect(thanks.querySelector('a[href="/home"]')).toBeTruthy();
-    expect(thanks.querySelector('a[href^="mailto:"]')).toBeTruthy();
+    expect(thanks.querySelector('a[href^="https://mail.google.com/mail/"]')).toBeTruthy();
 
     expect(thanks.querySelectorAll(".buy")).toHaveLength(0);
     expect(thanks.querySelectorAll('a[href*="buy.stripe.com"]')).toHaveLength(0);
