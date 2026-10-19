@@ -261,6 +261,11 @@ describe("the world page", () => {
   it("keeps the deck reachable from the world", () => {
     expect(world.brand.href).toBe("/home");
   });
+
+  it("keeps the primary button readable on the dark sheet", () => {
+    // the engine hardcodes white text, and the button itself is white here
+    expect(html).toMatch(/\.sw-btn--primary[\s\S]*?color:\s*var\(--sw-bg\)/);
+  });
 });
 
 describe("the vendored engine", () => {
