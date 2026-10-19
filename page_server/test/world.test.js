@@ -177,7 +177,7 @@ describe("the copy, by the landing page rules", () => {
     const last = sections[sections.length - 1];
 
     expect(withCta).toHaveLength(1);
-    expect(last.cta.primary.href).toMatch(/^mailto:/);
+    expect(last.cta.primary.href).toMatch(/^https:\/\/mail\.google\.com\/mail\//);
     expect(last.cta.secondary.href).toBe("/services"); // the prices page
     for (const action of Object.values(last.cta)) {
       expect(action.label).not.toMatch(/learn more|submit|click here/i);
@@ -255,7 +255,7 @@ describe("the world page", () => {
 
     expect(fallback.textContent).toContain("five slide version");
     expect(fallback.querySelector('a[href="/home"]')).toBeTruthy();
-    expect(fallback.querySelector('a[href^="mailto:"]')).toBeTruthy();
+    expect(fallback.querySelector('a[href^="https://mail.google.com/mail/"]')).toBeTruthy();
   });
 
   it("keeps the deck reachable from the world", () => {
