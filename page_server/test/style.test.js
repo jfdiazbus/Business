@@ -99,6 +99,16 @@ describe("the page fills the screen", () => {
     expect(small).toContain("--bar-h");
   });
 
+  it("keeps the page action visible on a phone", () => {
+    const action = ruleBody(css, ".topbar--enhanced > .btn");
+    const brand = ruleBody(css, ".topbar--enhanced .brand");
+
+    expect(action).toContain("display: inline-flex");
+    // the action keeps its room; the long name truncates instead
+    expect(brand).toContain("text-overflow: ellipsis");
+    expect(brand).toContain("min-width: 0");
+  });
+
   it("scrolls a long nav sideways rather than wrapping it", () => {
     expect(ruleBody(css, ".topbar nav")).toContain("overflow-x: auto");
   });

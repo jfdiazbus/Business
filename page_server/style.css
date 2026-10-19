@@ -1363,9 +1363,16 @@ footer .links a:focus-visible {
     display: none;
   }
 
-  /* the panel already links the prices */
+  /* keep the page's main action in the bar; the name gives up width first */
   .topbar--enhanced > .btn {
-    display: none;
+    display: inline-flex;
+  }
+
+  .topbar--enhanced .brand {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   @media (prefers-reduced-motion: no-preference) {
