@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blog — Juan Felipe Diaz</title>
+    <meta
+      name="description"
+      content="Notes on building websites, software, and the work around them."
+    />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Blog — Juan Felipe Diaz" />
+    <meta
+      property="og:description"
+      content="Notes on building websites, software, and the work around them."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='14' font-weight='bold' text-anchor='middle' fill='%23ff6b5a'%3E:-)%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#blog-main">skip to the blog</a>
+    <div class="sheet">
+      <div class="page">
+        <header class="topbar">
+          <a class="brand" href="/">Juan Felipe Diaz<span class="role"> — blog</span></a>
+          <nav id="topbar-nav" aria-label="site">
+            <a href="/home">Portfolio</a>
+            <a href="/services">Prices</a>
+            <a href="/school">School</a>
+            <a href="/blog" aria-current="page">Blog</a>
+          </nav>
+          <a class="btn btn--primary" href="/blog/write">Write</a>
+          <button
+            class="topbar__menu"
+            type="button"
+            aria-expanded="false"
+            aria-controls="topbar-nav"
+            aria-label="Menu"
+          >
+            <span class="topbar__bars" aria-hidden="true"></span>
+          </button>
+        </header>
+        <main id="blog-main">
+          <h1 class="page-title">Notes from the work</h1>
+          <p class="lede">
+            Things I have learned while building websites, software and the work around them.
+          </p>
+          <div class="blog-status" id="blog-status" role="status" aria-live="polite">
+            Loading posts…
+          </div>
+          <div class="blog-content" id="blog-content"></div>
+        </main>
+        <footer class="block">
+          <div class="rule rule--thin" aria-hidden="true"></div>
+          <p class="eof">Thanks for reading! :-)</p>
+          <p class="colophon">Hand coded by Juan Felipe with HTML and CSS, 2026.</p>
+          <p class="links">
+            <a href="/services">What I charge</a>
+            <a href="/terms">Terms and privacy</a>
+            <a href="mailto:juan-felipe.diaz-bustamante@epitech.eu">Email</a>
+          </p>
+        </footer>
+      </div>
+    </div>
+    <script type="module" src="/bar.js"></script>
+    <script type="module" src="/blog.js"></script>
+  </body>
+</html>

@@ -26,6 +26,8 @@ export const REWRITES = {
   "/services": "services.html",
   "/thanks": "thanks.html",
   "/terms": "terms.html",
+  "/blog": "blog.html",
+  "/blog/write": "blog-write.html",
 };
 
 export const MIME = {
@@ -262,7 +264,15 @@ export function createAppServer({
     }
 
     const requested = new URL(req.url ?? "/", "http://localhost").pathname;
-    const urlPath = rewrites[requested] ? `/${rewrites[requested]}` : requested;
+    const blogPost =
+      requested.startsWith("/blog/") &&
+      requested !== "/blog/write" &&
+      !requested.startsWith("/blog/media/");
+    const urlPath = rewrites[requested]
+      ? `/${rewrites[requested]}`
+      : blogPost
+        ? "/blog.html"
+        : requested;
 
     try {
       const found = locate(urlPath, { mounts });

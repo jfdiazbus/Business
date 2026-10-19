@@ -1,0 +1,5 @@
+# Local only. Copy this file to .dev.vars and use private values of your own.
+# Never commit .dev.vars or reuse these example values for a deployed Worker.
+BLOG_ADMIN_PASSWORD=replace-this-with-a-long-private-passphrase
+BLOG_SESSION_SECRET=replace-this-with-a-separate-random-secret-at-least-32-characters
+STRIPE_SECRET_KEY=sk_test_...
