@@ -23,6 +23,9 @@ const ROUTES = {
   "/terms": "terms.html",
   "/blog": "blog.html",
   "/blog/write": "blog-write.html",
+  "/login": "login.html",
+  "/register": "register.html",
+  "/account": "account.html",
 };
 
 const text = (node) => node.textContent.replace(/\s+/g, " ").trim();

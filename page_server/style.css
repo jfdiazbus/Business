@@ -1138,6 +1138,81 @@ footer .links a:focus-visible {
   color: var(--ink-soft);
 }
 
+/* -- accounts and comments ----------------------------------------------- */
+
+.blog-comments {
+  margin-top: var(--sp-700);
+  padding-top: var(--sp-400);
+  border-top: 1px solid var(--line);
+}
+
+.comment-list,
+.account-orders {
+  display: grid;
+  gap: var(--sp-200);
+  max-width: 68ch;
+  margin-top: var(--sp-300);
+}
+
+.comment,
+.account-order {
+  padding: var(--sp-300);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.comment-meta {
+  margin: 0 0 var(--sp-100);
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+}
+
+.comment-meta strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.comment-body {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.comment-delete {
+  margin-top: var(--sp-200);
+}
+
+.comment-form {
+  display: grid;
+  gap: var(--sp-200);
+  max-width: 68ch;
+  margin-top: var(--sp-300);
+}
+
+.comment-form textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: var(--sp-100) var(--sp-200);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+
+.account-order h3 {
+  margin: 0 0 var(--sp-75);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+.account-order-meta {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
 /* -- motion: content arrives, it does not appear ------------------------- */
 
 /* A reveal settles into place; it does not fade in. Anything dimmer than the

@@ -25,6 +25,27 @@ const MEDIA_KEY = /^blog-media\/[0-9a-f-]{36}\.(?:jpg|png|webp|gif|mp4|webm)$/;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const TEMPLATES = new Set(["article", "project", "photo-story"]);
 
+// Accounts: readers and customers, not the blog writing desk.
+const USER_COOKIE = "user_session";
+const USER_SESSION_SECONDS = 30 * 24 * 60 * 60;
+// Cloudflare Workers refuses PBKDF2 above 100,000 iterations, so this is the
+// platform ceiling rather than the OWASP recommendation. It still makes each
+// guess cost real work, and the format records the count for a future upgrade.
+const PASSWORD_ITERATIONS = 100000;
+const PASSWORD_MIN = 10;
+const PASSWORD_MAX = 200;
+const COMMENT_MAX = 2000;
+
+// The five offers, by the live Price ID that is also in services.html. Only
+// these prices can be checked out, and the label travels to the webhook.
+const OFFER_BY_PRICE = {
+  price_1URy83FtV5oJWaqwYTOp40qz: "A website",
+  price_1URy86FtV5oJWaqwD4iGGeTq: "An API",
+  price_1URy83FtV5oJWaqwNlKbhAwD: "The whole website service",
+  price_1URzlEFtV5oJWaqwXzKPYPXP: "Stripe implementation",
+  price_1URzlPFtV5oJWaqwF1mFUifx: "AI implementation for businesses",
+};
+
 const json = (data, status = 200, headers = {}) =>
   Response.json(data, {
     status,
@@ -209,13 +230,17 @@ async function issueSession(secret, now = Date.now()) {
   return `${toBase64Url(encoder.encode(payload))}.${toBase64Url(new Uint8Array(signature))}`;
 }
 
-function getCookie(request) {
+function cookieValue(request, name) {
   const cookies = request.headers.get("Cookie") || "";
   const entry = cookies
     .split(";")
     .map((part) => part.trim())
-    .find((part) => part.startsWith(`${COOKIE}=`));
-  return entry ? entry.slice(COOKIE.length + 1) : "";
+    .find((part) => part.startsWith(`${name}=`));
+  return entry ? entry.slice(name.length + 1) : "";
+}
+
+function getCookie(request) {
+  return cookieValue(request, COOKIE);
 }
 
 async function hasSession(request, secret, now = Date.now()) {
@@ -243,6 +268,168 @@ function setSessionCookie(value) {
 
 function clearSessionCookie() {
   return `${COOKIE}=; Path=/api/blog; HttpOnly; Secure; SameSite=Strict; Max-Age=0`;
+}
+
+// --- accounts -------------------------------------------------------------
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function normalizeEmail(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function validEmail(email) {
+  return email.length > 3 && email.length <= 254 && EMAIL.test(email);
+}
+
+function userCookie(value, maxAge = USER_SESSION_SECONDS) {
+  return `${USER_COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+}
+
+function clearUserCookie() {
+  return `${USER_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+
+async function derivePassword(password, salt, iterations = PASSWORD_ITERATIONS) {
+  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, [
+    "deriveBits",
+  ]);
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
+    key,
+    256,
+  );
+  return new Uint8Array(bits);
+}
+
+async function hashPassword(password) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const hash = await derivePassword(password, salt);
+  return `pbkdf2_sha256$${PASSWORD_ITERATIONS}$${toBase64Url(salt)}$${toBase64Url(hash)}`;
+}
+
+async function verifyPassword(password, stored) {
+  const [scheme, iterations, salt, hash] = String(stored || "").split("$");
+  if (scheme !== "pbkdf2_sha256" || !iterations || !salt || !hash) return false;
+  const rounds = Number(iterations);
+  if (!Number.isInteger(rounds) || rounds !== PASSWORD_ITERATIONS) return false;
+  const expected = fromBase64Url(hash);
+  const actual = await derivePassword(password, fromBase64Url(salt), rounds);
+  if (actual.length !== expected.length) return false;
+  let different = 0;
+  for (let i = 0; i < actual.length; i += 1) different |= actual[i] ^ expected[i];
+  return different === 0;
+}
+
+async function tokenHash(token) {
+  return toHex(await digest(token));
+}
+
+/** The signed in reader, or null. Never returns the password hash. */
+async function sessionUser(request, env) {
+  if (!env.DB) return null;
+  const token = cookieValue(request, USER_COOKIE);
+  if (!token) return null;
+  const row = await env.DB.prepare(
+    "SELECT u.id, u.email, u.name, u.created_at FROM user_sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ? AND s.expires_at > ?",
+  )
+    .bind(await tokenHash(token), new Date().toISOString())
+    .first()
+    .catch(() => null);
+  return row || null;
+}
+
+async function createUserSession(db, userId) {
+  const token = toBase64Url(crypto.getRandomValues(new Uint8Array(32)));
+  const now = new Date();
+  const expires = new Date(now.getTime() + USER_SESSION_SECONDS * 1000);
+  await db
+    .prepare(
+      "INSERT INTO user_sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
+    )
+    .bind(await tokenHash(token), userId, now.toISOString(), expires.toISOString())
+    .run();
+  await db
+    .prepare("DELETE FROM user_sessions WHERE expires_at <= ?")
+    .bind(now.toISOString())
+    .run()
+    .catch(() => {});
+  return token;
+}
+
+/** A hash of the network address, so the table never holds it in the clear. */
+async function attemptKey(kind, value) {
+  return toHex(await digest(`${kind}:${String(value || "unknown")}`));
+}
+
+async function attemptCount(db, kind, value, limit, windowSeconds, now = Date.now()) {
+  if (!db) return 0;
+  const cutoff = Math.floor((now - windowSeconds * 1000) / 1000);
+  await db
+    .prepare("DELETE FROM account_attempts WHERE kind = ? AND attempted_at < ?")
+    .bind(kind, cutoff)
+    .run()
+    .catch(() => {});
+  const row = await db
+    .prepare(
+      "SELECT COUNT(*) AS attempts FROM account_attempts WHERE kind = ? AND address_hash = ? AND attempted_at >= ?",
+    )
+    .bind(kind, await attemptKey(kind, value), cutoff)
+    .first()
+    .catch(() => null);
+  return Number(row?.attempts || 0) >= limit;
+}
+
+async function recordAttempt(db, kind, value, now = Date.now()) {
+  if (!db) return;
+  await db
+    .prepare("INSERT INTO account_attempts (kind, address_hash, attempted_at) VALUES (?, ?, ?)")
+    .bind(kind, await attemptKey(kind, value), Math.floor(now / 1000))
+    .run()
+    .catch(() => {});
+}
+
+function stripeClient(env) {
+  return env.STRIPE_CLIENT || new Stripe(env.STRIPE_SECRET_KEY);
+}
+
+async function recordOrder(env, session) {
+  if (!env.DB || !session?.id) return;
+  const userId = session.client_reference_id || session.metadata?.user_id || null;
+  const owner = userId
+    ? await env.DB.prepare("SELECT id, email FROM users WHERE id = ?")
+        .bind(userId)
+        .first()
+        .catch(() => null)
+    : null;
+  await env.DB.prepare(
+    `INSERT INTO orders (id, user_id, email, amount_total, currency, offer, payment_status, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET
+       payment_status = excluded.payment_status,
+       user_id = COALESCE(orders.user_id, excluded.user_id),
+       email = COALESCE(orders.email, excluded.email)`,
+  )
+    .bind(
+      session.id,
+      owner?.id || null,
+      session.customer_details?.email || session.customer_email || owner?.email || null,
+      Number(session.amount_total || 0),
+      String(session.currency || "eur"),
+      String(session.metadata?.offer || ""),
+      String(session.payment_status || "paid"),
+      new Date(Number(session.created || Date.now() / 1000) * 1000).toISOString(),
+    )
+    .run()
+    .catch((cause) => {
+      console.error("order record failed", String(cause?.message || cause));
+    });
+}
+
+function publicUser(user) {
+  return { id: user.id, email: user.email, name: user.name || "" };
 }
 
 function sameOrigin(request) {
@@ -358,7 +545,7 @@ async function handleAdminApi(request, env, url) {
     }
 
     const existing = await env.DB.prepare(
-      "SELECT created_at, published_at FROM blog_posts WHERE id = ?",
+      "SELECT slug, created_at, published_at FROM blog_posts WHERE id = ?",
     )
       .bind(post.id)
       .first();
@@ -399,6 +586,11 @@ async function handleAdminApi(request, env, url) {
     } catch {
       return error("That address is already used by another post", 409);
     }
+    if (existing?.slug && existing.slug !== post.slug) {
+      await env.DB.prepare("UPDATE blog_comments SET post_slug = ? WHERE post_slug = ?")
+        .bind(post.slug, existing.slug)
+        .run();
+    }
     return json(
       {
         post: {
@@ -418,6 +610,7 @@ async function handleAdminApi(request, env, url) {
     if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
     const slug = decodeSlug(deleteMatch[1]);
     if (!slug) return error("Invalid post address", 400);
+    await env.DB.prepare("DELETE FROM blog_comments WHERE post_slug = ?").bind(slug).run();
     await env.DB.prepare("DELETE FROM blog_posts WHERE slug = ?").bind(slug).run();
     return json({ deleted: slug });
   }
@@ -539,10 +732,351 @@ function assetUrl(request, pathname) {
   });
 }
 
-async function createCheckoutSession(request, env, url) {
-  if (!env.STRIPE_SECRET_KEY) return error("Stripe is not configured", 500);
+async function handleAccountApi(request, env, url) {
+  if (!env.DB) return error("Accounts are not configured", 503);
+  const path = url.pathname;
 
-  const stripe = new Stripe(env.STRIPE_SECRET_KEY);
+  if (path === "/api/account/session" && request.method === "GET") {
+    const user = await sessionUser(request, env);
+    return json({ authenticated: Boolean(user), user: user ? publicUser(user) : null });
+  }
+
+  if (path === "/api/account/register" && request.method === "POST") {
+    if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+    const address = request.headers.get("CF-Connecting-IP") || "local";
+    if (await attemptCount(env.DB, "register", address, 5, 60 * 60))
+      return error("Too many accounts were created from here. Try again in an hour.", 429);
+
+    let input;
+    try {
+      input = await readJson(request);
+    } catch (cause) {
+      return error(cause.message, cause instanceof RangeError ? 413 : 400);
+    }
+
+    const email = normalizeEmail(input.email);
+    const name = typeof input.name === "string" ? input.name.trim().slice(0, 80) : "";
+    const password = typeof input.password === "string" ? input.password : "";
+    if (!validEmail(email)) return error("Enter an email address that works", 400);
+    if (password.length < PASSWORD_MIN)
+      return error(`Use at least ${PASSWORD_MIN} characters for the password`, 400);
+    if (password.length > PASSWORD_MAX) return error("That password is too long", 400);
+
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    try {
+      await env.DB.prepare(
+        "INSERT INTO users (id, email, name, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+      )
+        .bind(id, email, name, await hashPassword(password), now, now)
+        .run();
+    } catch (cause) {
+      const message = String(cause?.message || "");
+      if (/unique/i.test(message)) {
+        return error("An account with that email already exists", 409);
+      }
+      console.error("account register failed", message);
+      return error("The account could not be created", 500);
+    }
+
+    await recordAttempt(env.DB, "register", address);
+    const token = await createUserSession(env.DB, id);
+    return json({ user: { id, email, name } }, 201, { "Set-Cookie": userCookie(token) });
+  }
+
+  if (path === "/api/account/login" && request.method === "POST") {
+    if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+    const address = request.headers.get("CF-Connecting-IP") || "local";
+    if (await attemptCount(env.DB, "login", address, 10, 15 * 60))
+      return error("Too many sign in attempts. Wait fifteen minutes and try again.", 429);
+
+    let input;
+    try {
+      input = await readJson(request);
+    } catch (cause) {
+      return error(cause.message, cause instanceof RangeError ? 413 : 400);
+    }
+
+    const email = normalizeEmail(input.email);
+    const password = typeof input.password === "string" ? input.password : "";
+    const user = await env.DB.prepare(
+      "SELECT id, email, name, password_hash FROM users WHERE email = ?",
+    )
+      .bind(email)
+      .first();
+
+    let accepted = false;
+    if (user?.password_hash) {
+      accepted = await verifyPassword(password, user.password_hash);
+    } else {
+      // Spend the same work on an unknown address, so timing does not answer
+      // the question "is this email registered?".
+      await derivePassword(password, crypto.getRandomValues(new Uint8Array(16))).catch(() => {});
+    }
+
+    if (!accepted) {
+      await recordAttempt(env.DB, "login", address);
+      return error("Email or password is not correct", 401);
+    }
+
+    const token = await createUserSession(env.DB, user.id);
+    return json({ user: publicUser(user) }, 200, { "Set-Cookie": userCookie(token) });
+  }
+
+  if (path === "/api/account/logout" && request.method === "POST") {
+    if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+    const token = cookieValue(request, USER_COOKIE);
+    if (token) {
+      await env.DB.prepare("DELETE FROM user_sessions WHERE token_hash = ?")
+        .bind(await tokenHash(token))
+        .run();
+    }
+    return json({ authenticated: false }, 200, { "Set-Cookie": clearUserCookie() });
+  }
+
+  if (path === "/api/account/orders" && request.method === "GET") {
+    const user = await sessionUser(request, env);
+    if (!user) return error("Sign in to see your orders", 401);
+    const { results } = await env.DB.prepare(
+      "SELECT id, amount_total, currency, offer, payment_status, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 100",
+    )
+      .bind(user.id)
+      .all();
+    return json({ orders: results || [] });
+  }
+
+  if (path === "/api/account/orders/reconcile" && request.method === "POST") {
+    if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+    const user = await sessionUser(request, env);
+    if (!user) return error("Sign in to see your orders", 401);
+    if (!env.STRIPE_SECRET_KEY && !env.STRIPE_CLIENT) return error("Stripe is not configured", 500);
+
+    let input;
+    try {
+      input = await readJson(request);
+    } catch (cause) {
+      return error(cause.message, cause instanceof RangeError ? 413 : 400);
+    }
+    const sessionId =
+      typeof input.sessionId === "string" && input.sessionId.startsWith("cs_")
+        ? input.sessionId
+        : "";
+    if (!sessionId) return error("Missing checkout session", 400);
+
+    let checkout;
+    try {
+      checkout = await stripeClient(env).checkout.sessions.retrieve(sessionId);
+    } catch {
+      return error("That payment could not be found", 404);
+    }
+    if (checkout.client_reference_id !== user.id)
+      return error("That payment belongs to another account", 403);
+    if (checkout.payment_status !== "paid") return error("That payment has not completed", 409);
+
+    await recordOrder(env, checkout);
+    const { results } = await env.DB.prepare(
+      "SELECT id, amount_total, currency, offer, payment_status, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 100",
+    )
+      .bind(user.id)
+      .all();
+    return json({ orders: results || [] });
+  }
+
+  if (path === "/api/account/password" && request.method === "POST") {
+    if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+    const user = await sessionUser(request, env);
+    if (!user) return error("Sign in to change your password", 401);
+
+    let input;
+    try {
+      input = await readJson(request);
+    } catch (cause) {
+      return error(cause.message, cause instanceof RangeError ? 413 : 400);
+    }
+
+    const row = await env.DB.prepare("SELECT password_hash FROM users WHERE id = ?")
+      .bind(user.id)
+      .first();
+    if (
+      typeof input.currentPassword !== "string" ||
+      !(await verifyPassword(input.currentPassword, row?.password_hash))
+    ) {
+      return error("The current password was not accepted", 401);
+    }
+
+    const next = typeof input.newPassword === "string" ? input.newPassword : "";
+    if (next.length < PASSWORD_MIN)
+      return error(`Use at least ${PASSWORD_MIN} characters for the new password`, 400);
+    if (next.length > PASSWORD_MAX) return error("That password is too long", 400);
+
+    await env.DB.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?")
+      .bind(await hashPassword(next), new Date().toISOString(), user.id)
+      .run();
+    const token = cookieValue(request, USER_COOKIE);
+    if (token) {
+      await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ? AND token_hash <> ?")
+        .bind(user.id, await tokenHash(token))
+        .run();
+    }
+    return json({ changed: true });
+  }
+
+  if (path === "/api/account" && request.method === "DELETE") {
+    if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+    const user = await sessionUser(request, env);
+    if (!user) return error("Sign in to delete your account", 401);
+
+    let input;
+    try {
+      input = await readJson(request);
+    } catch (cause) {
+      return error(cause.message, cause instanceof RangeError ? 413 : 400);
+    }
+    const row = await env.DB.prepare("SELECT password_hash FROM users WHERE id = ?")
+      .bind(user.id)
+      .first();
+    if (
+      typeof input.password !== "string" ||
+      !(await verifyPassword(input.password, row?.password_hash))
+    ) {
+      return error("The password was not accepted", 401);
+    }
+
+    await env.DB.prepare("DELETE FROM blog_comments WHERE user_id = ?").bind(user.id).run();
+    // Orders stay for accounting, without the account attached.
+    await env.DB.prepare("UPDATE orders SET user_id = NULL WHERE user_id = ?").bind(user.id).run();
+    await env.DB.prepare("DELETE FROM user_sessions WHERE user_id = ?").bind(user.id).run();
+    await env.DB.prepare("DELETE FROM users WHERE id = ?").bind(user.id).run();
+    return json({ deleted: true }, 200, { "Set-Cookie": clearUserCookie() });
+  }
+
+  return error("Account route not found", 404);
+}
+
+async function handleCommentsApi(request, env, url) {
+  if (!env.DB) return error("Blog database is not configured", 503);
+
+  const onPost = url.pathname.match(/^\/api\/blog\/posts\/([^/]+)\/comments$/);
+  if (onPost) {
+    const slug = decodeSlug(onPost[1]);
+    if (!slug) return error("Post not found", 404);
+    const post = await env.DB.prepare(
+      "SELECT slug FROM blog_posts WHERE slug = ? AND status = 'published'",
+    )
+      .bind(slug)
+      .first();
+    if (!post) return error("Post not found", 404);
+
+    if (request.method === "GET") {
+      const user = await sessionUser(request, env);
+      const { results } = await env.DB.prepare(
+        "SELECT c.id, c.user_id, c.body, c.created_at, u.name FROM blog_comments c JOIN users u ON u.id = c.user_id WHERE c.post_slug = ? ORDER BY c.created_at ASC LIMIT 200",
+      )
+        .bind(slug)
+        .all();
+      return json({
+        comments: (results || []).map((row) => ({
+          id: row.id,
+          body: row.body,
+          created_at: row.created_at,
+          author: String(row.name || "").trim() || "Reader",
+          mine: Boolean(user && row.user_id === user.id),
+        })),
+      });
+    }
+
+    if (request.method === "POST") {
+      if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+      const user = await sessionUser(request, env);
+      if (!user) return error("Sign in to comment", 401);
+      if (await attemptCount(env.DB, "comment", user.id, 5, 10 * 60))
+        return error("That is a lot of comments at once. Wait ten minutes and try again.", 429);
+
+      let input;
+      try {
+        input = await readJson(request);
+      } catch (cause) {
+        return error(cause.message, cause instanceof RangeError ? 413 : 400);
+      }
+      let body;
+      try {
+        body = boundedText(input.body, "Comment", COMMENT_MAX, true);
+      } catch (cause) {
+        return error(cause.message, 400);
+      }
+
+      const id = crypto.randomUUID();
+      const now = new Date().toISOString();
+      await env.DB.prepare(
+        "INSERT INTO blog_comments (id, post_slug, user_id, body, created_at) VALUES (?, ?, ?, ?, ?)",
+      )
+        .bind(id, slug, user.id, body, now)
+        .run();
+      await recordAttempt(env.DB, "comment", user.id);
+      return json(
+        {
+          comment: {
+            id,
+            body,
+            created_at: now,
+            author: String(user.name || "").trim() || "Reader",
+            mine: true,
+          },
+        },
+        201,
+      );
+    }
+
+    return error("Method not allowed", 405);
+  }
+
+  const own = url.pathname.match(/^\/api\/blog\/comments\/([0-9a-f-]{36})$/i);
+  if (own) {
+    if (request.method !== "DELETE") return error("Method not allowed", 405);
+    if (!sameOrigin(request)) return error("Request origin could not be verified", 403);
+    const user = await sessionUser(request, env);
+    if (!user) return error("Sign in to delete a comment", 401);
+    const result = await env.DB.prepare("DELETE FROM blog_comments WHERE id = ? AND user_id = ?")
+      .bind(own[1], user.id)
+      .run();
+    if (!result?.meta?.changes) return error("Comment not found", 404);
+    return json({ deleted: own[1] });
+  }
+
+  return error("Comment route not found", 404);
+}
+
+async function handleStripeWebhook(request, env) {
+  if (!env.STRIPE_WEBHOOK_SECRET) return error("Webhook is not configured", 503);
+  if (!env.STRIPE_SECRET_KEY && !env.STRIPE_CLIENT) return error("Stripe is not configured", 500);
+  if (request.method !== "POST") return error("Method not allowed", 405);
+
+  const signature = request.headers.get("Stripe-Signature");
+  if (!signature) return error("Missing signature", 400);
+  const payload = await request.text();
+
+  let event;
+  try {
+    event = await stripeClient(env).webhooks.constructEventAsync(
+      payload,
+      signature,
+      env.STRIPE_WEBHOOK_SECRET,
+    );
+  } catch {
+    return error("Invalid signature", 400);
+  }
+
+  if (
+    event.type === "checkout.session.completed" ||
+    event.type === "checkout.session.async_payment_succeeded"
+  ) {
+    await recordOrder(env, event.data?.object);
+  }
+  return json({ received: true });
+}
+
+async function createCheckoutSession(request, env, url) {
+  if (!env.STRIPE_SECRET_KEY && !env.STRIPE_CLIENT) return error("Stripe is not configured", 500);
 
   let body = {};
   try {
@@ -552,24 +1086,34 @@ async function createCheckoutSession(request, env, url) {
     return error("Invalid JSON", 400);
   }
 
-  const price =
-    typeof body.price === "string" && body.price.startsWith("price_") ? body.price : "price_...";
+  const price = typeof body.price === "string" ? body.price : "";
+  if (!OFFER_BY_PRICE[price]) return error("That is not one of the services", 400);
 
   const origin = url.origin;
+  const user = await sessionUser(request, env);
+
+  const params = {
+    mode: "payment",
+    ui_mode: "hosted_page",
+    success_url: `${origin}/thanks?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/services`,
+    line_items: [{ price, quantity: 1 }],
+    billing_address_collection: "auto",
+    allow_promotion_codes: false,
+    submit_type: "auto",
+    integration_identifier: "hosted_web_0001",
+    origin_context: "web",
+    metadata: { offer: OFFER_BY_PRICE[price] },
+  };
+
+  if (user) {
+    params.client_reference_id = user.id;
+    params.customer_email = user.email;
+    params.metadata.user_id = user.id;
+  }
 
   try {
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      ui_mode: "hosted_page",
-      success_url: `${origin}/thanks?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/services`,
-      line_items: [{ price, quantity: 1 }],
-      billing_address_collection: "auto",
-      allow_promotion_codes: false,
-      submit_type: "auto",
-      integration_identifier: "hosted_web_0001",
-      origin_context: "web",
-    });
+    const session = await stripeClient(env).checkout.sessions.create(params);
 
     if (request.headers.get("Accept")?.includes("application/json")) {
       return json({ url: session.url });
@@ -584,11 +1128,19 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     try {
+      if (url.pathname.startsWith("/api/account")) return await handleAccountApi(request, env, url);
+      if (url.pathname === "/api/stripe/webhook") return await handleStripeWebhook(request, env);
       if (url.pathname === "/api/create-checkout-session" && request.method === "POST") {
         return await createCheckoutSession(request, env, url);
       }
       if (url.pathname === "/api/blog/admin" || url.pathname.startsWith("/api/blog/admin/")) {
         return await handleAdminApi(request, env, url);
+      }
+      if (
+        url.pathname.startsWith("/api/blog/comments/") ||
+        /^\/api\/blog\/posts\/[^/]+\/comments$/.test(url.pathname)
+      ) {
+        return await handleCommentsApi(request, env, url);
       }
       if (url.pathname === "/api/blog" || url.pathname.startsWith("/api/blog/")) {
         return await handlePublicApi(request, env, url);

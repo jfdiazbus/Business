@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in — Juan Felipe Diaz Bustamante</title>
+    <meta name="description" content="Sign in to see your orders and comment on the blog." />
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='14' font-weight='bold' text-anchor='middle' fill='%23ff6b5a'%3E:-)%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#signin">skip to sign in</a>
+
+    <div class="sheet">
+      <div class="page">
+        <header class="topbar">
+          <a class="brand" href="/"
+            >Juan Felipe Diaz Bustamante<span class="role"> — account</span></a
+          >
+          <nav id="topbar-nav" aria-label="site">
+            <a href="/home">Portfolio</a>
+            <a href="/services">Services</a>
+            <a href="/school">School</a>
+            <a href="/blog">Blog</a>
+            <a href="/login" data-account-link aria-current="page">Log in</a>
+          </nav>
+          <a class="btn btn--primary" href="mailto:jfdiazbus@gmail.com">Email me</a>
+          <button
+            class="topbar__menu"
+            type="button"
+            aria-expanded="false"
+            aria-controls="topbar-nav"
+            aria-label="Menu"
+          >
+            <span class="topbar__bars" aria-hidden="true"></span>
+          </button>
+        </header>
+
+        <main id="signin">
+          <h1 class="page-title">Sign in</h1>
+          <noscript>
+            <p class="blog-status blog-status--error">
+              This form needs JavaScript. Email
+              <a href="mailto:jfdiazbus@gmail.com">jfdiazbus@gmail.com</a> instead.
+            </p>
+          </noscript>
+          <p class="lede">
+            Your account keeps your orders in one place and lets you comment on the blog.
+          </p>
+
+          <section class="block" aria-labelledby="signin-title">
+            <div class="rule" aria-hidden="true"></div>
+            <h2 class="heading" id="signin-title">Your account</h2>
+
+            <form class="blog-panel blog-login-form" id="login-form" novalidate>
+              <div class="blog-field">
+                <label for="login-email">Email</label>
+                <input
+                  id="login-email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  maxlength="254"
+                  required
+                />
+              </div>
+              <div class="blog-field">
+                <label for="login-password">Password</label>
+                <input
+                  id="login-password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  maxlength="200"
+                  required
+                />
+              </div>
+              <p class="blog-status" id="login-status" role="status" aria-live="polite"></p>
+              <button class="btn btn--primary" type="submit">Sign in</button>
+              <p class="blog-muted">
+                No account yet? <a href="/register">Create one</a>. The blog writing desk keeps its
+                own password and is not this account.
+              </p>
+            </form>
+          </section>
+        </main>
+
+        <footer class="block">
+          <div class="rule rule--thin" aria-hidden="true"></div>
+          <p class="eof">Thanks for reading! :-)</p>
+          <p class="links">
+            <a href="/services">Services</a>
+            <a href="/terms">Terms and privacy</a>
+            <a href="mailto:jfdiazbus@gmail.com">Email</a>
+          </p>
+        </footer>
+      </div>
+    </div>
+    <script type="module" src="/bar.js"></script>
+    <script type="module" src="/account.js"></script>
+  </body>
+</html>

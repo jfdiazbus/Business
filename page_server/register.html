@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create an account — Juan Felipe Diaz Bustamante</title>
+    <meta name="description" content="Create an account for your orders and blog comments." />
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='14' font-weight='bold' text-anchor='middle' fill='%23ff6b5a'%3E:-)%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#register">skip to the form</a>
+
+    <div class="sheet">
+      <div class="page">
+        <header class="topbar">
+          <a class="brand" href="/"
+            >Juan Felipe Diaz Bustamante<span class="role"> — account</span></a
+          >
+          <nav id="topbar-nav" aria-label="site">
+            <a href="/home">Portfolio</a>
+            <a href="/services">Services</a>
+            <a href="/school">School</a>
+            <a href="/blog">Blog</a>
+            <a href="/login" data-account-link>Log in</a>
+          </nav>
+          <a class="btn btn--primary" href="mailto:jfdiazbus@gmail.com">Email me</a>
+          <button
+            class="topbar__menu"
+            type="button"
+            aria-expanded="false"
+            aria-controls="topbar-nav"
+            aria-label="Menu"
+          >
+            <span class="topbar__bars" aria-hidden="true"></span>
+          </button>
+        </header>
+
+        <main id="register">
+          <h1 class="page-title">Create an account</h1>
+          <noscript>
+            <p class="blog-status blog-status--error">
+              This form needs JavaScript. Email
+              <a href="mailto:jfdiazbus@gmail.com">jfdiazbus@gmail.com</a> instead.
+            </p>
+          </noscript>
+          <p class="lede">One account for your orders and for comments on the blog.</p>
+
+          <section class="block" aria-labelledby="register-title">
+            <div class="rule" aria-hidden="true"></div>
+            <h2 class="heading" id="register-title">A few details</h2>
+
+            <form class="blog-panel blog-login-form" id="register-form" novalidate>
+              <div class="blog-field">
+                <label for="register-name">Name (optional)</label>
+                <input
+                  id="register-name"
+                  name="name"
+                  type="text"
+                  autocomplete="name"
+                  maxlength="80"
+                />
+                <small>Shown next to your comments. Leave it empty and they say Reader.</small>
+              </div>
+              <div class="blog-field">
+                <label for="register-email">Email</label>
+                <input
+                  id="register-email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  maxlength="254"
+                  required
+                />
+              </div>
+              <div class="blog-field">
+                <label for="register-password">Password</label>
+                <input
+                  id="register-password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="10"
+                  maxlength="200"
+                  required
+                />
+                <small>At least 10 characters. I do not send account email yet.</small>
+              </div>
+              <p class="blog-status" id="register-status" role="status" aria-live="polite"></p>
+              <button class="btn btn--primary" type="submit">Create account</button>
+              <p class="blog-muted">
+                Already have one? <a href="/login">Sign in</a>. By creating an account you agree to
+                the <a href="/terms">terms and privacy notice</a>.
+              </p>
+            </form>
+          </section>
+        </main>
+
+        <footer class="block">
+          <div class="rule rule--thin" aria-hidden="true"></div>
+          <p class="eof">Thanks for reading! :-)</p>
+          <p class="links">
+            <a href="/services">Services</a>
+            <a href="/terms">Terms and privacy</a>
+            <a href="mailto:jfdiazbus@gmail.com">Email</a>
+          </p>
+        </footer>
+      </div>
+    </div>
+    <script type="module" src="/bar.js"></script>
+    <script type="module" src="/account.js"></script>
+  </body>
+</html>

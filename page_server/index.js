@@ -28,6 +28,9 @@ export const REWRITES = {
   "/terms": "terms.html",
   "/blog": "blog.html",
   "/blog/write": "blog-write.html",
+  "/login": "login.html",
+  "/register": "register.html",
+  "/account": "account.html",
 };
 
 export const MIME = {
@@ -201,6 +204,16 @@ export function createAppServer({
   return createServer(async (req, res) => {
     const method = req.method ?? "GET";
     const apiUrl = new URL(req.url ?? "/", "http://localhost");
+
+    if (apiUrl.pathname.startsWith("/api/account") || apiUrl.pathname === "/api/stripe/webhook") {
+      res.writeHead(503, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          error: "Accounts and orders run on Cloudflare. Use pnpm dev:worker.",
+        }),
+      );
+      return;
+    }
 
     if (apiUrl.pathname === "/api/create-checkout-session" && method === "POST") {
       const secret = process.env.STRIPE_SECRET_KEY;

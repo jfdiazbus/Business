@@ -27,6 +27,9 @@ const ROUTES = {
   "/terms": "terms.html",
   "/blog": "blog.html",
   "/blog/write": "blog-write.html",
+  "/login": "login.html",
+  "/register": "register.html",
+  "/account": "account.html",
 };
 
 const text = (node) => node.textContent.replace(/\s+/g, " ").trim();
@@ -228,11 +231,11 @@ describe("the two pages together", () => {
     }
   });
 
-  it("loads one small script on either page, for the bar alone", () => {
-    for (const page of [services, thanks]) {
-      const scripts = [...page.querySelectorAll("script[src]")];
+  it("loads one small script on either page, plus the account note after a payment", () => {
+    const scripts = (page) =>
+      [...page.querySelectorAll("script[src]")].map((script) => script.getAttribute("src"));
 
-      expect(scripts.map((script) => script.getAttribute("src"))).toEqual(["/bar.js"]);
-    }
+    expect(scripts(services)).toEqual(["/bar.js"]);
+    expect(scripts(thanks)).toEqual(["/bar.js", "/account.js"]);
   });
 });

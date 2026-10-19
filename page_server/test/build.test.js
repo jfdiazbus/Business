@@ -135,6 +135,8 @@ describe("the build", () => {
     expect(entries.sort()).toEqual([
       "404.html",
       "_headers",
+      "account.html",
+      "account.js",
       "bar.js",
       "blog-editor.html",
       "blog-shell.html",
@@ -143,7 +145,9 @@ describe("the build", () => {
       "docs",
       "home.html",
       "index.html",
+      "login.html",
       "projects",
+      "register.html",
       "school.html",
       "services.html",
       "style.css",
