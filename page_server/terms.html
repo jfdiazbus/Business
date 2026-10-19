@@ -42,6 +42,7 @@
             <a href="/services">Services</a>
             <a href="/school">School</a>
             <a href="/blog">Blog</a>
+            <a href="/login" data-account-link>Log in</a>
           </nav>
           <a class="btn btn--primary" href="mailto:jfdiazbus@gmail.com">Email me</a>
           <button
@@ -206,9 +207,10 @@
               Controller: Juan Felipe Diaz Bustamante, contact
               <a href="mailto:jfdiazbus@gmail.com">jfdiazbus@gmail.com</a>. I hold your name, your
               email address, what you wrote in the brief, and the records of what you paid and what
-              was delivered. Stripe holds the payment itself. Cloudflare serves the site. I use your
-              details to perform the contract, to send the invoice, and to meet legal duties such as
-              accounting.
+              was delivered. If you create an account, I also hold your email, the optional name you
+              give, a hash of your password, your orders and your comments. Stripe holds the payment
+              itself. Cloudflare serves the site. I use your details to perform the contract, to
+              send the invoice, and to meet legal duties such as accounting.
             </p>
             <p>
               Legal bases: performance of the contract for carrying out the service and related
@@ -225,18 +227,44 @@
             <p>
               Retention: I keep invoices and accounting records for ten years as required by Spanish
               law. Briefs and messages are kept until the work is delivered and any warranty period
-              ends, then deleted or archived only as needed for accounting. The private blog editor
-              also keeps a one way hash of a network address when someone tries to sign in, to slow
-              password guessing; expired entries are cleared on a later sign in attempt.
+              ends, then deleted or archived only as needed for accounting. Account details and
+              comments stay until you delete the account. After that, orders stay in the accounting
+              records without your account attached; the invoice keeps the billing details the law
+              requires. The private blog editor and the account sign in also keep a one way hash of
+              a network address for a short time when someone tries to sign in, to slow password
+              guessing; expired entries are cleared on a later attempt.
             </p>
             <p>
               Your rights: you may ask for access to, correction of, or deletion of your data where
               the law allows, and you may object to or ask to restrict certain uses, and ask for
-              portability where it applies. Email me at the address above to exercise these rights.
-              You also have the right to lodge a complaint with your supervisory authority. In Spain
-              that is the AEPD (Agencia Espanola de Proteccion de Datos). I use no marketing cookies
-              and no tracking beyond what is strictly necessary to run the site and Stripe checkout.
-              Consent for any non essential cookie would be sought first, and you may refuse.
+              portability where it applies. Email me at the address above to exercise these rights,
+              or use the delete button on your account page. You also have the right to lodge a
+              complaint with your supervisory authority. In Spain that is the AEPD (Agencia Espanola
+              de Proteccion de Datos). I use no marketing cookies and no tracking beyond what is
+              strictly necessary to run the site, the sign in cookie and Stripe checkout. Consent
+              for any non essential cookie would be sought first, and you may refuse.
+            </p>
+
+            <h2 class="heading heading--sub" id="accounts-title">Accounts and comments</h2>
+            <p>
+              An account is optional. It keeps your orders in one place and lets you comment on the
+              blog. To create one I ask for an email address, a password and, if you want, a name.
+              The password is stored only as a slow one way hash, never in readable form. Signing in
+              sets one essential cookie that keeps you signed in for thirty days; signing out or
+              deleting the account removes it.
+            </p>
+            <p>
+              Comments are public. Anyone can read them, and your name, or Reader if you left the
+              name empty, appears beside them. Do not write anything in a comment that you would not
+              put on a public page. You can delete your own comments, and deleting your account
+              deletes all of them. I may remove a comment that is abusive, unlawful, or unrelated to
+              the post; email me if you see one that should go.
+            </p>
+            <p>
+              I do not send account email yet. That means there is no email confirmation and no
+              automatic password reset. If you lose your password, email me and I will help you
+              delete the account so you can create it again. If you ask for a change to an order
+              that is already in the accounting records, I may need to keep the invoice as it is.
             </p>
 
             <h2 class="heading heading--sub" id="law-title">Which law applies</h2>
@@ -260,7 +288,7 @@
             <h2 class="heading heading--sub" id="changed-title">Changes to these terms</h2>
             <p>
               The version published on the day you pay is the one that applies to your work. If I
-              change anything, this page shows the date it last changed. Last updated 18 October
+              change anything, this page shows the date it last changed. Last updated 19 October
               2026.
             </p>
           </section>

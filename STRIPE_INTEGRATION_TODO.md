@@ -117,7 +117,7 @@ Hosted Checkout means you never handle card data; Stripe does.
 - [ ] Set `STRIPE_SECRET_KEY` live (`sk_live_...`) as Worker secret and remove test keys from `.env`/`.dev.vars`.
 - [ ] Switch Payment Links to live (`buy.stripe.com/live_...`) or remove fallback hrefs once Checkout Sessions are verified.
 - [ ] If you upgrade `stripe` to `>=21.0.0`, change `ui_mode` from `hosted` to `hosted_page` in both `worker.js` and `index.js` (or keep `hosted` — both work but `hosted_page` is the new name).
-- [ ] Add `STRIPE_WEBHOOK_SECRET` and a `POST /api/webhook` handler only if you need fulfillment (grant access, emails). Current code has no webhook — add only when you have a datastore pattern for `customer_id`/`subscription_id`.
+- [x] `POST /api/stripe/webhook` records paid checkouts for reader accounts (orders and comments live in D1). Set `STRIPE_WEBHOOK_SECRET` from the Stripe endpoint, with `checkout.session.completed` and `checkout.session.async_payment_succeeded` enabled. The `/thanks` page also reconciles the checkout when Stripe redirects back, so a delayed webhook does not lose the order.
 - [ ] Verify `automatic_tax`, `phone_number_collection`, `billing_address_collection`, etc., still match your Checkout Studio UI before each deploy.
 
 ### 7. Resources

@@ -132,7 +132,148 @@ function renderPost(post) {
   const link = element("a", "", "Back to all posts");
   link.href = "/blog";
   back.append(link);
-  root.append(back);
+
+  const comments = element("section", "blog-comments");
+  comments.id = "comments";
+  root.append(back, comments);
+  renderComments(post, comments);
+}
+
+function setBlogStatus(node, message, kind = "") {
+  node.textContent = message;
+  node.className = `blog-status${kind ? ` blog-status--${kind}` : ""}`;
+}
+
+function renderCommentList(list, comments, status) {
+  list.replaceChildren();
+
+  if (comments.length === 0) {
+    setBlogStatus(status, "No comments yet. Say something useful.");
+    return;
+  }
+
+  setBlogStatus(status, `${comments.length} ${comments.length === 1 ? "comment" : "comments"}`);
+
+  for (const comment of comments) {
+    const card = element("article", "comment");
+    const meta = element("p", "comment-meta");
+    meta.append(element("strong", "", comment.author), ` · ${dateLabel(comment.created_at)}`);
+    card.append(meta, element("p", "comment-body", comment.body));
+
+    if (comment.mine) {
+      const remove = element("button", "btn btn--ghost comment-delete", "Delete");
+      remove.type = "button";
+      remove.addEventListener("click", async () => {
+        try {
+          const response = await fetch(`/api/blog/comments/${encodeURIComponent(comment.id)}`, {
+            method: "DELETE",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+          });
+          if (!response.ok) throw new Error();
+          await refreshComments(card.closest(".blog-comments"), list, status);
+        } catch {
+          setBlogStatus(status, "That comment could not be deleted.", "error");
+        }
+      });
+      card.append(remove);
+    }
+
+    list.append(card);
+  }
+}
+
+async function refreshComments(section, list, status) {
+  const slug = section.dataset.slug;
+  try {
+    const response = await fetch(`/api/blog/posts/${encodeURIComponent(slug)}/comments`);
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "Could not load comments");
+    renderCommentList(list, result.comments || [], status);
+  } catch {
+    setBlogStatus(status, "Comments could not load just now.", "error");
+  }
+}
+
+function commentForm(section, list, status) {
+  const form = element("form", "comment-form");
+  const label = element("label", "blog-label", "Your comment");
+  label.htmlFor = "comment-body";
+  const textarea = element("textarea");
+  textarea.id = "comment-body";
+  textarea.name = "body";
+  textarea.rows = 4;
+  textarea.maxLength = 2000;
+  textarea.required = true;
+  const submit = element("button", "btn btn--primary", "Post comment");
+  submit.type = "submit";
+  form.append(label, textarea, submit);
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const body = textarea.value.trim();
+    if (!body) {
+      setBlogStatus(status, "Write something first.", "error");
+      return;
+    }
+
+    submit.disabled = true;
+    setBlogStatus(status, "Posting…");
+    try {
+      const response = await fetch(
+        `/api/blog/posts/${encodeURIComponent(section.dataset.slug)}/comments`,
+        {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ body }),
+        },
+      );
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Could not post the comment");
+      textarea.value = "";
+      await refreshComments(section, list, status);
+      setBlogStatus(status, "Posted.", "success");
+    } catch (cause) {
+      setBlogStatus(status, cause.message, "error");
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
+  return form;
+}
+
+async function renderComments(post, section) {
+  section.dataset.slug = post.slug;
+  const heading = element("h2", "heading", "Comments");
+  heading.id = "comments-title";
+  const status = element("p", "blog-status");
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  const list = element("div", "comment-list");
+  section.setAttribute("aria-labelledby", "comments-title");
+  section.append(heading, status, list);
+
+  await refreshComments(section, list, status);
+
+  try {
+    const response = await fetch("/api/account/session", { credentials: "same-origin" });
+    const result = await response.json();
+    if (result.authenticated) {
+      section.append(commentForm(section, list, status));
+      return;
+    }
+  } catch {
+    // fall through to the sign in prompt
+  }
+
+  const prompt = element("p", "blog-muted");
+  prompt.append("Sign in to comment. ");
+  const link = element("a", "", "Sign in");
+  link.href = `/login?next=${encodeURIComponent(location.pathname)}`;
+  prompt.append(link);
+  section.append(prompt);
 }
 
 async function load() {

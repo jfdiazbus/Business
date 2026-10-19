@@ -95,6 +95,29 @@ export function activateMenu(bar, { doc = document, view = globalThis } = {}) {
   return { open, close, isOpen };
 }
 
+/** The nav says "Log in" until the server says someone is signed in. */
+export async function markSignedIn(link, { fetchImpl = globalThis.fetch } = {}) {
+  if (!link || typeof fetchImpl !== "function") return null;
+
+  try {
+    const response = await fetchImpl("/api/account/session", { credentials: "same-origin" });
+    if (!response.ok) return null;
+    const result = await response.json();
+    if (!result || !result.authenticated) return null;
+    link.textContent = "Account";
+    link.href = "/account";
+    link.setAttribute("data-signed-in", "true");
+    if (globalThis.location?.pathname === "/account") {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+    return result.user || null;
+  } catch {
+    return null;
+  }
+}
+
 if (typeof document !== "undefined") {
   const bar = document.querySelector(BAR);
 
@@ -102,4 +125,6 @@ if (typeof document !== "undefined") {
     observeScroll(bar);
     activateMenu(bar);
   }
+
+  markSignedIn(document.querySelector("[data-account-link]"));
 }

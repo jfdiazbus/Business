@@ -27,8 +27,12 @@ export const PAGE_FILES = [
   ["terms.html", "terms.html"],
   ["blog.html", "blog-shell.html"],
   ["blog-write.html", "blog-editor.html"],
+  ["login.html", "login.html"],
+  ["register.html", "register.html"],
+  ["account.html", "account.html"],
   ["blog.js", "blog.js"],
   ["blog-write.js", "blog-write.js"],
+  ["account.js", "account.js"],
   ["style.css", "style.css"],
   ["world.js", "world.js"],
   ["bar.js", "bar.js"],
@@ -64,6 +68,9 @@ export const HEADERS = `/projects/*/assets/*
   Cache-Control: public, max-age=3600
 
 /bar.js
+  Cache-Control: public, max-age=3600
+
+/account.js
   Cache-Control: public, max-age=3600
 
 
@@ -129,6 +136,9 @@ export async function build({ outDir = DEFAULT_OUT, workspace = DEFAULT_WORKSPAC
       ...(await checkLinks(outDir, "terms.html")),
       ...(await checkLinks(outDir, "blog-shell.html")),
       ...(await checkLinks(outDir, "blog-editor.html")),
+      ...(await checkLinks(outDir, "login.html")),
+      ...(await checkLinks(outDir, "register.html")),
+      ...(await checkLinks(outDir, "account.html")),
     ]),
   ];
 
@@ -144,7 +154,13 @@ export function collectInternalLinks(html) {
 /** The file a site-absolute link should resolve to inside dist. */
 export function resolveAsset(outDir, href) {
   const clean = href.split("#")[0].split("?")[0];
-  const prettyPages = { "/blog": "blog-shell.html", "/blog/write": "blog-editor.html" };
+  const prettyPages = {
+    "/blog": "blog-shell.html",
+    "/blog/write": "blog-editor.html",
+    "/login": "login.html",
+    "/register": "register.html",
+    "/account": "account.html",
+  };
   if (prettyPages[clean]) return path.join(outDir, prettyPages[clean]);
   let rel = clean.replace(/^\/+/, "");
   if (rel === "" || rel.endsWith("/")) rel += "index.html";

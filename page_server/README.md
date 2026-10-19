@@ -182,6 +182,10 @@ network service.
   text nodes, so a title or paragraph cannot run as a script.
 - Images may be JPEG, PNG, WebP or GIF up to 12 MB. Videos may be MP4 or WebM up
   to 32 MB. They are served by the Worker from generated R2 keys.
+- Readers with an account can comment on published posts. Comments are plain
+  text, render with `textContent`, and are limited to five per reader in ten
+  minutes. The blog writing desk keeps its own password and is separate from
+  reader accounts.
 
 ### Local blog development
 
@@ -294,6 +298,69 @@ when a price, the tax behaviour, the redirect or the invoice setting has drifted
 since. The deploy script passes only the `CLOUDFLARE_*` values from `.secrets`
 to wrangler, so nothing else in that file can reach a deploy.
 
+## Accounts, orders and comments
+
+Readers can create an account with an email and password. It keeps their orders
+in one place and lets them comment on published posts. The blog writing desk is
+not part of this: it keeps its own admin password and cannot be reached with a
+reader account.
+
+- `/register`, `/login` and `/account` are the pages. The nav link says `Log in`
+  until the Worker session says otherwise, then `Account`.
+- The API lives under `/api/account`: `session`, `register`, `login`, `logout`,
+  `orders`, `orders/reconcile`, `password`, and `DELETE /api/account`.
+- Passwords are hashed with PBKDF2 SHA-256, 100,000 iterations (the highest
+  Workers accepts), a random salt per account, and a constant time comparison.
+  Only the hash is stored.
+- Sessions are random 32 byte tokens. The database stores a SHA-256 hash of the
+  token, not the token itself, and the cookie is `HttpOnly`, `Secure`,
+  `SameSite=Lax`, and lasts thirty days.
+- Limits: five registrations per network address per hour, ten failed sign ins
+  per address per fifteen minutes, and five comments per reader per ten
+  minutes. Addresses are stored only as one way hashes.
+- No account email is sent yet, so there is no address confirmation and no
+  automatic password reset. The terms say so, and the account page can change or
+  delete the account.
+- Deleting an account removes its comments and sessions. Orders stay in the
+  accounting records with no account attached, as the ten year invoice duty
+  requires.
+- Comments publish immediately. There is no moderation screen yet: list them
+  with `wrangler d1 execute portfolio-blog --remote --command "SELECT id, post_slug, user_id, body, created_at FROM blog_comments ORDER BY created_at DESC"`,
+  then delete one by id. A comment is also removed when its author deletes it,
+  when the account is deleted, or when the post is deleted.
+
+The schema is in `migrations/0003_accounts.sql`:
+
+```bash
+pnpm exec wrangler d1 migrations apply portfolio-blog --local
+pnpm exec wrangler d1 migrations apply portfolio-blog --remote
+pnpm exec wrangler d1 migrations apply portfolio-blog --remote --preview
+```
+
+### Orders from Stripe
+
+When a signed in reader starts a checkout, the Worker adds their account id as
+`client_reference_id` and `metadata.user_id`, so the payment can be attributed
+without trusting anything the browser sent. Two paths record the order:
+
+1. `POST /api/stripe/webhook` verifies the Stripe signature with
+   `STRIPE_WEBHOOK_SECRET` and stores `checkout.session.completed` (and
+   `checkout.session.async_payment_succeeded`) events.
+2. When Stripe redirects back to `/thanks?session_id=...`, `account.js` asks the
+   Worker to retrieve the session and store it if the signed in reader owns it.
+   This covers the case where the webhook is delayed.
+
+Create the webhook endpoint in Stripe for the production URL and those two
+events, then store its signing secret:
+
+```bash
+pnpm exec wrangler secret put STRIPE_WEBHOOK_SECRET
+```
+
+A checkout started with JavaScript turned off goes through the Payment Link
+fallback and is not attached to an account. The order is still in Stripe and in
+the receipt email.
+
 ## Tests
 
 `pnpm test` runs fourteen suites:
@@ -354,10 +421,12 @@ Worth knowing before you change anything, because the tests enforce most of it:
 
 ## Still to do
 
-- **Stripe is in sandbox mode.** The buy buttons work, but they take Stripe's
-  test cards until an account is activated and three live links are pasted in.
-  See "Going live" above, and the tax registration in particular: without one,
-  Stripe collects zero tax and says nothing at all.
+- **Stripe is live.** The five links charge real cards. Test with a small real
+  payment after any change, and keep the live keys out of the repository.
+- **Accounts have no email confirmation or automatic password reset.** Adding
+  an email provider is the next step before registration is advertised widely.
+  Until then the terms explain the manual route, and comments are published
+  without moderation.
 - **The layout and copy have not been checked by a designer**, and the terms
   have not been read by a lawyer.
 - **Privacy is a section of the terms, not its own page.** If analytics or any
