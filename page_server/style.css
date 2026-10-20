@@ -545,6 +545,107 @@ a:focus-visible {
   background: var(--ink-faint);
 }
 
+/* -- the five services at a glance --------------------------------------- */
+/* A real table, because it is one: rows of comparable facts. The first column
+   links into the card that sells the thing. */
+
+.offers {
+  width: 100%;
+  max-width: 92ch;
+  margin: var(--sp-500) 0 var(--sp-500);
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  text-align: left;
+}
+
+.offers caption {
+  margin-bottom: var(--sp-200);
+  color: var(--ink-soft);
+  text-align: left;
+}
+
+.offers th,
+.offers td {
+  padding: var(--sp-100) var(--sp-300) var(--sp-100) 0;
+  vertical-align: baseline;
+  border-bottom: 1px solid var(--line);
+}
+
+.offers thead th {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.offers tbody th {
+  font-weight: 500;
+}
+
+.offers th:last-child,
+.offers td:last-child {
+  padding-right: 0;
+}
+
+.offers tbody th a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 1px;
+}
+
+.offers tbody th a:hover,
+.offers tbody th a:focus-visible {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+
+.offers__price {
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+
+/* -- the two branches, each a run of cards ------------------------------- */
+
+.branch {
+  margin-top: var(--sp-700);
+}
+
+.branch > .heading {
+  margin-bottom: var(--sp-50);
+}
+
+.branch__note {
+  margin-bottom: var(--sp-400);
+  color: var(--ink-soft);
+}
+
+/* what the price leaves out, said before the buy button rather than after */
+.excluded {
+  margin: var(--sp-300) 0 0;
+  padding-top: var(--sp-200);
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+}
+
+.excluded__k {
+  margin-right: var(--sp-100);
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.price-note {
+  margin: 0 0 var(--sp-300);
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+}
+
+.note {
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+}
+
 .faq {
   margin: 0;
   max-width: var(--measure);
@@ -629,7 +730,7 @@ a:focus-visible {
 
 /* the buy buttons: one clear action per offer */
 .project .links a.buy {
-  padding: var(--sp-75) var(--sp-200);
+  padding: var(--sp-100) var(--sp-300);
   border: 0;
   border-radius: var(--r-full);
   background: var(--ink);
@@ -1326,6 +1427,60 @@ footer .links a:focus-visible {
   .blog-add-control {
     flex-basis: auto;
   }
+
+  /* the comparison table stacks rather than scrolling sideways: each row
+     becomes a small block, and the cells that need a name carry one */
+  .offers {
+    margin-block: var(--sp-400);
+  }
+
+  .offers caption {
+    display: block;
+    width: 100%;
+    margin-bottom: var(--sp-100);
+  }
+
+  .offers thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .offers,
+  .offers tbody,
+  .offers tr,
+  .offers th,
+  .offers td {
+    display: block;
+    width: auto;
+  }
+
+  .offers tr {
+    padding: var(--sp-200) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .offers th,
+  .offers td {
+    padding: 0;
+    border: 0;
+  }
+
+  .offers td[data-label] {
+    color: var(--ink-soft);
+  }
+
+  .offers td[data-label]::before {
+    content: attr(data-label) ": ";
+  }
+
+  .offers__price {
+    margin-block: var(--sp-50);
+    font-size: var(--fs-lg);
+  }
 }
 
 @media (max-width: 767px) {
@@ -1436,11 +1591,31 @@ footer .links a:focus-visible {
     background: #fff;
   }
 
+  /* the buy pill would print as a solid black block; on paper it is a label */
+  .project .links a.buy {
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #000;
+  }
+
+  .offers th,
+  .offers td,
+  .offers tr {
+    border-color: #ccc;
+  }
+
   .price,
   .included li,
   .faq dd,
   .colophon,
-  .lede {
+  .lede,
+  .note,
+  .price-note,
+  .excluded,
+  .branch__note,
+  .offers th,
+  .offers td,
+  .offers caption {
     color: #000;
   }
 }

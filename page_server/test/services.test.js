@@ -121,8 +121,52 @@ describe("the prices page", () => {
 
     for (const offer of offers) {
       expect(text(offer.querySelector("h3")).length).toBeGreaterThan(3);
-      expect(text(offer.querySelector("p:not(.price)")).length).toBeGreaterThan(20);
+      expect(text(offer.querySelector("p.detail")).length).toBeGreaterThan(20);
       expect(offer.querySelectorAll(".included li").length).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("shows the five at a glance, cheapest first, each one a link into its card", () => {
+    const rows = [...services.querySelectorAll(".offers tbody tr")];
+
+    expect(services.querySelector(".offers caption")).toBeTruthy();
+    expect(services.querySelectorAll('.offers thead th[scope="col"]')).toHaveLength(4);
+    expect(rows).toHaveLength(5);
+
+    const prices = rows.map((row) =>
+      Number(text(row.querySelector(".offers__price")).replace(/\D/g, "")),
+    );
+    expect(prices).toEqual([...prices].sort((a, b) => a - b));
+
+    for (const row of rows) {
+      const target = row.querySelector("th a").getAttribute("href");
+
+      expect(target.startsWith("#"), target).toBe(true);
+      expect(services.getElementById(target.slice(1)), target).toBeTruthy();
+    }
+  });
+
+  it("says what each price leaves out, and that tax comes on top", () => {
+    for (const offer of services.querySelectorAll("#services .project")) {
+      const name = text(offer.querySelector("h3"));
+
+      expect(text(offer.querySelector(".price-note")), name).toMatch(/tax/i);
+      expect(text(offer.querySelector(".excluded")), name).toMatch(/not included/i);
+      expect(text(offer.querySelector(".excluded")).length, name).toBeGreaterThan(20);
+    }
+  });
+
+  it("puts every card under the branch that owns it", () => {
+    const branches = [...services.querySelectorAll("#services .branch")];
+
+    expect(branches).toHaveLength(2);
+
+    for (const branch of branches) {
+      const label = branch.getAttribute("aria-labelledby");
+
+      expect(services.getElementById(label), label).toBeTruthy();
+      expect(branch.querySelector("#" + label).tagName).toBe("H2");
+      expect(branch.querySelectorAll(".project").length).toBeGreaterThan(0);
     }
   });
 
@@ -145,7 +189,14 @@ describe("the prices page", () => {
     expect(questions.length).toBeGreaterThanOrEqual(5);
     expect(services.querySelectorAll(".faq dd")).toHaveLength(questions.length);
 
-    for (const worry of [/refund/, /owns? the code/, /need from me/, /working day|week/]) {
+    for (const worry of [
+      /refund/,
+      /owns? the code/,
+      /need from me/,
+      /working day|week/,
+      /add the rest later/,
+      /domain and hosting/,
+    ]) {
       expect(answers, String(worry)).toMatch(worry);
     }
   });
@@ -154,6 +205,7 @@ describe("the prices page", () => {
     expect(text(services.querySelector("#services"))).toContain("euro");
     expect(services.querySelector('#services a[href="/home"]')).toBeTruthy();
     expect(services.querySelector('#services a[href="/school"]')).toBeTruthy();
+    expect(services.querySelector('#services a[href="/terms"]')).toBeTruthy();
   });
 
   it("leaves one way to get in touch and one way back", () => {

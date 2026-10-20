@@ -264,7 +264,7 @@ for the buyer, and a redirect to `/thanks`. Payment methods are left to Stripe
 (dynamic payment methods), which is why its checkout offers card, Klarna,
 Bancontact and Amazon Pay rather than card alone.
 
-Those links sit directly in the three buy buttons in `services.html`, so the page
+Those links sit directly in the five buy buttons in `services.html`, so the page
 sells without any JavaScript. They are **test links**, so the buttons lead to
 the Stripe sandbox: a visitor can only pay with Stripe's test cards, no money
 moves, and Stripe labels the page as a sandbox. Swap in live links before you
@@ -278,8 +278,8 @@ send anyone to `/services`.
    for each place you are registered to collect tax. Until both exist,
    `automatic_tax` silently collects **zero**: the checkout shows a tax line of
    €0.00 and raises no error. Settle that with your accountant, not with me.
-3. Recreate the three Payment Links in **live mode** with the same settings as
-   the table above, and swap their URLs into the three buy buttons in
+3. Recreate the five Payment Links in **live mode** with the same settings as
+   the table above, and swap their URLs into the five buy buttons in
    `services.html`.
 4. Buy one with a card from Stripe's test list in the sandbox, then make one real
    live purchase and refund it.
@@ -390,7 +390,9 @@ the receipt email.
   repositories, and keeps the copy on the same house rules.
 - **services** — the prices and the questions, one checkout per offer, heading
   levels that never skip, every id used once, and every link pointed at a page
-  this site really serves.
+  this site really serves. A comparison table at the top that links into each
+  card, and on every offer a tax note and a line saying what the price leaves
+  out.
 - **stripe** — the buttons sell with real Payment Links that carry the settings
   the page promises and charge the price the page shows. It reads
   `STRIPE_SECRET_KEY` from the environment or from `.secrets`; without a key the
