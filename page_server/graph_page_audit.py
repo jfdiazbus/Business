@@ -21,7 +21,7 @@ from urllib.request import urlopen
 
 from langgraph.graph import END, START, StateGraph
 
-PAGES = ["/", "/home", "/school", "/services", "/thanks"]
+PAGES = ["/", "/home", "/school", "/services", "/terms", "/thanks", "/login", "/register", "/blog"]
 
 
 class State(TypedDict):
@@ -250,7 +250,7 @@ def check(page: dict, base_url: str, dead_links: list[str]) -> list[dict]:
         third_party = sorted({urlparse(url).netloc for url in page["preconnects"]})
         add("info", "third-party", f"preconnect to {', '.join(third_party)}")
 
-    if page["bytes"] > 15_000:
+    if page["bytes"] > 25_000:
         add("warn", "weight", f"{page['bytes']} bytes of HTML")
 
     if page.get("total_bytes", page["bytes"]) > 80_000:

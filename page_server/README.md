@@ -11,7 +11,7 @@ If you are here to change how it looks, read **[`docs/style.md`](docs/style.md)*
 first: it explains where every value lives and what not to break. This file is
 about running, testing and shipping it.
 
-### The pages
+## The pages
 
 | Route         | Page                      |
 | ------------- | ------------------------- |
@@ -29,19 +29,48 @@ and a rewrite table in the local server — so nothing ships an `_redirects` fil
 
 ## Everyday commands
 
-| Command           | What it does                                                      |
-| ----------------- | ----------------------------------------------------------------- |
-| `pnpm install`    | Install the dev tools (only needed once, and after a fresh clone) |
-| `pnpm start`      | Open it at <http://localhost:3000>                                |
-| `pnpm dev`        | The static site at `http://localhost:3000`                        |
-| `pnpm dev:worker` | Build, then run the Worker with local D1 and R2 at port 8787      |
-| `pnpm test`       | Run the tests                                                     |
-| `pnpm build`      | Write the deployable site to `dist/`                              |
-| `pnpm format`     | Tidy the code with Prettier                                       |
-| `pnpm run deploy` | Build and ship `dist/` to Cloudflare                              |
+| Command           | What it does                                                       |
+| ----------------- | ------------------------------------------------------------------ |
+| `pnpm install`    | Install the dev tools (only needed once, and after a fresh clone)  |
+| `pnpm start`      | Open it at <http://localhost:3000>                                 |
+| `pnpm dev`        | The static site at `http://localhost:3000`                         |
+| `pnpm dev:worker` | Build, then run the Worker with local D1 and R2 at port 8787       |
+| `pnpm test`       | Run the unit, build and Worker tests                               |
+| `pnpm e2e`        | Open every page in a browser: axe, the skip link, the film         |
+| `pnpm lighthouse` | Score every page and hold accessibility at 100                     |
+| `pnpm lint`       | JavaScript, CSS, HTML, Markdown and the spelling in all of them    |
+| `pnpm types`      | Type check the server and the pipeline scripts, with no build      |
+| `pnpm knip`       | Find code, exports and dependencies nothing uses                   |
+| `pnpm size`       | Check the stylesheet, the scripts, the engine and the film budgets |
+| `pnpm coverage`   | The unit tests again, with a coverage report                       |
+| `pnpm build`      | Write the deployable site to `dist/`                               |
+| `pnpm format`     | Tidy the code with Prettier                                        |
+| `pnpm run deploy` | Build and ship `dist/` to Cloudflare                               |
 
 `node_modules/` and `dist/` are not committed — they are built from
 `package.json` and the source files.
+
+The site's own code still runs on the platform and the Stripe SDK. Everything
+in the table above is a dev dependency, and the project suite fails if
+`dependencies` grows past `stripe`.
+
+## Dev tools
+
+| Package                                                     | What it is for                                                                            |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `vitest`, `jsdom`                                           | The test runner, and the real HTML it parses without a browser.                           |
+| `@vitest/coverage-v8`                                       | Coverage for the server, the Worker, the build and the page scripts.                      |
+| `prettier`                                                  | One formatting, enforced in CI.                                                           |
+| `eslint`, `@eslint/js`, `globals`, `eslint-config-prettier` | JavaScript errors, with browser, Worker and Node globals kept apart.                      |
+| `stylelint`, `stylelint-config-recommended`                 | CSS errors. The descending specificity rule is off: the stylesheet is ordered by section. |
+| `html-validate`                                             | HTML5 validation, which jsdom would otherwise repair silently.                            |
+| `markdownlint-cli2`, `cspell`                               | The prose in this file, and the spelling in the copy and the code.                        |
+| `knip`                                                      | Unused files, exports and dependencies.                                                   |
+| `size-limit`, `@size-limit/file`                            | Budgets on the stylesheet, the page scripts, the engine and the film.                     |
+| `typescript`, `@types/node`                                 | `checkJs` over the server and the scripts, with `noEmit`.                                 |
+| `@playwright/test`, `@axe-core/playwright`                  | A real browser: axe on every page, the skip link, and the scroll film.                    |
+| `@lhci/cli`                                                 | Lighthouse, with accessibility asserted at 100.                                           |
+| `wrangler`                                                  | The Worker, local D1 and R2, and deploying.                                               |
 
 ## What's in here
 
@@ -398,8 +427,42 @@ the receipt email.
 - **terms** — the page names the seller, answers what a buyer needs before
   paying (prices, delivery, refunds, the 14 day right to cancel, data), and is
   reachable from every footer.
-- **project** — the promises this project makes about itself: no runtime
-  dependencies, the pipeline files exist, git stays clean.
+- **project** — the promises this project makes about itself: the only runtime
+  dependency is Stripe, the pipeline files exist, git stays clean, and
+  node_modules never comes back into the index.
+
+`pnpm e2e` runs the browser checks jsdom cannot: axe over every page, the skip
+link by keyboard, and the scroll film mounting and moving. `pnpm lighthouse`
+asserts accessibility at 100 on the same pages, with reduced motion forced so
+the scroll reveals cannot be measured half faded; performance is a warning,
+because the film is the point of the front page.
+
+The CI in `.github/workflows/ci.yml` runs format, lint, dead code, size, types,
+tests and build in one job, then the browser checks and Lighthouse in two more.
+
+## Auditing the pages
+
+`graph_page_server.py` walks the pages and reports status and bytes.
+`graph_page_audit.py` is the same graph with a worker that reads what it
+fetches: title and description lengths, headings in order, duplicate ids,
+images without alt, links without words or pointing at `#`, dead internal
+links, Open Graph tags, inline script and style weight, and the bytes of CSS
+and JS each page asks the browser to download.
+
+```bash
+pnpm start                       # in one terminal
+python3 -m venv .venv
+./.venv/bin/pip install langgraph
+./.venv/bin/python graph_page_audit.py http://localhost:3000
+./.venv/bin/python graph_page_audit.py http://localhost:3000 -v   # notes too
+```
+
+It prints a count per level, then every error and warning. Errors are things a
+page should not ship; warnings are judgement calls; notes are facts worth
+knowing, such as a third party preconnect or a page kept out of search on
+purpose. The run on `main` found two level one headings on the front page, a
+services description too long for a search result, and missing preview tags on
+the private pages. Those are fixed.
 
 ## Conventions
 
@@ -500,7 +563,7 @@ pnpm run deploy
 **With an API token** — put the two values in `page_server/.secrets`, which is
 gitignored and read automatically:
 
-```
+```dotenv
 CLOUDFLARE_API_TOKEN=your-token-here
 CLOUDFLARE_ACCOUNT_ID=your-account-id-here
 ```
