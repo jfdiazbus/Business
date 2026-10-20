@@ -237,11 +237,9 @@ def check(page: dict, base_url: str, dead_links: list[str]) -> list[dict]:
     if not page["meta"].get("og:title") or not page["meta"].get("og:description"):
         add("warn", "open-graph", "og:title or og:description missing")
 
-    if not page["meta"].get("og:url") and not page.get("canonical"):
-        # The origin depends on where this is deployed, so the source cannot
-        # know it. Worth adding once there is a domain, not before.
-        if not (page["meta"].get("robots") and "noindex" in page["meta"]["robots"]):
-            add("info", "canonical", "no og:url or canonical: the deployed origin is not known here")
+    noindex = "noindex" in page["meta"].get("robots", "")
+    if not noindex and not page["meta"].get("og:url") and not page.get("canonical"):
+        add("warn", "canonical", "search may index this page but it names no canonical url")
 
     if page["meta"].get("robots") and "noindex" in page["meta"]["robots"]:
         add("info", "noindex", "kept out of search on purpose")
