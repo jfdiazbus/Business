@@ -8,7 +8,10 @@
         "http://127.0.0.1:3200/home",
         "http://127.0.0.1:3200/school",
         "http://127.0.0.1:3200/services",
-        "http://127.0.0.1:3200/thanks"
+        "http://127.0.0.1:3200/terms",
+        "http://127.0.0.1:3200/thanks",
+        "http://127.0.0.1:3200/login",
+        "http://127.0.0.1:3200/register"
       ],
       "numberOfRuns": 1,
       "settings": {

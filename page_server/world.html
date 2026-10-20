@@ -72,6 +72,12 @@
         border-color: var(--line-strong);
       }
 
+      /* The engine paints the current scene white on the accent, which lands at
+         2.8:1. Ink on the accent is 6.7:1 and still marks where you are. */
+      .sw-nav__item.is-active {
+        color: var(--bg);
+      }
+
       .sw-route__label {
         background: color-mix(in srgb, #000 78%, transparent);
         color: var(--ink);
@@ -99,7 +105,8 @@
         line-height: 1.65;
       }
 
-      .no-js h1 {
+      .no-js h1,
+      .no-js__title {
         font-size: 20px;
       }
 
@@ -139,7 +146,7 @@
 
     <noscript>
       <div class="no-js">
-        <h1>Juan Felipe Diaz Bustamante — web developer</h1>
+        <p class="no-js__title">Juan Felipe Diaz Bustamante — web developer</p>
         <p>
           The tour needs JavaScript to play. The five slide version has everything in it:
           <a href="/home">read the portfolio</a>.

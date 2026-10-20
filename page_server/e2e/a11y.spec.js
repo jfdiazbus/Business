@@ -12,7 +12,11 @@ const PAGES = [
   { path: "/home", name: "the portfolio" },
   { path: "/school", name: "the school page" },
   { path: "/services", name: "the prices" },
+  { path: "/terms", name: "the terms" },
   { path: "/thanks", name: "the thank you page" },
+  { path: "/login", name: "the login page" },
+  { path: "/register", name: "the register page" },
+  { path: "/blog", name: "the blog" },
 ];
 
 for (const { path, name } of PAGES) {
