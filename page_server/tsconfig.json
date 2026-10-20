@@ -1,0 +1,21 @@
+{
+  // The server and the pipeline scripts, checked without being rewritten:
+  // JavaScript stays JavaScript, and TypeScript reads the JSDoc that is already
+  // there. Null safety is on because that is where a file server breaks;
+  // `noImplicitAny` waits until the JSDoc annotations have caught up, so the
+  // check starts green instead of becoming a second job.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "types": ["node"],
+    "skipLibCheck": true
+  },
+  "include": ["index.js", "scripts/**/*.mjs"]
+}

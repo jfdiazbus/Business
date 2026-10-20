@@ -32,8 +32,70 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
+      - name: Lint
+        run: pnpm lint
+
+      - name: Dead code
+        run: pnpm knip
+
+      - name: Size budgets
+        run: pnpm size
+
+      - name: Types
+        run: pnpm types
+
       - name: Test
         run: pnpm test
 
       - name: Build the static site
         run: pnpm build
+
+  e2e:
+    name: Browser checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: page_server/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Accessibility and the scroll film
+        run: pnpm e2e
+
+  lighthouse:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: page_server/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the site Lighthouse will read
+        run: pnpm build
+
+      - name: Scores
+        run: pnpm lighthouse

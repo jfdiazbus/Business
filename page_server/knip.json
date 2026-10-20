@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "world/*.mjs",
+    "scripts/*.mjs",
+    "bar.js",
+    "world.js",
+    "account.js",
+    "blog.js",
+    "blog-write.js",
+    "test/**/*.test.js",
+    "e2e/**/*.spec.js"
+  ],
+  "project": ["**/*.{js,mjs}"],
+  "ignore": ["world/engine.js"],
+  "ignoreBinaries": ["ffmpeg"]
+}

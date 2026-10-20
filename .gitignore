@@ -30,3 +30,16 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 *.swp
+
+# checks
+coverage/
+page_server/coverage/
+page_server/.lighthouseci/
+page_server/test-results/
+page_server/playwright-report/
+page_server/blob-report/
+
+# python
+__pycache__/
+*.pyc
+.venv/

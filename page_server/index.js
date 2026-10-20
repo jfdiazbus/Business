@@ -130,25 +130,40 @@ export function buildMounts({ root = HERE, workspace = WORKSPACE } = {}) {
   ].sort((a, b) => b.prefix.length - a.prefix.length);
 }
 
+/**
+ * @param {string} encoded
+ * @returns {string | null} the decoded path, or null when it is not valid
+ */
+function decodePath(encoded) {
+  try {
+    return decodeURIComponent(encoded);
+  } catch {
+    return null;
+  }
+}
+
 // Turns a URL path into a file inside one of the mounts, or a redirect/error.
+/**
+ * @param {string} urlPath
+ * @param {{ mounts?: ReturnType<typeof buildMounts> }} [options]
+ * @returns {{ file: string } | { redirect: string } | { error: number } | null}
+ */
 export function locate(urlPath, { mounts = buildMounts() } = {}) {
   for (const mount of mounts) {
     if (!urlPath.startsWith(mount.prefix)) continue;
 
-    if (mount.file) {
+    if ("file" in mount && mount.file) {
       if (urlPath === mount.prefix) return { file: mount.file };
       continue;
     }
 
+    if (!("root" in mount) || !mount.root) continue;
+
     const rest = urlPath.slice(mount.prefix.length);
     if (rest === "" && mount.prefix !== "/") return { redirect: `${mount.prefix}/` };
 
-    let rel;
-    try {
-      rel = decodeURIComponent(rest);
-    } catch {
-      return { error: 400 };
-    }
+    const rel = decodePath(rest);
+    if (rel === null) return { error: 400 };
 
     const target = path.resolve(mount.root, rel.replace(/^\/+/, ""));
     // Refuse anything that climbs out of the folder it is mounted from.
@@ -163,7 +178,7 @@ function sendPage(res, status, html, extraHeaders = {}) {
   res.end(html);
 }
 
-function sendError(res, status, { heading, message, detail, headers = {} }) {
+function sendError(res, status, { heading, message, detail = "", headers = {} }) {
   sendPage(res, status, errorPageHtml({ heading, message, detail }), headers);
 }
 
@@ -257,6 +272,7 @@ export function createAppServer({
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ url: session.url }));
         } else {
+          if (!session.url) throw new Error("Stripe returned no checkout URL");
           res.writeHead(303, { Location: session.url });
           res.end();
         }
@@ -299,7 +315,7 @@ export function createAppServer({
         return;
       }
 
-      if (found.error === 400) {
+      if ("error" in found && found.error === 400) {
         sendError(res, 400, {
           heading: "That address doesn't look right.",
           message: "Some characters in the link couldn't be read.",
@@ -307,7 +323,7 @@ export function createAppServer({
         return;
       }
 
-      if (found.error === 403) {
+      if ("error" in found && found.error === 403) {
         sendError(res, 403, {
           heading: "That page is off limits.",
           message: "This server only shares the portfolio and the projects linked from it.",
@@ -316,9 +332,18 @@ export function createAppServer({
         return;
       }
 
-      if (found.redirect) {
+      if ("redirect" in found) {
         res.writeHead(301, { location: found.redirect });
         res.end();
+        return;
+      }
+
+      if (!("file" in found)) {
+        sendError(res, 500, {
+          heading: "Something went wrong on my side.",
+          message: "That address could not be resolved to a file.",
+          detail: urlPath,
+        });
         return;
       }
 
@@ -384,7 +409,7 @@ const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPat
 if (isMain) {
   const server = createAppServer();
 
-  server.on("error", (error) => {
+  server.on("error", (/** @type {NodeJS.ErrnoException} */ error) => {
     if (error.code === "EADDRINUSE") {
       console.error(`port ${DEFAULT_PORT} is already in use — try PORT=3001 pnpm start`);
       process.exit(1);

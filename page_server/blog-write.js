@@ -120,7 +120,7 @@ async function uploadFile(file, block, statusLine) {
   }
 }
 
-function renderMediaBlock(block, index) {
+function renderMediaBlock(block) {
   const media = node("div", "blog-media-editor");
   media.append(
     label(
@@ -225,7 +225,7 @@ function renderBlockEditor(block, index) {
     });
     card.append(label(block.type === "paragraph" ? "Paragraph text" : "Heading text", area));
   } else if (block.type === "image" || block.type === "video") {
-    card.append(renderMediaBlock(block, index));
+    card.append(renderMediaBlock(block));
   } else if (block.type === "columns") {
     const columns = node("div", "blog-columns-editor");
     block.columns.forEach((column, columnIndex) => {
@@ -409,7 +409,12 @@ async function save(status) {
   }
 }
 
-saveDraft.addEventListener("click", () => save("draft"));
+// Saving a draft is the form's submit action, so Enter in a field saves
+// rather than publishing. Publishing stays an explicit click.
+postForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  save("draft");
+});
 publishPost.addEventListener("click", () => save("published"));
 
 async function checkSession() {

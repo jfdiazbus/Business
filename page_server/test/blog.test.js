@@ -100,7 +100,7 @@ describe("the built blog routes", () => {
   it("adds the pages and their scripts to the static assets build", () => {
     const build = read("scripts/build.mjs");
     for (const file of ["blog-shell.html", "blog-editor.html", "blog.js", "blog-write.js"]) {
-      expect(build).toContain(`\"${file}\"`);
+      expect(build).toContain(`"${file}"`);
     }
     expect(read("index.js")).toContain('"/blog": "blog.html"');
     expect(read("index.js")).toContain('"/blog/write": "blog-write.html"');

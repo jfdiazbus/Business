@@ -9,11 +9,11 @@
 //   node motion.mjs preview    a few stills per scene, for looking at
 
 import { execFile } from "node:child_process";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PNG_DIR, SVG_DIR, shoot } from "./render.mjs";
-import { LAYER_H, LAYER_W, SCENES } from "./scenes.mjs";
+import { SCENES } from "./scenes.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
@@ -46,7 +46,8 @@ function run(args) {
   });
 }
 
-const D = (t) => `${CAM.travel}*t/${CAM.seconds}`;
+/** ffmpeg's own clock, written as a formula the filter graph can read. */
+const D = () => `${CAM.travel}*t/${CAM.seconds}`;
 
 /**
  * The filter graph for one dive: build a transparent frame, then slide each
@@ -69,7 +70,7 @@ function diveGraph(layers) {
     const driftFactor = (1 + layer.speed).toFixed(4);
     const label = index === layers.length - 1 ? "film" : `o${index}`;
     parts.push(
-      `[${previous}][l${index}]overlay=x=${-CAM.x0}:y='-(${CAM.y0}+${D("t")}*${driftFactor})':format=rgb:eval=frame[${label}]`,
+      `[${previous}][l${index}]overlay=x=${-CAM.x0}:y='-(${CAM.y0}+${D()}*${driftFactor})':format=rgb:eval=frame[${label}]`,
     );
     if (label !== "film") parts.push(`[${label}]format=rgba[o${index}r]`);
     previous = label === "film" ? "film" : `o${index}r`;

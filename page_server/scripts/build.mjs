@@ -80,8 +80,10 @@ export const HEADERS = `/projects/*/assets/*
 
 const skipDotFiles = (src) => !src.split(path.sep).some((segment) => segment.startsWith("."));
 
-/** The scroll world's film, posters and the engine that plays them. */
-export async function copyWorld({ outDir, source = path.join(PROJECT_ROOT, "world") } = {}) {
+/** The scroll world's film, posters and the engine that plays them.
+ * @param {{ outDir: string, source?: string }} options
+ */
+export async function copyWorld({ outDir, source = path.join(PROJECT_ROOT, "world") }) {
   const target = path.join(outDir, "world");
   await mkdir(target, { recursive: true });
 

@@ -3,6 +3,7 @@
 // node_modules out of it.
 
 import { describe, expect, it } from "vitest";
+import { execFileSync } from "node:child_process";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -24,7 +25,30 @@ describe("the project", () => {
     // Stripe Checkout needs the Stripe SDK at runtime; everything else stays zero-deps
     expect(pkg.dependencies ?? {}).toEqual({ stripe: expect.any(String) });
     expect(Object.keys(pkg.devDependencies).sort()).toEqual(
-      ["jsdom", "prettier", "vitest", "wrangler"].sort(),
+      [
+        "@axe-core/playwright",
+        "@eslint/js",
+        "@lhci/cli",
+        "@playwright/test",
+        "@size-limit/file",
+        "@types/node",
+        "@vitest/coverage-v8",
+        "cspell",
+        "eslint",
+        "eslint-config-prettier",
+        "globals",
+        "html-validate",
+        "jsdom",
+        "knip",
+        "markdownlint-cli2",
+        "prettier",
+        "size-limit",
+        "stylelint",
+        "stylelint-config-recommended",
+        "typescript",
+        "vitest",
+        "wrangler",
+      ].sort(),
     );
   });
 
@@ -96,6 +120,14 @@ describe("the project", () => {
 
     expect(ignore).toContain("node_modules");
     expect(ignore).toContain("dist");
+  });
+
+  it("tracks nothing from node_modules", () => {
+    // The ignore file only covers untracked files. If anyone re-adds the
+    // folder with `git add -f`, this is what catches it before it lands.
+    const tracked = execFileSync("git", ["ls-files"], { cwd: REPO_ROOT, encoding: "utf8" });
+
+    expect(tracked).not.toMatch(/node_modules/);
   });
 
   it("lets Cloudflare build the site, keeping CI to tests", async () => {

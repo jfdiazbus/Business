@@ -460,7 +460,7 @@ async function readJson(request) {
 
 function postFromRow(row) {
   if (!row) return null;
-  let blocks = [];
+  let blocks;
   try {
     blocks = JSON.parse(row.blocks_json || "[]");
   } catch {

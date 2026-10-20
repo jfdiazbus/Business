@@ -66,6 +66,9 @@ export function wranglerEnv(secrets, env = process.env) {
 }
 
 /** Hands the built folder to wrangler, inheriting our terminal and logs. */
+/**
+ * @param {{ args?: string[], env?: NodeJS.ProcessEnv }} [options]
+ */
 export function upload({ args = [], env = process.env } = {}) {
   return new Promise((resolve) => {
     const child = spawn(process.execPath, [wranglerEntry(), "deploy", ...args], {

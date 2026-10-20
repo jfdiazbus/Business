@@ -2,6 +2,10 @@ node_modules
 dist
 pnpm-lock.yaml
 .agents
-
-# the film's render scratch: generated, and not committed
+coverage
+.lighthouseci
+test-results
+playwright-report
 world/build
+world/out
+.venv

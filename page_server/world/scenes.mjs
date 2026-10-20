@@ -30,7 +30,6 @@ import {
   shelfBoard,
   shelfSheet,
   spool,
-  sprocketEdge,
 } from "./kit.mjs";
 
 export const LAYER_W = 4600;

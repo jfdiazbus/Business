@@ -84,11 +84,11 @@
                 <input type="hidden" name="id" />
                 <div class="blog-field">
                   <label for="post-title">Title</label>
-                  <input id="post-title" name="title" maxlength="140" required />
+                  <input id="post-title" name="title" type="text" maxlength="140" required />
                 </div>
                 <div class="blog-field">
                   <label for="post-slug">Address</label>
-                  <input id="post-slug" name="slug" maxlength="80" required />
+                  <input id="post-slug" name="slug" type="text" maxlength="80" required />
                   <small
                     >Letters, numbers and hyphens. The post will live at /blog/your-address.</small
                   >
@@ -117,8 +117,8 @@
                       Add text, headings, images, video or a two column section.
                     </p>
                   </div>
-                  <label class="blog-add-control">
-                    <span class="sr-only">Section type</span>
+                  <div class="blog-add-control">
+                    <label class="sr-only" for="new-block-type">Section type</label>
                     <select id="new-block-type">
                       <option value="paragraph">Paragraph</option>
                       <option value="heading">Heading</option>
@@ -127,12 +127,12 @@
                       <option value="columns">Two columns</option>
                     </select>
                     <button class="btn btn--ghost" id="add-block" type="button">Add section</button>
-                  </label>
+                  </div>
                 </div>
                 <div id="block-list" class="blog-block-list"></div>
 
                 <div class="blog-save-row">
-                  <button class="btn btn--ghost" id="save-draft" type="button">Save draft</button>
+                  <button class="btn btn--ghost" id="save-draft" type="submit">Save draft</button>
                   <button class="btn btn--primary" id="publish-post" type="button">Publish</button>
                   <a class="blog-preview-link" id="preview-post" href="/blog">View post</a>
                 </div>

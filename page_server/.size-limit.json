@@ -1,0 +1,22 @@
+[
+  {
+    "name": "stylesheet",
+    "path": "style.css",
+    "limit": "30 kB"
+  },
+  {
+    "name": "page scripts",
+    "path": ["bar.js", "world.js", "account.js", "blog.js", "blog-write.js"],
+    "limit": "40 kB"
+  },
+  {
+    "name": "scroll engine",
+    "path": "world/engine.js",
+    "limit": "40 kB"
+  },
+  {
+    "name": "film",
+    "path": "world/out/*.mp4",
+    "limit": "15 MB"
+  }
+]

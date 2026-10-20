@@ -1,0 +1,7 @@
+{
+  "ignores": ["node_modules", "dist", ".agents", "coverage", "STRIPE_INTEGRATION_TODO.md"],
+  "config": {
+    "MD013": false,
+    "MD033": false,
+  },
+}
