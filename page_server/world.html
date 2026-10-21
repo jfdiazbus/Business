@@ -128,6 +128,13 @@
         max-width: 36ch;
         text-wrap: pretty;
       }
+
+      /* The engine hardcodes white text for its primary button. On this dark
+         theme the button itself is white, so the label takes the page colour. */
+      .sw-btn--primary,
+      .sw-topcta {
+        color: var(--sw-bg);
+      }
     </style>
   </head>
   <body>
@@ -146,7 +153,12 @@
         </p>
         <p>
           Or email me at
-          <a href="mailto:jfdiazbus@gmail.com">jfdiazbus@gmail.com</a>.
+          <a
+            href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=jfdiazbus%40gmail.com"
+            target="_blank"
+            rel="noopener"
+            >jfdiazbus@gmail.com</a
+          >.
         </p>
       </div>
     </noscript>

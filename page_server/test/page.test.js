@@ -126,7 +126,7 @@ describe("the portfolio page", () => {
   it("leaves one way to get in touch, and one way to the prices", () => {
     const contact = section("contact");
 
-    expect(contact.querySelector('a[href^="mailto:"]')).toBeTruthy();
+    expect(contact.querySelector('a[href^="https://mail.google.com/mail/"]')).toBeTruthy();
     expect(contact.querySelector('a[href="/services"]')).toBeTruthy();
     expect(contact.querySelectorAll(".leader").length).toBeGreaterThanOrEqual(4);
     expect(text(contact)).toContain("linkedin");
