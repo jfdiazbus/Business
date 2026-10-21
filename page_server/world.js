@@ -114,8 +114,30 @@ export function sceneStep({ key = null, delta = 0, index, count }) {
   return to === index ? null : to;
 }
 
+/**
+ * The vendored engine writes only an href on its action links. Send external
+ * actions to a new tab, with noopener, the same way every other contact link
+ * on the site behaves; internal links keep the current tab.
+ */
+export function openExternalActions(root, origin) {
+  for (const link of root.querySelectorAll(
+    '.sw-copy__cta a[href^="http"], .sw-topcta[href^="http"]',
+  )) {
+    let url;
+    try {
+      url = new URL(link.href, origin);
+    } catch {
+      continue;
+    }
+    if (url.origin === origin) continue;
+    link.target = "_blank";
+    link.rel = "noopener";
+  }
+}
+
 if (typeof document !== "undefined" && typeof mountScrollWorld === "function") {
   mountScrollWorld(document.getElementById("world"), world);
+  openExternalActions(document, location.origin);
 
   // The engine already renders a route dot per scene and its own jumpTo(), so
   // the gesture layer just presses the right dot: one source of layout maths.
