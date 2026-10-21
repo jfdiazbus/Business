@@ -8,7 +8,7 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
-import { sceneStep, world } from "../world.js";
+import { openExternalActions, sceneStep, world } from "../world.js";
 
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(PROJECT_ROOT, "world", "out");
@@ -265,6 +265,23 @@ describe("the world page", () => {
   it("keeps the primary button readable on the dark sheet", () => {
     // the engine hardcodes white text, and the button itself is white here
     expect(html).toMatch(/\.sw-btn--primary[\s\S]*?color:\s*var\(--sw-bg\)/);
+  });
+
+  it("opens the contact email in a new tab, without handing over the opener", () => {
+    const dom = new JSDOM(`
+      <div class="sw-copy__cta">
+        <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=jfdiazbus%40gmail.com">Email me</a>
+        <a href="/services">See services</a>
+      </div>
+    `);
+
+    openExternalActions(dom.window.document, "https://portfolio.example");
+
+    const [email, services] = dom.window.document.querySelectorAll("a");
+    expect(email.target).toBe("_blank");
+    expect(email.rel).toBe("noopener");
+    expect(services.getAttribute("target")).toBeNull();
+    expect(services.getAttribute("rel")).toBeNull();
   });
 });
 
