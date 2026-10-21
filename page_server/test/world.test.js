@@ -227,7 +227,7 @@ describe("one gesture, one scene", () => {
 describe("the world page", () => {
   it("describes itself", () => {
     expect(document.documentElement.getAttribute("lang")).toBe("en");
-    expect(document.title).toContain("print shop");
+    expect(document.title).toBe("Portfolio - Juan Felipe Diaz");
     expect(document.querySelector('meta[name="description"]')?.content.length).toBeGreaterThan(40);
     expect(document.querySelector('meta[property="og:title"]')).toBeTruthy();
     expect(document.querySelector('link[rel="icon"]')).toBeTruthy();
