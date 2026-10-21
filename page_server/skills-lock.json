@@ -76,11 +76,9 @@
       "wellKnownDigest": "sha256:c72547202781ed7635dfe412eb2f5db7e045310fea055df19e6137f9fcd78424"
     },
     "stripe-best-practices": {
-      "source": "docs.stripe.com",
-      "sourceUrl": "https://docs.stripe.com",
-      "sourceType": "well-known",
-      "computedHash": "4e34f2e8ac99058e7f89326cdab4b86da762eeff1a4c25529c6224b65a4aa1a4",
-      "wellKnownDigest": "sha256:15065ba81698cd5dae6ca556e0858535f4149c5f30845e7c8ce1c254a53c0e6b"
+      "source": "stripe/ai",
+      "sourceType": "autoskills-registry",
+      "computedHash": "82055cb92946b6861434c220a7869d79b3e473b65c2c8738e2a67e6e7b3375f8"
     },
     "stripe-directory": {
       "source": "docs.stripe.com",
@@ -111,11 +109,9 @@
       "wellKnownDigest": "sha256:f50bdb39096e80876612dd824ebe22ae6a44867039098021848bda3c9ae3bf5d"
     },
     "upgrade-stripe": {
-      "source": "docs.stripe.com",
-      "sourceUrl": "https://docs.stripe.com",
-      "sourceType": "well-known",
-      "computedHash": "9df37facf3dbdd5735cb26ec2c71a8416392f3e9b86343b46c28891d75c0e0ac",
-      "wellKnownDigest": "sha256:3fe6b9457648524eaee3dec06406f902de5b336b7cf84f836544d72567da5090"
+      "source": "stripe/ai",
+      "sourceType": "autoskills-registry",
+      "computedHash": "e6adafe947fb33ab2e328f09106caa66d4985167d4532c9a31a817daaf8f27a5"
     },
     "vitest": {
       "source": "antfu/skills",
