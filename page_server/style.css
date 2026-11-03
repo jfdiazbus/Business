@@ -1,19 +1,9 @@
-/* page_server — a dark, flat, type-led portfolio.
- *
- * One typeface for the interface (Geist) plus a monospace for prices, numbers
- * and anything that is data, flat surfaces, hairlines instead of boxes, and one
- * red accent. No gradients in backgrounds, no shadows on cards, no decoration
- * that is not doing a job.
- *
- * Every colour pair below is checked against WCAG AA on --bg: --ink is 19.7:1,
- * --ink-soft is 7.8:1, --accent is 7.0:1. --ink-faint is 4.1:1 and is only ever
- * used for non-text marks like hairline dots.
- */
+/* An open, sky blue identity for independent work and ideas. */
 
 :root {
   /* surfaces */
-  --bg: #0a0a0a;
-  --surface: #141414;
+  --bg: #000000;
+  --surface: #181818;
   --surface-2: #1f1f1f;
   --line: rgba(255, 255, 255, 0.08);
   --line-strong: rgba(255, 255, 255, 0.16);
@@ -23,9 +13,9 @@
   --ink-soft: #a3a3a3;
   --ink-faint: #737373;
 
-  /* the one accent, lightened so it stays legible on near black */
-  --accent: #ff6b5a;
-  --accent-deep: #b03024;
+  /* Sky blue keeps links and controls clear against dark surfaces. */
+  --accent: #8bd5ff;
+  --accent-deep: #21658c;
 
   /* type: one step per Tailwind step, so nothing is invented ad hoc */
   --fs-xs: 12px;
@@ -60,7 +50,7 @@
 
   --measure: 68ch;
   --page-max: 1120px;
-  --page-pad: clamp(20px, 5vw, 64px);
+  --page-pad: clamp(24px, 5vw, 64px);
   --bar-h: 72px;
 
   /* motion: mass and spring, never a default ease */
@@ -248,12 +238,12 @@ a:focus-visible {
 }
 
 /* the page (or slide) you are looking at */
-.topbar nav a[aria-current="true"] {
+.topbar nav a[aria-current] {
   color: var(--ink);
   font-weight: 500;
 }
 
-.topbar nav a[aria-current="true"]::after {
+.topbar nav a[aria-current]::after {
   content: "";
   display: block;
   height: 2px;
@@ -1618,4 +1608,87 @@ footer .links a:focus-visible {
   .offers caption {
     color: #000;
   }
+}
+
+/* Freedom is room to read, build and follow your own direction. */
+.freedom-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 240px);
+  align-items: center;
+  gap: var(--sp-600);
+  padding-top: calc(var(--bar-h) + var(--sp-700));
+  padding-bottom: var(--sp-600);
+}
+.freedom-intro .page-title {
+  padding-top: 0;
+  max-width: 680px;
+  background: linear-gradient(to right, #ffffff, #9b9b9b);
+  background-clip: text;
+  color: transparent;
+}
+.freedom-intro .lede {
+  max-width: 680px;
+}
+.freedom-mark {
+  width: 100%;
+  color: var(--accent);
+}
+.freedom-note {
+  max-width: 680px;
+  margin: var(--sp-600) 0;
+  font-size: var(--fs-3xl);
+  line-height: 1.2;
+  font-weight: 500;
+}
+.blog-introduction {
+  max-width: var(--measure);
+  color: var(--ink-soft);
+}
+.blog-list {
+  gap: var(--sp-400);
+}
+.blog-card {
+  border-radius: var(--r-lg);
+}
+.blog-card-title {
+  overflow-wrap: anywhere;
+}
+.blog-article-content {
+  overflow-wrap: anywhere;
+}
+.btn--primary {
+  background: var(--accent);
+}
+.btn--primary:hover {
+  background: #bce7ff;
+}
+@media (max-width: 767px) {
+  .freedom-intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-300);
+  }
+  .freedom-mark {
+    width: 160px;
+    justify-self: end;
+  }
+  .freedom-note {
+    font-size: var(--fs-2xl);
+    line-height: 1.333333;
+  }
+}
+@media print {
+  .freedom-intro .page-title {
+    background: none;
+    color: inherit;
+  }
+  .freedom-mark {
+    display: none;
+  }
+}
+
+.freedom-intro--article {
+  grid-template-columns: minmax(0, 1fr);
+}
+.freedom-mark[hidden] {
+  display: none;
 }
