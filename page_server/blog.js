@@ -109,6 +109,10 @@ function renderPost(post) {
   document.querySelector('meta[property="og:description"]').content = post.excerpt || post.title;
   document.querySelector("h1.page-title").textContent = post.title;
 
+  document.querySelector(".freedom-intro")?.classList.add("freedom-intro--article");
+  document.querySelector(".blog-introduction")?.setAttribute("hidden", "");
+  document.querySelector(".freedom-mark")?.setAttribute("hidden", "");
+
   const article = element("article", "blog-article");
   const date = element("p", "blog-date", dateLabel(post.published_at));
   article.append(date);

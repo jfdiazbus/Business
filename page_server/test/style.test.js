@@ -238,7 +238,9 @@ describe("the design tokens", () => {
   });
 
   it("keeps backgrounds flat and type upright", () => {
-    expect(css).not.toMatch(/background[^;{}]*gradient/i);
+    // A gradient clipped to heading glyphs is text; surface fills remain flat.
+    const surfaces = css.replace(/background: linear-gradient[^;]+;\s*background-clip: text;/g, "");
+    expect(surfaces).not.toMatch(/background[^;{}]*gradient/i);
     expect(css).not.toContain("font-style: italic");
     expect(css).not.toMatch(/font-weight:\s*(800|900)/);
   });
